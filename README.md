@@ -4,16 +4,15 @@ R code used in the study "No evidence of a change in genetic influence on social
 Sample preparation (ancestry filtering, relatedness) was accomplished as in https://github.com/ivkuz/GeneticMigrationStructureEstonia.
 
 
-Find a short description of what each of the scripts from the "R_code" directory does below:
+Find a short description of what each of the scripts from the "scripts" directory does below:
 
 
-        plot_h2_main.R -  Fig. 1 (cutoff 15), SF4 (cutoff 10) and SF 5 (GCTA and binary EA):
-                          Heritability in the post-Soviet and Soviet groups and the groups additionally divided by the wave of participation
+        figures_h2_2_3_4.R generates fragments of Fig. 2 and 3, and Fig. 4; figures_h2_S1_S2 generates Supplementary Fig. 1 and 2: Heritability in the post-Soviet and Soviet groups and the groups additionally divided by the wave of participation
                           
-        plot_h2_origSample - SF1: Heritability in the post-Soviet and Soviet groups in the original sample
+        figures_h2_decades_2_3_S3.R generates fragments of Fig. 2 and 3, and Supplementary Fig. 3: Heritability across decade-long birth year cohorts 
         
-        plot_h2_decades - Fig. 4 and SF 8: Variance explained by PGS in the birth cohorts by half-decade
-
+        plot_h2_origSample generates Supplementary Figure 13: Heritability in the post-Soviet and Soviet groups in the original sample
+        
 
         pgsR2.R - All the calculations with R2:
                   1. Prepare the data for the analysis 
@@ -23,15 +22,17 @@ Find a short description of what each of the scripts from the "R_code" directory
                   5. Original sample 
 
 
-        plot_R2_main.R - Plot Fig. 3 and SF 7: Trait variance explained by PGS in the post-Soviet and Soviet groups
+        figure_R2_5.R generates Fig. 5; figures_R2_S4_S7.R generates Supplementary Fig. 4 and 7: Trait variance explained by PGS in the post-Soviet and Soviet groups
         
-        plot_R2_origSample.R -SF3: Variance explained by PGS in the post-Soviet and Soviet groups in the original sample
+        figures_R2_decades_5_S5_S6.R generates a fragment of Fig. 5,  Supplementary Fig. 5 and 6: Variance explained by PGS in the birth cohorts by half-decade 
         
-        plot_R2_decades.R - Fig. 2  and SF 6: Heritability across different birth year cohorts 
+        plot_R2_origSample.R generates Supplementary Fig. 14 and 15: Variance explained by PGS in the post-Soviet and Soviet groups in the original sample
 
 
-        plot R2_matching.R - Fig. 5 and SF 9:
-                            Variance of EA explained by PGSEA in subsamples from the groups (defined by wave participation and era) 
+        plot R2_matching.R generates Fig. 6 and Supplementary Fig. 8: Variance of EA explained by PGSEA in subsamples from the groups (defined by wave participation and era) 
                             selected based on the distribution of EA in another subcohort
 
-        plot_R2_weighting.R - Fig. 6: Trait variance explained by PGS in weighted subsamples 
+        plot_R2_weighting.R generates Fig. 7: Trait variance explained by PGS in weighted subsamples
+
+
+        regressionInteractions.R analyses GxE through linear regression, generates Fig. 8 and Supplementary Fig. 9-11
