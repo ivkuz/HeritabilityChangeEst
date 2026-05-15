@@ -111,6 +111,10 @@ compareR2 <- function(r2_res, bootstrap){
 
 
 # files with R2 values and bootstrap results
+# r2_res_v <- c("r2_adj_EduYears.tsv", "r2_adj_OS.tsv", 
+#               "r2_adj_Height_first.tsv", "r2_adj_BMI_first.tsv")
+# bootstrap_v <- c("r2_adj_EduYears_1000.tsv", "r2_adj_OS_1000.tsv", 
+#                  "r2_adj_Height_first_1000.tsv", "r2_adj_BMI_first_1000.tsv")
 r2_res_v <- c("r2_adj_EduYears.tsv", "r2_adj_OS.tsv", 
               "r2_adj_Height_first.tsv", "r2_adj_BMI_first.tsv")
 bootstrap_v <- c("r2_adj_EduYears_1000.tsv", "r2_adj_OS_1000.tsv", 
@@ -131,8 +135,11 @@ for(i in 1:4){
   r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
   bootstrap <- fread(paste0("~/EA_heritability/results/revision/", bootstrap_v[i]))
   plot_list_inc <- append(plot_list_inc, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
-                                                r2_var = "r2_inc", title = titles[i], 
-                                                lim = lim_list_inc[i], step = steps[i]))
+                                                r2_var = "r2_inc", title = titles[i],
+                                                step = 0.01
+  ))
+                                                # , 
+                                                # lim = lim_list_inc[i], step = steps[i]))
   plot_list <- append(plot_list, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
                                         r2_var = "r2", title = titles[i], 
                                         lim = lim_list[i], step = steps[i]))
@@ -144,33 +151,33 @@ for(i in 1:4){
 pval_dt <- as.data.table(pval_dt)
 pval_dt[, trait := rep(titles, each = 2)]
 
-plot_list_inc[[1]] <- plot_list_inc[[1]] + 
-  geom_signif(comparisons=list(c("S", "PS")),
-              annotations = "p<0.002",
-              textsize=3, size=0.5, vjust = -0.3,
-              y_position = 0.107, tip_length = c(2, 1.7),
-              step_increase = 0.3)
-
-plot_list_inc[[2]] <- plot_list_inc[[2]] + 
-  geom_signif(comparisons=list(c("p1S", "p2S")),
-              annotations = "p=0.034",
-              textsize=3, size=0.5, vjust = -0.3,
-              y_position = 0.107, tip_length = c(0.8, 0.65),
-              step_increase = 0.3)
-
-plot_list_inc[[3]] <- plot_list_inc[[3]] + 
-  geom_signif(comparisons=list(c("S", "PS")),
-              annotations = "p=0.25",
-              textsize=3, size=0.5, vjust = -0.3,
-              y_position = 0.095, tip_length = c(4.7, 5),
-              step_increase = 0.3)
-
-plot_list_inc[[4]] <- plot_list_inc[[4]] + 
-  geom_signif(comparisons=list(c("p1S", "p1PS"), c("p1S", "p2S")),
-              annotations = c("p<0.002", "p<0.002"),
-              textsize=3, size=0.5, vjust = -0.3,
-              y_position = 0.093, tip_length = c(0.03, 0.84, 0.15, 1.08),
-              step_increase = 0.23)
+# plot_list_inc[[1]] <- plot_list_inc[[1]] + 
+#   geom_signif(comparisons=list(c("S", "PS")),
+#               annotations = "p<0.002",
+#               textsize=3, size=0.5, vjust = -0.3,
+#               y_position = 0.107, tip_length = c(2, 1.7),
+#               step_increase = 0.3)
+# 
+# plot_list_inc[[2]] <- plot_list_inc[[2]] + 
+#   geom_signif(comparisons=list(c("p1S", "p2S")),
+#               annotations = "p=0.034",
+#               textsize=3, size=0.5, vjust = -0.3,
+#               y_position = 0.107, tip_length = c(0.8, 0.65),
+#               step_increase = 0.3)
+# 
+# plot_list_inc[[3]] <- plot_list_inc[[3]] + 
+#   geom_signif(comparisons=list(c("S", "PS")),
+#               annotations = "p=0.25",
+#               textsize=3, size=0.5, vjust = -0.3,
+#               y_position = 0.095, tip_length = c(4.7, 5),
+#               step_increase = 0.3)
+# 
+# plot_list_inc[[4]] <- plot_list_inc[[4]] + 
+#   geom_signif(comparisons=list(c("p1S", "p1PS"), c("p1S", "p2S")),
+#               annotations = c("p<0.002", "p<0.002"),
+#               textsize=3, size=0.5, vjust = -0.3,
+#               y_position = 0.093, tip_length = c(0.03, 0.84, 0.15, 1.08),
+#               step_increase = 0.23)
 
 
 saveRDS(plot_list_inc[1:4], "~/EA_heritability/figures/paper/revision/files_for_figures/fig5abde.rds")

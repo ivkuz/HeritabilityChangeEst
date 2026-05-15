@@ -108,22 +108,29 @@ compareR2 <- function(r2_res, bootstrap){
 }
 
 
-r2_res_v <- c("r2_adj_EA_p_years_15y.tsv", "r2_adj_OS_15y.tsv", 
-              "r2_adj_log_Height_first_ukbb.tsv", "r2_adj_log_BMI_first_ukbb.tsv")
-bootstrap_v <- c("r2_adj_EA_p_years_1000.tsv", "r2_adj_OS_OS_15y_1000.tsv", 
-                 "r2_adj_log_Height_first_1000_ukbb.tsv", "r2_adj_log_BMI_first_1000_ukbb.tsv")
+# r2_res_v <- c("r2_adj_EA_p_years_15y.tsv", "r2_adj_OS_15y.tsv", 
+#               "r2_adj_log_Height_first_ukbb.tsv", "r2_adj_log_BMI_first_ukbb.tsv")
+# bootstrap_v <- c("r2_adj_EA_p_years_1000.tsv", "r2_adj_OS_OS_15y_1000.tsv", 
+#                  "r2_adj_log_Height_first_1000_ukbb.tsv", "r2_adj_log_BMI_first_1000_ukbb.tsv")
+r2_res_v <- c("r2_adj_EduYears.tsv", "r2_adj_OS.tsv", 
+              "r2_adj_Height_first.tsv", "r2_adj_BMI_first.tsv")
+bootstrap_v <- c("r2_adj_EduYears_1000.tsv", "r2_adj_OS_1000.tsv", 
+                 "r2_adj_Height_first_1000.tsv", "r2_adj_BMI_first_1000.tsv")
 titles <- c("EA", "OS", "Height", "BMI")
-lim_list_inc <- c(0.105, 0.10, 0.15, 0.13)
-lim_list <- c(0.11, 0.10, 0.32, 0.13)
-steps = c(0.05, 0.05, 0.1, 0.05)
+# lim_list_inc <- c(0.105, 0.10, 0.15, 0.13)
+# lim_list <- c(0.11, 0.10, 0.32, 0.13)
+# steps = c(0.05, 0.05, 0.1, 0.05)
+lim_list_inc <- c(0.16, 0.135, 0.20, 0.15)
+lim_list <- c(0.165, 0.135, 0.42, 0.15)
+steps = c(0.05, 0.04, 0.1, 0.05)
 
 plot_list_inc <- list()
 plot_list <- list()
 pval_dt <- data.table()
 for(i in 1:4){
   
-  r2_res <- fread(paste0("~/EA_heritability/results/", r2_res_v[i]))
-  bootstrap <- fread(paste0("~/EA_heritability/results/", bootstrap_v[i]))
+  r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
+  bootstrap <- fread(paste0("~/EA_heritability/results/revision/", bootstrap_v[i]))
   plot_list_inc <- append(plot_list_inc, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
                                                 r2_var = "r2_inc", title = titles[i], 
                                                 lim = lim_list_inc[i], step = 0.05))
@@ -136,10 +143,10 @@ for(i in 1:4){
 
 pval_dt <- as.data.table(pval_dt)
 pval_dt[, trait := rep(titles, each = 2)]
-write.table(pval_dt, "~/EA_heritability/figures/paper/r2_pval.tsv",
+write.table(pval_dt, "~/EA_heritability/figures/paper/revision/r2_pval.tsv",
             row.names = F, quote = F, sep = "\t")
 
-pdf("~/EA_heritability/figures/paper/r2_main.pdf", width=5.5, height=6)
+pdf("~/EA_heritability/figures/paper/revision/r2_main.pdf", width=5.5, height=6)
 print(
   grid.arrange(
     grobs = plot_list_inc,
@@ -179,7 +186,7 @@ grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
 dev.off()
 
 # Supplementary Fig. 7
-pdf("~/EA_heritability/figures/paper/r2_suppl_incr.pdf", width=5.5, height=3)
+pdf("~/EA_heritability/figures/paper/revision/r2_suppl_incr.pdf", width=5.5, height=3)
 print(
   grid.arrange(
     grobs = plot_list_inc[5:8],
