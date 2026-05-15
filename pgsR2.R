@@ -249,51 +249,15 @@ colnames(prs) <- c("vkood", "PRS_BMI_orig")
 ebb <- merge(ebb, prs)
 
 pgi_ea <-  fread("/gpfs/space/GI/GV/Projects/PGI_repository_v2/SSGAC_PGI_Repository_v2_EstBB.txt", 
-                 select = c("IID", "PGI_EA", "PGI_EA_proband", "PGI_EA_paternal", "PGI_EA_maternal",
-                            "PGI_HEIGHT", "PGI_HEIGHT_proband", "PGI_HEIGHT_paternal", "PGI_HEIGHT_maternal",
-                            "PGI_BMI", "PGI_BMI_proband", "PGI_BMI_paternal", "PGI_BMI_maternal"))
+                 # select = c("IID", "FATHER_ID", "MOTHER_ID", "PGI_EA", "PGI_EA_proband", "PGI_EA_paternal", "PGI_EA_maternal",
+                 #            "PGI_HEIGHT", "PGI_HEIGHT_proband", "PGI_HEIGHT_paternal", "PGI_HEIGHT_maternal",
+                 #            "PGI_BMI", "PGI_BMI_proband", "PGI_BMI_paternal", "PGI_BMI_maternal"))
+                 select = c("IID", "FATHER_ID", "MOTHER_ID", "PGI_EA", "PGI_HEIGHT", "PGI_BMI"))
 colnames(pgi_ea)[1] <- "vkood"
 ebb <- merge(ebb, pgi_ea)
 
 
 
-lm0_EA <- lm(paste0("EduYears ~ Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-lm1_EA <- lm(paste0("EduYears ~ PRS_EA_orig + Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-lm2_EA <- lm(paste0("EduYears ~ PGI_EA + Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-lm3_EA <- lm(paste0("EduYears ~ PGI_EA_proband + Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-summary(lm1_EA)$r.squared - summary(lm0_EA)$r.squared
-summary(lm2_EA)$r.squared - summary(lm0_EA)$r.squared
-summary(lm3_EA)$r.squared - summary(lm0_EA)$r.squared
-
-lm_height_sex <- lm("Height_last ~ Sex", data = ebb)
-ebb[, Height_adj := Height_last - predict(object = lm_height_sex, newdata = ebb)]
-
-lm0_HEIGHT <- lm(paste0("Height_last ~ Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-lm1_HEIGHT <- lm(paste0("Height_last ~ PRS_HEIGHT_orig + Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-lm2_HEIGHT <- lm(paste0("Height_last ~ PGI_HEIGHT + Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-lm3_HEIGHT <- lm(paste0("Height_last ~ PGI_HEIGHT_proband + Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-summary(lm1_HEIGHT)$r.squared - summary(lm0_HEIGHT)$r.squared
-summary(lm2_HEIGHT)$r.squared - summary(lm0_HEIGHT)$r.squared
-summary(lm3_HEIGHT)$r.squared - summary(lm0_HEIGHT)$r.squared
-
-lm0_HEIGHT_adj <- lm(paste0("Height_adj ~ Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-lm1_HEIGHT_adj <- lm(paste0("Height_adj ~ PRS_HEIGHT_orig + Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-lm2_HEIGHT_adj <- lm(paste0("Height_adj ~ PGI_HEIGHT + Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-lm3_HEIGHT_adj <- lm(paste0("Height_adj ~ PGI_HEIGHT_proband + Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-summary(lm1_HEIGHT_adj)$r.squared - summary(lm0_HEIGHT_adj)$r.squared
-summary(lm2_HEIGHT_adj)$r.squared - summary(lm0_HEIGHT_adj)$r.squared
-summary(lm3_HEIGHT_adj)$r.squared - summary(lm0_HEIGHT_adj)$r.squared
-
-
-lm0_BMI <- lm(paste0("BMI_last ~ Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-lm1_BMI <- lm(paste0("BMI_last ~ PRS_BMI_orig + Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-lm2_BMI <- lm(paste0("BMI_last ~ PGI_BMI + Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-lm3_BMI <- lm(paste0("BMI_last ~ PGI_BMI_proband + Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")), data = ebb)
-summary(lm1_BMI)$r.squared - summary(lm0_BMI)$r.squared
-summary(lm2_BMI)$r.squared - summary(lm0_BMI)$r.squared
-summary(lm3_BMI)$r.squared - summary(lm0_BMI)$r.squared
-
-cor(ebb$PGI_HEIGHT_proband, ebb$PGI_HEIGHT, use = "complete.obs")
 
 # Upload the list of unrelated individuals for each group on Era and Participation Wave
 ind_list <- getIndepInd(cutoff = 15)
@@ -433,21 +397,27 @@ analyzeR2 <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA
 
 
 # Аunction for transmitted-untransmitted R2 analysis
-analyzeR2_family <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA_heritability/results/revision/"){
+analyzeR2_untransmitted <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA_heritability/results/revision/"){
   
   # Format analysed data
   colnames(ebb_test)[which(colnames(ebb_test)==pheno)] <- "Trait"
   colnames(ebb_test)[which(colnames(ebb_test)==age)] <- "Age"
-  colnames(ebb_test)[which(colnames(ebb_test)==paste0(prs, "_proband"))] <- "PRS_proband"
-  colnames(ebb_test)[which(colnames(ebb_test)==paste0(prs, "_paternal"))] <- "PRS_paternal"
-  colnames(ebb_test)[which(colnames(ebb_test)==paste0(prs, "_maternal"))] <- "PRS_maternal"
+  colnames(ebb_test)[which(colnames(ebb_test)==prs)] <- "PRS"
   ebb_test[, Age2 := Age^2]
   ebb_test[, SxA := Age*Sex]
   
-  ebb_test <- ebb_test[!is.na(Trait) & !is.na(PRS_proband), ]
+  # Create a lookup table: IID -> PRS
+  pgs_lookup <- ebb_test[, .(vkood, PRS)]
+    # Join paternal PGI
+  ebb_test[pgs_lookup, PRS_paternal := i.PRS, on = .(FATHER_ID = vkood)]
+  ebb_test[pgs_lookup, PRS_maternal := i.PRS, on = .(MOTHER_ID = vkood)]
+  
+  ebb_test <- ebb_test[!is.na(Trait) & !is.na(PRS_paternal) & !is.na(PRS_maternal),]
+  ebb_test[, PRS_untransmitted := PRS_paternal + PRS_maternal - PRS]
+  
   
   # Generate pre-adjusted trait
-  lm_prs2 <- lm(paste0("Trait ~ PRS_maternal + PRS_paternal + Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")),
+  lm_prs2 <- lm(paste0("Trait ~ Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")),
                 data = ebb_test)
   ebb_test$Trait_adj2 <- ebb_test$Trait - predict(object = lm_prs2, newdata = ebb_test)
   ebb_test[, Trait_adj2 := (Trait_adj2-mean(Trait_adj2))/sd(Trait_adj2)]
@@ -483,12 +453,12 @@ analyzeR2_family <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out 
                                                         nrow(ebb_test_bootstrap), replace = T), ]
       
       # R2 with pre-adjusted phenotype 
-      lm_xx <- lm("Trait_adj2 ~ PRS_proband", data = ebb_test_bootstrap_i)
+      lm_xx <- lm("Trait_adj2 ~ PRS", data = ebb_test_bootstrap_i)
       rsq_bootstrap <- c(rsq_bootstrap, summary(lm_xx)$r.squared)
       # Incremental R2
-      lm_0 <- lm(paste0("Trait ~ PRS_maternal + PRS_paternal + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")),
+      lm_0 <- lm(paste0("Trait ~ Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")),
                  data = ebb_test_bootstrap_i)
-      lm_0prs <- lm(paste0("Trait ~ PRS_proband + PRS_maternal + PRS_paternal + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")),
+      lm_0prs <- lm(paste0("Trait ~ PRS_untransmitted + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")),
                     data = ebb_test_bootstrap_i)
       r2_inc <- summary(lm_0prs)$r.squared - summary(lm_0)$r.squared
       rsq_inc_bootstrap <- c(rsq_inc_bootstrap, r2_inc)
@@ -499,23 +469,17 @@ analyzeR2_family <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out 
     rsq_bottom95 <- c(rsq_bottom95, quantile(rsq_bootstrap, probs = 0.025))
     rsq_inc_top95 <- c(rsq_inc_top95, quantile(rsq_inc_bootstrap, probs = 0.975))
     rsq_inc_bottom95 <- c(rsq_inc_bottom95, quantile(rsq_inc_bootstrap, probs = 0.025))
-    # rsq_top95 <- c(rsq_top95, apply(rsq_bootstrap, 2, quantile, probs = 0.975))
-    # rsq_bottom95 <- c(rsq_bottom95, apply(rsq_bootstrap, 2, quantile, probs = 0.025))
-    # rsq_inc_top95 <- c(rsq_inc_top95, apply(rsq_inc_bootstrap, 2, quantile, probs = 0.975))
-    # rsq_inc_bottom95 <- c(rsq_inc_bottom95, apply(rsq_inc_bootstrap, 2, quantile, probs = 0.025))
-    # rsq_inc_top95 <- c(rsq_inc_top95, sort(rsq_inc_bootstrap)[975])
-    # rsq_inc_bottom95 <- c(rsq_inc_bottom95, sort(rsq_inc_bootstrap)[26])
     dt <- cbind(dt, rsq_bootstrap, rsq_inc_bootstrap)
     
     # Original R2 for pre-adjusted phenotype 
-    lm_xx <- lm("Trait_adj2 ~ PRS_proband", data = ebb_test_bootstrap)
+    lm_xx <- lm("Trait_adj2 ~ PRS", data = ebb_test_bootstrap)
     rsq <- c(rsq, summary(lm_xx)$r.squared)
     rsq_all <- c(rsq_all, summary(lm_xx)$r.squared) # for the table with main results
     
     # Original incremental R2
-    lm_0 <- lm(paste0("Trait ~ PRS_maternal + PRS_paternal + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
+    lm_0 <- lm(paste0("Trait ~ Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
                data = ebb_test_bootstrap)
-    lm_0prs <- lm(paste0("Trait ~ PRS_proband + PRS_maternal + PRS_paternal + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
+    lm_0prs <- lm(paste0("Trait ~ PRS_untransmitted + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
                   data = ebb_test_bootstrap)
     r2_inc <- summary(lm_0prs)$r.squared - summary(lm_0)$r.squared
     rsq_inc <- c(rsq_inc, r2_inc)
@@ -532,7 +496,7 @@ analyzeR2_family <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out 
   
   # Save bootstrap results
   colnames(dt) <- cohort
-  write.table(dt, paste0(out, "/family_r2_adj_", pheno, "_1000.tsv"),
+  write.table(dt, paste0(out, "/untransmitted_r2_adj_", pheno, "_1000.tsv"),
               row.names = F, quote = F, sep = "\t")
   
   ################################################
@@ -542,7 +506,7 @@ analyzeR2_family <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out 
             "p2S", "p2S", "p2PS", "p2PS")
   r2_res <- rbind(name, r2, round(rsq_all, 8), n)
   colnames(r2_res) <- cohort
-  write.table(r2_res, paste0(out, "/family_r2_adj_", pheno, ".tsv"),
+  write.table(r2_res, paste0(out, "/untransmitted_r2_adj_", pheno, ".tsv"),
               row.names = F, quote = F, sep = "\t")
   
   
@@ -584,7 +548,7 @@ for(i in 1:4){
   age <- ages[i]
   prs <- prses[i]
   
-  analyzeR2_family(ebb_test, pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/")
+  analyzeR2_untransmitted(ebb_test, pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/")
   
 }
 
