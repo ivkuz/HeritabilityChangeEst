@@ -1,8 +1,8 @@
 
-##########################################################################
-# Plot Fig. S4 and S7 ####################################################
-# Trait variance explained by PGS in the post-Soviet and Soviet groups ###
-##########################################################################
+###############################################################################
+# Plot Fig. S4 and S7, Untransmitted, sex-specific, cognitive/non-cognitive ###
+# Trait variance explained by PGS in the post-Soviet and Soviet groups ########
+###############################################################################
 
 library(data.table)
 library(psychometric)
@@ -280,3 +280,154 @@ grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
 
+
+
+
+
+# By sex
+for(sex in c("male", "female")){
+  
+  r2_res_v <- paste0("r2_adj_", c("EduYears", "OS", "Height_first", "BMI_first"), "_", sex, ".tsv")
+  bootstrap_v <- paste0("r2_adj_", c("EduYears", "OS", "Height_first", "BMI_first"), "_", sex, "_1000.tsv")
+  titles <- c("EA", "OS", "Height", "BMI")
+  lim_list_inc <- c(0.18, 0.175, 0.45, 0.15)
+  steps_inc = c(0.05, 0.05, 0.1, 0.05)
+  lim_list <- c(0.18, 0.175, 0.45, 0.15)
+  steps = c(0.05, 0.05, 0.1, 0.05)
+  
+  
+  plot_list_inc <- list()
+  plot_list <- list()
+  pval_dt <- data.table()
+  for(i in 1:4){
+    
+    r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
+    bootstrap <- fread(paste0("~/EA_heritability/results/revision/", bootstrap_v[i]))
+    plot_list_inc <- append(plot_list_inc, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
+                                                  r2_var = "r2_inc", title = titles[i], 
+                                                  lim = lim_list_inc[i], step = steps_inc[i]))
+    plot_list <- append(plot_list, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
+                                          r2_var = "r2", title = titles[i], 
+                                          lim = lim_list[i], step = steps[i]))
+    pval_dt <- rbind(pval_dt, compareR2(r2_res = r2_res, bootstrap = bootstrap))
+    
+  }
+  
+  pval_dt <- as.data.table(pval_dt)
+  pval_dt[, trait := rep(titles, each = 2)]
+  write.table(pval_dt, paste0("~/EA_heritability/figures/paper/revision/r2_pval_", sex, ".tsv"),
+              row.names = F, quote = F, sep = "\t")
+  
+  pdf(paste0("~/EA_heritability/figures/paper/revision/r2_", sex, ".pdf"), width=5.5, height=6)
+  print(
+    grid.arrange(
+      grobs = plot_list_inc,
+      layout_matrix = matrix(1:8, ncol = 2, byrow = T),
+      widths = c(1, 1.5)
+    )
+  )
+  
+  grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("c", x = 0.02, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("d", x = 0.42, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("e", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("f", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("g", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+  
+  print(
+    grid.arrange(
+      grobs = plot_list,
+      layout_matrix = matrix(1:8, ncol = 2, byrow = T),
+      widths = c(1, 1.5)
+    )
+  )
+  
+  
+  grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("c", x = 0.02, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("d", x = 0.42, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("e", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("f", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("g", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+  
+  
+  dev.off()
+  
+}
+
+
+
+# Cognitive/noncognitive
+r2_res_v <- paste0("r2_adj_", rep(c("EduYears", "OS"), each = 2), "_", rep(c("Cog", "Noncog"), 2), ".tsv")
+bootstrap_v <- paste0("r2_adj_", rep(c("EduYears", "OS"), each = 2), "_", rep(c("Cog", "Noncog"), 2), "_1000.tsv")
+titles <- c("EA - Cog", "EA - NonCog", "OS - Cog", "OS - NonCog")
+lim_list_inc <- c(0.05, 0.05, 0.05, 0.05)
+steps_inc = c(0.02, 0.02, 0.02, 0.02)
+lim_list <- c(0.05, 0.05, 0.05, 0.05)
+steps = c(0.02, 0.02, 0.02, 0.02)
+
+
+plot_list_inc <- list()
+plot_list <- list()
+pval_dt <- data.table()
+for(i in 1:4){
+  
+  r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
+  bootstrap <- fread(paste0("~/EA_heritability/results/revision/", bootstrap_v[i]))
+  plot_list_inc <- append(plot_list_inc, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
+                                                r2_var = "r2_inc", title = titles[i], 
+                                                lim = lim_list_inc[i], step = steps_inc[i]))
+  plot_list <- append(plot_list, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
+                                        r2_var = "r2", title = titles[i], 
+                                        lim = lim_list[i], step = steps[i]))
+  pval_dt <- rbind(pval_dt, compareR2(r2_res = r2_res, bootstrap = bootstrap))
+  
+}
+
+pval_dt <- as.data.table(pval_dt)
+pval_dt[, trait := rep(titles, each = 2)]
+write.table(pval_dt, paste0("~/EA_heritability/figures/paper/revision/r2_pval_Cog_Noncog.tsv"),
+            row.names = F, quote = F, sep = "\t")
+
+pdf(paste0("~/EA_heritability/figures/paper/revision/r2_Cog_Noncog.pdf"), width=5.5, height=6)
+print(
+  grid.arrange(
+    grobs = plot_list_inc,
+    layout_matrix = matrix(1:8, ncol = 2, byrow = T),
+    widths = c(1, 1.5)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("c", x = 0.02, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("d", x = 0.42, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("e", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("f", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("g", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+
+print(
+  grid.arrange(
+    grobs = plot_list,
+    layout_matrix = matrix(1:8, ncol = 2, byrow = T),
+    widths = c(1, 1.5)
+  )
+)
+
+
+grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("c", x = 0.02, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("d", x = 0.42, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("e", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("f", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("g", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+
+
+dev.off()
