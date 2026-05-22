@@ -164,118 +164,8 @@ getIndepInd <- function(cutoff = 15){
 }
 
 
-#######################################
-# Prepare the data for the analysis ###
-#######################################
-
-# Upload main data
-estbb_filtered <- fread("~/EBB_project/phenotypes/EstBB_filtered.tsv")
-ebb <- fread("~/EBB_project/phenotypes/query1.tsv")
-ebb <- ebb[, c("Person skood", "PersonLocation birthParishName", "PersonLocation residencyParishName", 
-               "CONCATSTR(BMIAssembled ageAtBmi)", "CONCATSTR(BMIAssembled bmi)", "CONCATSTR(BMIAssembled height)")]
-colnames(ebb) <- c("skood", "ParishBirth", "ParishRes", "Age_meas", "BMI", "Height")
-ebb <- merge(estbb_filtered, ebb, by="skood")
-ebb <- ebb[Nat=="Eestlane", ]
-
-# Process Height & BMI
-# Extract the first measurements
-ebb_hb <- ebb[, c("skood", "Age_meas", "BMI", "Height")]
-ebb_hb[, Age_first := getValue(trait_vector = Age_meas, measurement = "first")]
-ebb_hb[, BMI_first := getValue(trait_vector = BMI, measurement = "first")]
-ebb_hb[, Height_first := getValue(trait_vector = Height, measurement = "first")]
-# Exclude empty values
-ebb_hb <- ebb_hb[!(is.na(Age_first) | is.na(BMI_first) | is.na(Height_first)), ]
-
-# Extract the last measurements
-ebb_hb[, Age_last := getValue(trait_vector = Age_meas, measurement = "last")]
-ebb_hb[, BMI_last := getValue(trait_vector = BMI, measurement = "last")]
-ebb_hb[, Height_last := getValue(trait_vector = Height, measurement = "last")]
-
-# Exclude zero values
-ebb_hb <- ebb_hb[BMI_first != 0 & BMI_last != 0 & Height_first != 0 & Height_last != 0]
-# Transform to the logarithmic scale
-ebb_hb[, BMI_first := log10(BMI_first)]
-ebb_hb[, BMI_last := log10(BMI_last)]
-ebb_hb[, Height_first := log10(Height_first)]
-ebb_hb[, Height_last := log10(Height_last)]
-
-# Exclude outliers 
-ebb_hb <- ebb_hb[abs(BMI_first-mean(BMI_first))<4*sd(BMI_first) &
-                   abs(BMI_last-mean(BMI_last))<4*sd(BMI_last) &
-                   abs(Height_first-mean(Height_first))<4*sd(Height_first) &
-                   abs(Height_last-mean(Height_last))<4*sd(Height_last),]
-
-ebb <- merge(ebb, ebb_hb, by="skood", all.x = TRUE)
-
-
-# Upload and process EA
-ebb2 <- fread("~/EBB_project/phenotypes/query_bmi_edu.tsv")
-ebb2 <- ebb2[, c("Person skood", "PersonPortrait lastEducation code")]
-colnames(ebb2) <- c("skood", "EA_portrait")
-ebb <- merge(ebb, ebb2, by="skood")
-ebb[, EduYears := transformEAtoEduYears(EA_portrait, to="years")]
-ebb[is.na(EduYears), EduYears := NA]
-
-
-# Upload and process OS
-ebb2 <- fread("~/EA_heritability/data/query_OccupationStatus.tsv")
-ebb2 <- ebb2[, c("Person skood", "CONCATSTR(Work currentOccupation code)", "CONCATSTR(Work mainOccupation code)")]
-colnames(ebb2) <- c("skood", "curOcc", "mainOcc")
-ebb2[, curOcc := sapply(curOcc, getOccStat)]
-ebb2[, mainOcc := sapply(mainOcc, getOccStat)]
-ebb2[, OS := rowMeans(.SD, na.rm = T), .SDcols = c("curOcc", "mainOcc")]
-ebb2[is.na(OS), OS := NA]
-ebb <- merge(ebb, ebb2, by="skood")
-
-
-# Upload PCA
-pca_est <- fread("~/EBB_project/data_filtering/pca/pcs_EstBB_estonian")
-pca_est <- pca_est[,c("IID", paste0("PC", 1:100))]
-colnames(pca_est)[1] <- "vkood"
-ebb <- merge(ebb, pca_est, by="vkood")
-
-
-# Upload polygenic scores (PGS)
-prs <- fread("~/EA_heritability/data/EA4_excl_23andMe_EGCUT/PRS.chrALL.sscore")
-colnames(prs) <- c("vkood", "PRS_EA_orig")
-ebb <- merge(ebb, prs)
-
-prs <- fread("~/EBB_project/PRSs/pan-UKB/50/50.chrALL.sscore")
-colnames(prs) <- c("vkood", "PRS_HEIGHT_orig")
-ebb <- merge(ebb, prs)
-
-prs <- fread("~/EBB_project/PRSs/pan-UKB/21001/21001.chrALL.sscore")
-colnames(prs) <- c("vkood", "PRS_BMI_orig")
-ebb <- merge(ebb, prs)
-
-pgi_ea <-  fread("/gpfs/space/GI/GV/Projects/PGI_repository_v2/SSGAC_PGI_Repository_v2_EstBB.txt", 
-                 # select = c("IID", "FATHER_ID", "MOTHER_ID", "PGI_EA", "PGI_EA_proband", "PGI_EA_paternal", "PGI_EA_maternal",
-                 #            "PGI_HEIGHT", "PGI_HEIGHT_proband", "PGI_HEIGHT_paternal", "PGI_HEIGHT_maternal",
-                 #            "PGI_BMI", "PGI_BMI_proband", "PGI_BMI_paternal", "PGI_BMI_maternal"))
-                 select = c("IID", "FATHER_ID", "MOTHER_ID", "PGI_EA", "PGI_HEIGHT", "PGI_BMI"))
-colnames(pgi_ea)[1] <- "vkood"
-ebb <- merge(ebb, pgi_ea)
-
-
-
-
-# Upload the list of unrelated individuals for each group on Era and Participation Wave
-ind_list <- getIndepInd(cutoff = 15)
-ind_01 <- ind_list[[1]]
-ind_02 <- ind_list[[2]]
-ind_11 <- ind_list[[3]]
-ind_12 <- ind_list[[4]]
-ind_21 <- ind_list[[5]]
-ind_22 <- ind_list[[6]]
-
-
-
-####################################
-###### Main R2 analysis ############
-####################################
-
 # Main function for R2 analysis
-analyzeR2 <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA_heritability/results/revision/"){
+analyzeR2 <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = ""){
   
   # Format analysed data
   colnames(ebb_test)[which(colnames(ebb_test)==pheno)] <- "Trait"
@@ -378,7 +268,7 @@ analyzeR2 <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA
   
   # Save bootstrap results
   colnames(dt) <- cohort
-  write.table(dt, paste0(out, "/r2_adj_", pheno, "_1000.tsv"),
+  write.table(dt, paste0(out, "/r2_adj_", pheno, suff, "_1000.tsv"),
               row.names = F, quote = F, sep = "\t")
   
   ################################################
@@ -388,7 +278,7 @@ analyzeR2 <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA
             "p2S", "p2S", "p2PS", "p2PS")
   r2_res <- rbind(name, r2, round(rsq_all, 8), n)
   colnames(r2_res) <- cohort
-  write.table(r2_res, paste0(out, "/r2_adj_", pheno, ".tsv"),
+  write.table(r2_res, paste0(out, "/r2_adj_", pheno, suff, ".tsv"),
               row.names = F, quote = F, sep = "\t")
   
   
@@ -408,7 +298,7 @@ analyzeR2_untransmitted <- function(ebb_test, pheno, age, prs, bootstrap_n = 100
   
   # Create a lookup table: IID -> PRS
   pgs_lookup <- ebb_test[, .(vkood, PRS)]
-    # Join paternal PGI
+  # Join paternal PGI
   ebb_test[pgs_lookup, PRS_paternal := i.PRS, on = .(FATHER_ID = vkood)]
   ebb_test[pgs_lookup, PRS_maternal := i.PRS, on = .(MOTHER_ID = vkood)]
   
@@ -453,7 +343,7 @@ analyzeR2_untransmitted <- function(ebb_test, pheno, age, prs, bootstrap_n = 100
                                                         nrow(ebb_test_bootstrap), replace = T), ]
       
       # R2 with pre-adjusted phenotype 
-      lm_xx <- lm("Trait_adj2 ~ PRS", data = ebb_test_bootstrap_i)
+      lm_xx <- lm("Trait_adj2 ~ PRS_untransmitted", data = ebb_test_bootstrap_i)
       rsq_bootstrap <- c(rsq_bootstrap, summary(lm_xx)$r.squared)
       # Incremental R2
       lm_0 <- lm(paste0("Trait ~ Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")),
@@ -472,7 +362,7 @@ analyzeR2_untransmitted <- function(ebb_test, pheno, age, prs, bootstrap_n = 100
     dt <- cbind(dt, rsq_bootstrap, rsq_inc_bootstrap)
     
     # Original R2 for pre-adjusted phenotype 
-    lm_xx <- lm("Trait_adj2 ~ PRS", data = ebb_test_bootstrap)
+    lm_xx <- lm("Trait_adj2 ~ PRS_untransmitted", data = ebb_test_bootstrap)
     rsq <- c(rsq, summary(lm_xx)$r.squared)
     rsq_all <- c(rsq_all, summary(lm_xx)$r.squared) # for the table with main results
     
@@ -514,6 +404,121 @@ analyzeR2_untransmitted <- function(ebb_test, pheno, age, prs, bootstrap_n = 100
 
 
 
+#######################################
+# Prepare the data for the analysis ###
+#######################################
+
+# Upload main data
+estbb_filtered <- fread("~/EBB_project/phenotypes/EstBB_filtered.tsv")
+ebb <- fread("~/EBB_project/phenotypes/query1.tsv")
+ebb <- ebb[, c("Person skood", "PersonLocation birthParishName", "PersonLocation residencyParishName", 
+               "CONCATSTR(BMIAssembled ageAtBmi)", "CONCATSTR(BMIAssembled bmi)", "CONCATSTR(BMIAssembled height)")]
+colnames(ebb) <- c("skood", "ParishBirth", "ParishRes", "Age_meas", "BMI", "Height")
+ebb <- merge(estbb_filtered, ebb, by="skood")
+ebb <- ebb[Nat=="Eestlane", ]
+
+# Process Height & BMI
+# Extract the first measurements
+ebb_hb <- ebb[, c("skood", "Age_meas", "BMI", "Height")]
+ebb_hb[, Age_first := getValue(trait_vector = Age_meas, measurement = "first")]
+ebb_hb[, BMI_first := getValue(trait_vector = BMI, measurement = "first")]
+ebb_hb[, Height_first := getValue(trait_vector = Height, measurement = "first")]
+# Exclude empty values
+ebb_hb <- ebb_hb[!(is.na(Age_first) | is.na(BMI_first) | is.na(Height_first)), ]
+
+# Extract the last measurements
+ebb_hb[, Age_last := getValue(trait_vector = Age_meas, measurement = "last")]
+ebb_hb[, BMI_last := getValue(trait_vector = BMI, measurement = "last")]
+ebb_hb[, Height_last := getValue(trait_vector = Height, measurement = "last")]
+
+# Exclude zero values
+ebb_hb <- ebb_hb[BMI_first != 0 & BMI_last != 0 & Height_first != 0 & Height_last != 0]
+# Transform to the logarithmic scale
+ebb_hb[, BMI_first := log10(BMI_first)]
+ebb_hb[, BMI_last := log10(BMI_last)]
+ebb_hb[, Height_first := log10(Height_first)]
+ebb_hb[, Height_last := log10(Height_last)]
+
+# Exclude outliers 
+ebb_hb <- ebb_hb[abs(BMI_first-mean(BMI_first))<4*sd(BMI_first) &
+                   abs(BMI_last-mean(BMI_last))<4*sd(BMI_last) &
+                   abs(Height_first-mean(Height_first))<4*sd(Height_first) &
+                   abs(Height_last-mean(Height_last))<4*sd(Height_last),]
+
+ebb <- merge(ebb, ebb_hb, by="skood", all.x = TRUE)
+
+
+# Upload and process EA
+ebb2 <- fread("~/EBB_project/phenotypes/query_bmi_edu.tsv")
+ebb2 <- ebb2[, c("Person skood", "PersonPortrait lastEducation code")]
+colnames(ebb2) <- c("skood", "EA_portrait")
+ebb <- merge(ebb, ebb2, by="skood")
+ebb[, EduYears := transformEAtoEduYears(EA_portrait, to="years")]
+ebb[is.na(EduYears), EduYears := NA]
+
+
+# Upload and process OS
+ebb2 <- fread("~/EA_heritability/data/query_OccupationStatus.tsv")
+ebb2 <- ebb2[, c("Person skood", "CONCATSTR(Work currentOccupation code)", "CONCATSTR(Work mainOccupation code)")]
+colnames(ebb2) <- c("skood", "curOcc", "mainOcc")
+ebb2[, curOcc := sapply(curOcc, getOccStat)]
+ebb2[, mainOcc := sapply(mainOcc, getOccStat)]
+ebb2[, OS := rowMeans(.SD, na.rm = T), .SDcols = c("curOcc", "mainOcc")]
+ebb2[is.na(OS), OS := NA]
+ebb <- merge(ebb, ebb2, by="skood")
+
+
+# Upload PCA
+pca_est <- fread("~/EBB_project/data_filtering/pca/pcs_EstBB_estonian")
+pca_est <- pca_est[,c("IID", paste0("PC", 1:100))]
+colnames(pca_est)[1] <- "vkood"
+ebb <- merge(ebb, pca_est, by="vkood")
+
+
+# Upload polygenic scores (PGS)
+prs <- fread("~/EA_heritability/data/EA4_excl_23andMe_EGCUT/PRS.chrALL.sscore")
+colnames(prs) <- c("vkood", "PRS_EA_orig")
+ebb <- merge(ebb, prs)
+
+prs <- fread("~/EBB_project/PRSs/pan-UKB/50/50.chrALL.sscore")
+colnames(prs) <- c("vkood", "PRS_HEIGHT_orig")
+ebb <- merge(ebb, prs)
+
+prs <- fread("~/EBB_project/PRSs/pan-UKB/21001/21001.chrALL.sscore")
+colnames(prs) <- c("vkood", "PRS_BMI_orig")
+ebb <- merge(ebb, prs)
+
+pgi_ea <-  fread("/gpfs/space/GI/GV/Projects/PGI_repository_v2/SSGAC_PGI_Repository_v2_EstBB.txt", 
+                 select = c("IID", "FATHER_ID", "MOTHER_ID", "PGI_EA", "PGI_HEIGHT", "PGI_BMI"))
+colnames(pgi_ea)[1] <- "vkood"
+ebb <- merge(ebb, pgi_ea)
+
+prs_cog <- fread("~/EA_heritability/cog_noncog/PRS_Cognitive_noEBB_N.chrALL.sscore")
+prs_noncog <- fread("~/EA_heritability/cog_noncog/PRS_Noncognitive_noEBB_N.chrALL.sscore")
+prs <- merge(prs_cog, prs_noncog, by = "#IID")
+colnames(prs) <- c("vkood", "PRS_Cog", "PRS_Noncog")
+ebb <- merge(ebb, prs)
+
+
+
+
+# Upload the list of unrelated individuals for each group on Era and Participation Wave
+ind_list <- getIndepInd(cutoff = 15)
+ind_01 <- ind_list[[1]]
+ind_02 <- ind_list[[2]]
+ind_11 <- ind_list[[3]]
+ind_12 <- ind_list[[4]]
+ind_21 <- ind_list[[5]]
+ind_22 <- ind_list[[6]]
+
+
+
+####################################
+###### Main R2 analysis ############
+####################################
+
+
+
 
 # Make a copy of the dataset
 ebb_test <- ebb
@@ -529,7 +534,9 @@ ages <- c("Age", "Age", "Age_first", "Age_first")
 phenotypes <- c("EduYears", "OS", "Height_first", "BMI_first")
 # prses <- c("PRS_EA", "PRS_EA", "PRS_Height", "PRS_BMI")
 prses <- c("PGI_EA", "PGI_EA", "PGI_HEIGHT", "PGI_BMI")
-for(i in 1:4){
+
+# for(i in 1:4){
+for(i in 4){
   
   print(phenotypes[i])
   pheno <- phenotypes[i]
@@ -541,6 +548,22 @@ for(i in 1:4){
 }
 
 
+# Analysis by sex
+
+for(i in 1:4){
+
+  print(phenotypes[i])
+  pheno <- phenotypes[i]
+  age <- ages[i]
+  prs <- prses[i]
+  
+  analyzeR2(ebb_test[Sex == 1, ], pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_male")
+  analyzeR2(ebb_test[Sex == 2, ], pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_female")
+  
+}
+
+
+# Analysis of untransmitted allele PGSs
 for(i in 1:4){
   
   print(phenotypes[i])
@@ -549,6 +572,22 @@ for(i in 1:4){
   prs <- prses[i]
   
   analyzeR2_untransmitted(ebb_test, pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/")
+  
+}
+
+
+# Analysis of Cognitive and Non-cognitive EA components
+ages <- c("Age", "Age")
+phenotypes <- c("EduYears", "OS")
+for(i in 1:2){
+  
+  print(phenotypes[i])
+  pheno <- phenotypes[i]
+  age <- ages[i]
+  
+  analyzeR2(ebb_test, pheno=pheno, age = ages[i], prs = "PRS_Cog", bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_Cog")
+  print(phenotypes[i])
+  analyzeR2(ebb_test, pheno=pheno, age = ages[i], prs = "PRS_Noncog", bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_Noncog")
   
 }
 
