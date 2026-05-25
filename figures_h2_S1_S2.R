@@ -483,7 +483,7 @@ pl26 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "
 df26 <- compareH2(reml_res = reml_res, names = reml_names)
 
 
-# cutoff 15
+# table p-values
 df1 <- list(df12, df14, df15, df16)
 df2 <- list(df22, df24, df25, df26)
 df_p <- data.frame()
@@ -630,6 +630,18 @@ df23 <- compareH2(reml_res = reml_res, names = reml_names)
 # df26 <- compareH2(reml_res = reml_res, names = reml_names)
 
 
+# table p-values
+df1 <- list(df11, df12, df13)
+df2 <- list(df21, df22, df23)
+df_p <- data.frame()
+for(i in 1:3){
+  df_p_tmp <- cbind(df1[[i]], df2[[i]])
+  df_p <- rbind(df_p, df_p_tmp)
+}
+df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
+df_p[, Settlement := c("Rural", "Town", "Urban")]
+write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_rural-urban_15_pval.tsv",
+            row.names = F, quote = F, sep = "\t")
 
 
 # cutoff 15
