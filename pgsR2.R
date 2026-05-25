@@ -287,7 +287,7 @@ analyzeR2 <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA
 
 
 # Аunction for transmitted-untransmitted R2 analysis
-analyzeR2_untransmitted <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA_heritability/results/revision/"){
+analyzeR2_untransmitted <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = ""){
   
   # Format analysed data
   colnames(ebb_test)[which(colnames(ebb_test)==pheno)] <- "Trait"
@@ -386,7 +386,7 @@ analyzeR2_untransmitted <- function(ebb_test, pheno, age, prs, bootstrap_n = 100
   
   # Save bootstrap results
   colnames(dt) <- cohort
-  write.table(dt, paste0(out, "/untransmitted_r2_adj_", pheno, "_1000.tsv"),
+  write.table(dt, paste0(out, "/untransmitted_r2_adj_", pheno, suff, "_1000.tsv"),
               row.names = F, quote = F, sep = "\t")
   
   ################################################
@@ -396,7 +396,7 @@ analyzeR2_untransmitted <- function(ebb_test, pheno, age, prs, bootstrap_n = 100
             "p2S", "p2S", "p2PS", "p2PS")
   r2_res <- rbind(name, r2, round(rsq_all, 8), n)
   colnames(r2_res) <- cohort
-  write.table(r2_res, paste0(out, "/untransmitted_r2_adj_", pheno, ".tsv"),
+  write.table(r2_res, paste0(out, "/untransmitted_r2_adj_", pheno, suff, ".tsv"),
               row.names = F, quote = F, sep = "\t")
   
   
@@ -549,7 +549,6 @@ for(i in 4){
 
 
 # Analysis by sex
-
 for(i in 1:4){
 
   print(phenotypes[i])
@@ -588,6 +587,19 @@ for(i in 1:2){
   analyzeR2(ebb_test, pheno=pheno, age = ages[i], prs = "PRS_Cog", bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_Cog")
   print(phenotypes[i])
   analyzeR2(ebb_test, pheno=pheno, age = ages[i], prs = "PRS_Noncog", bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_Noncog")
+  
+}
+
+# Analysis of untransmitted allele PGSs of Cognitive and Non-cognitive EA components
+for(i in 1:2){
+  
+  print(phenotypes[i])
+  pheno <- phenotypes[i]
+  age <- ages[i]
+
+  analyzeR2_untransmitted(ebb_test, pheno=pheno, age = ages[i], prs = "PRS_Cog", bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_Cog")
+  print(phenotypes[i])
+  analyzeR2_untransmitted(ebb_test, pheno=pheno, age = ages[i], prs = "PRS_Noncog", bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_Noncog")
   
 }
 
