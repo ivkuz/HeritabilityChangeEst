@@ -126,11 +126,11 @@ reml_res[, se := as.numeric(se)]
 
 names <- c("all", "s10", "ps10", "s15", "ps15")
 pl32 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "LDAK, EA, Estonians")
-df32 <- compareH2(reml_res = reml_res, names = reml_res$name)
+df32 <- compareH2(reml_res = reml_res, names = names)
 
 names <- c("all_OS", "s10_OS", "ps10_OS", "s15_OS", "ps15_OS")
 pl31 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "LDAK, OS, Estonians")
-df31 <- compareH2(reml_res = reml_res, names = reml_res$name)
+df31 <- compareH2(reml_res = reml_res, names = names)
 
 
 # Make and save p-value table
