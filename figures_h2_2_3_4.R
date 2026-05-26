@@ -2,6 +2,7 @@
 # Plot Fig. 2abc, 3ab, 4 #######################################
 # Heritability in the post-Soviet and Soviet groups and ########
 # the groups additionally divided by the wave of participation #
+# and the estimates from the pedigree-based analysis ###########
 ################################################################
 
 
@@ -12,7 +13,7 @@ library(gridExtra)
 library(ggsignif)
 
 # Plotting h2 bar plot with error bars
-plotH2 <- function(reml_res, names, errors = "CI", title = "", lim = NULL, step = 0.1){
+plotH2 <- function(reml_res, names, errors = "CI", title = "", lim = NULL, step = 0.1, h2_type = NA){
   
   # Choose whether plot SE or 95% CI error bars
   if(errors %in% c("SE", "se")){
@@ -24,6 +25,9 @@ plotH2 <- function(reml_res, names, errors = "CI", title = "", lim = NULL, step 
   # Select names of output files where h2 were stored
   n <- length(names)
   tab <- reml_res[name %in% names, ]
+  if(!is.na(h2_type)){
+    tab <- tab[type == h2_type, ]  
+  }
   tab[, name := factor(name, levels = names)]
   
   # Main plot
@@ -63,11 +67,14 @@ plotH2 <- function(reml_res, names, errors = "CI", title = "", lim = NULL, step 
 
 
 # Calculate p-values for h2 differences
-compareH2 <- function(reml_res, names){
+compareH2 <- function(reml_res, names, h2_type = NA){
   
   # Select names of output files where h2 were stored
   n <- length(names)
   tab <- reml_res[name %in% names, ]
+  if(!is.na(h2_type)){
+    tab <- tab[type == h2_type, ]  
+  }
   tab <- tab[order(match(name, names))]
   
   # compare S and PS if n = 2 (no waves)
@@ -262,5 +269,116 @@ grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("b", x = 0.52, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("d", x = 0.52, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+
+dev.off()
+
+
+
+
+
+
+# Pedigree(relatives)-based analysis
+
+# list of files with LDAK results
+reml_files = paste0(rep(c("", "p1", "p2"), each = 4), rep(c("s", "ps"), 6), "_", rep(c(15, 15, 10, 10), 3))
+
+# Get REML results from the files
+reml_res <- data.frame()
+for( reml_file in reml_files){
+  file_path <- paste0("~/EA_heritability/gcta/results/ldak_pedigree_", reml_file, ".reml")
+  if (file.exists(file_path)){
+    res = readLines(file_path)
+    
+    l_h2g <- unlist(strsplit(res[grepl("Her_K1", res)], " "))
+    h2g <- l_h2g[2]
+    se_h2g <- l_h2g[3]
+
+    l_h2 <- unlist(strsplit(res[grepl("Her_All", res)], " "))
+    h2 <- l_h2[2]
+    se_h2 <- l_h2[3]
+    
+    reml_res <- rbind(reml_res, c(reml_file, "h2g", h2g, se_h2g))
+    reml_res <- rbind(reml_res, c(reml_file, "h2", h2, se_h2))
+    
+  } else{
+    print(paste0(reml_file, " doesn't exist"))
+  }
+}
+
+colnames(reml_res) <- c("name", "type", "h2", "se")
+reml_res <- as.data.table(reml_res)
+reml_res[, h2 := as.numeric(h2)]
+reml_res[, se := as.numeric(se)]
+
+# Both phases, cutoff 15
+names <- c("s_15", "ps_15")
+pl1_15_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "h2g, 15", h2_type = "h2g")
+df1_15_h2g <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
+
+pl1_15_h2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "N-s h2, 15", h2_type = "h2", step = 0.2)
+df1_15_h2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2")
+
+# Both phases, cutoff 10
+names <- c("s_10", "ps_10")
+pl1_10_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "h2g, 10", h2_type = "h2g")
+df1_10_h2g <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
+
+pl1_10_h2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "N-s h2, 10", h2_type = "h2", step = 0.2)
+df1_10_h2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2")
+
+
+# Phase 1, cutoff 15
+names <- c("p1s_15", "p1ps_15", "p2s_15", "p2ps_15")
+pl2_15_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "h2g, 15", h2_type = "h2g")
+df2_15_h2g <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
+
+pl2_15_h2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "N-s h2, 15", h2_type = "h2", step = 0.2)
+df2_15_h2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2")
+
+# Phase 2, cutoff 10
+names <- c("p1s_10", "p1ps_10", "p2s_10", "p2ps_10")
+pl2_10_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "h2g, 10", h2_type = "h2g", step = 0.2)
+df2_10_h2g <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
+
+pl2_10_h2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "N-s h2, 10", h2_type = "h2", step = 0.3)
+df2_10_h2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2")
+
+# Make and save p-value table
+# cutoff 10, collect p-value results in a table
+df1 <- list(df1_15_h2g, df1_10_h2g, df1_15_h2, df1_10_h2)
+df2 <- list(df2_15_h2g, df2_10_h2g, df2_15_h2, df2_10_h2)
+df_p <- data.frame()
+for(i in 1:4){
+  df_p_tmp <- cbind(df1[[i]], df2[[i]])
+  df_p <- rbind(df_p, df_p_tmp)
+}
+df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
+df_p[, h2_type := rep(c("h2g", "Narrow-sense h2"), each = 2)]
+df_p[, cutoff := rep(c(15, 10), 2)]
+
+# Save p-value table for both cutoffs
+write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_pedigree_pval.tsv",
+            row.names = F, quote = F, sep = "\t")
+
+
+plots <- list(pl1_15_h2g, pl1_10_h2g, pl1_15_h2, pl1_10_h2,
+              pl2_15_h2g, pl2_10_h2g, pl2_15_h2, pl2_10_h2)
+pdf("~/EA_heritability/figures/paper/revision/h2_pedigree.pdf", width=5.5, height=6)
+print(
+  grid.arrange(
+    grobs = plots,
+    layout_matrix = matrix(1:8, ncol = 2, byrow = F),
+    widths = c(1, 1.5)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("c", x = 0.02, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("d", x = 0.42, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("e", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("f", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("g", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
