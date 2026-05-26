@@ -467,6 +467,11 @@ ebb2[, OS := rowMeans(.SD, na.rm = T), .SDcols = c("curOcc", "mainOcc")]
 ebb2[is.na(OS), OS := NA]
 ebb <- merge(ebb, ebb2, by="skood")
 
+settlement <- fread("~/EA_heritability/data/query_settletype.tsv")
+colnames(settlement) <- c("skood", "settlCode", "settlName")
+ebb <- merge(ebb, settlement, by="skood")
+
+
 
 # Upload PCA
 pca_est <- fread("~/EBB_project/data_filtering/pca/pcs_EstBB_estonian")
@@ -535,9 +540,8 @@ phenotypes <- c("EduYears", "OS", "Height_first", "BMI_first")
 # prses <- c("PRS_EA", "PRS_EA", "PRS_Height", "PRS_BMI")
 prses <- c("PGI_EA", "PGI_EA", "PGI_HEIGHT", "PGI_BMI")
 
-# for(i in 1:4){
-for(i in 4){
-  
+for(i in 1:4){
+
   print(phenotypes[i])
   pheno <- phenotypes[i]
   age <- ages[i]
@@ -561,6 +565,22 @@ for(i in 1:4){
   
 }
 
+# Analysis by Settlement type: rural - town - city
+for(i in 1:4){
+  
+  print(phenotypes[i])
+  pheno <- phenotypes[i]
+  age <- ages[i]
+  prs <- prses[i]
+  
+  analyzeR2(ebb_test[settlName == "Rural-type settlement unit", ], pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_rural")
+  print(1)
+  analyzeR2(ebb_test[settlName == "Town-type settlement unit", ], pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_town")
+  print(2)
+  analyzeR2(ebb_test[settlName == "City-type settlement unit", ], pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_city")
+  print(3)
+  
+}
 
 # Analysis of untransmitted allele PGSs
 for(i in 1:4){
@@ -602,6 +622,13 @@ for(i in 1:2){
   analyzeR2_untransmitted(ebb_test, pheno=pheno, age = ages[i], prs = "PRS_Noncog", bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_Noncog")
   
 }
+
+
+
+
+
+
+
 
 
 ###############################
