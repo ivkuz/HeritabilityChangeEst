@@ -111,8 +111,8 @@ sexes <- c("male", "female")
 for(age in c(10, 15)){
   for(s in c(1, 2)){
 
-    ind_01  <- data.table(0, ebb_test[Sex==s, YoB >= 1991 - age, vkood])
-    ind_02  <- data.table(0, ebb_test[Sex==s, YoB < 1991 - age, vkood])
+    ind_01  <- data.table(0, ebb_test[Sex==s & YoB >= 1991 - age, vkood])
+    ind_02  <- data.table(0, ebb_test[Sex==s & YoB < 1991 - age, vkood])
 
     write.table(ind_01, paste0("~/EA_heritability/gcta/data/", "ps", "_ldak_list_all_", sexes[s], "_", age, ".tsv"),
                 row.names = F, col.names = F, quote = F, sep = "\t")
@@ -129,8 +129,8 @@ settl_codes <- c("L", "V", "M")
 for(age in c(10, 15)){
   for(s in 1:3){
     
-    ind_01  <- data.table(0, ebb_test[settlCode==settl_codes[s], YoB >= 1991 - age, vkood])
-    ind_02  <- data.table(0, ebb_test[settlCode==settl_codes[s], YoB < 1991 - age, vkood])
+    ind_01  <- data.table(0, ebb_test[settlCode==settl_codes[s] & YoB >= 1991 - age, vkood])
+    ind_02  <- data.table(0, ebb_test[settlCode==settl_codes[s] & YoB < 1991 - age, vkood])
     
     write.table(ind_01, paste0("~/EA_heritability/gcta/data/", "ps", "_ldak_list_all_", settl[s], "_", age, ".tsv"),
                 row.names = F, col.names = F, quote = F, sep = "\t")
