@@ -37,7 +37,7 @@ plotH2 <- function(reml_res, names, errors = "CI", title = "", lim = NULL, step 
                       ymax=(h2+i*se)), 
                   width=.2, linewidth = 0.3) +
     theme_bw() + theme(text = element_text(size=10),
-                       title = element_text(size=7.5),
+                       title = element_text(size=8),
                        panel.grid.major.x = element_blank(),
                        axis.title.x=element_blank(),
                        legend.position = "none") +
