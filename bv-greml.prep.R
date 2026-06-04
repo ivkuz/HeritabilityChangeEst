@@ -1,3 +1,8 @@
+#########################################################################
+# Prepare phenotype files for genetic correlation analysis between eras #
+#########################################################################
+
+
 library(data.table)
 library(reshape2)
 library(stringr)
