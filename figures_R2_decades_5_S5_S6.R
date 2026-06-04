@@ -347,6 +347,11 @@ prs <- fread("~/EBB_project/PRSs/pan-UKB/21001/21001.chrALL.sscore")
 colnames(prs) <- c("vkood", "PRS_BMI")
 ebb <- merge(ebb, prs)
 
+pgi_ea <-  fread("/gpfs/space/GI/GV/Projects/PGI_repository_v2/SSGAC_PGI_Repository_v2_EstBB.txt", 
+                 select = c("IID", "FATHER_ID", "MOTHER_ID", "PGI_EA", "PGI_HEIGHT", "PGI_BMI"))
+colnames(pgi_ea)[1] <- "vkood"
+ebb <- merge(ebb, pgi_ea)
+
 # We analyse individuals older than 25 years at the time of recruitment
 ebb_test <- ebb[AgeAtAgr > 25,]
 
@@ -376,16 +381,20 @@ ebb_test[, cohort := factor(cohort, levels = c("p1s", "p1ps", "p2s", "p2ps"))]
 
 
 # Calculate R2 values
-pl1 <- r2Decades(ebb_test = ebb_test, trait = "Height_first", age = "Age_first", prs = "PRS_Height", title = "Height")
-pl2 <- r2Decades(ebb_test = ebb_test, trait = "BMI_first", age = "Age_first", prs = "PRS_BMI", title = "BMI")
-pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PRS_EA", title = "EA")
-pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PRS_EA", title = "OS")
+# pl1 <- r2Decades(ebb_test = ebb_test, trait = "Height_first", age = "Age_first", prs = "PRS_Height", title = "Height")
+# pl2 <- r2Decades(ebb_test = ebb_test, trait = "BMI_first", age = "Age_first", prs = "PRS_BMI", title = "BMI")
+# pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PRS_EA", title = "EA")
+# pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PRS_EA", title = "OS")
+pl1 <- r2Decades(ebb_test = ebb_test, trait = "Height_first", age = "Age_first", prs = "PGI_HEIGHT", title = "Height")
+pl2 <- r2Decades(ebb_test = ebb_test, trait = "BMI_first", age = "Age_first", prs = "PGI_BMI", title = "BMI")
+pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "EA")
+pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "OS")
 
 
 
 # Make plots
 # Including Supplementary Fig. 6
-pdf("~/EA_heritability/figures/paper/r2_ages.pdf", width=5, height=5)
+pdf("~/EA_heritability/figures/paper/revision/r2_ages.pdf", width=5, height=5)
 
 for(i in 1:4){
 
@@ -417,7 +426,7 @@ plot_list <- list(pl1[[i]], pl2[[i]])
 
 
 # Supplementary figure 5
-pdf("~/EA_heritability/figures/paper/r2_ages_height_bmi.pdf", width=5, height=2.5)
+pdf("~/EA_heritability/figures/paper/revision/r2_ages_height_bmi.pdf", width=5, height=2.5)
 
 print(
   grid.arrange(
@@ -433,9 +442,9 @@ dev.off()
 
 
 # For figure 5
-pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PRS_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.125), step=0.03)
-pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PRS_EA", title = "", xl = "Decade of birth", ylims = c(0.015, 0.115), step=0.03)
+pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.17), step=0.03)
+pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.015, 0.17), step=0.03)
 
 plot_list <- list(pl3[[1]], pl4[[1]])
 
-saveRDS(plot_list, "~/EA_heritability/figures/paper/files_for_figures/fig5cf.rds")
+saveRDS(plot_list, "~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf.rds")
