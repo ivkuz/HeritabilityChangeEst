@@ -132,7 +132,7 @@ compareH2 <- function(reml_res, names){
 ########
 
 # list of files with LDAK results
-reml_files = readLines("~/EA_heritability/gcta/data/ldak_out_files2.txt")
+reml_files = readLines("~/EA_heritability/gcta/data/ldak_out_files_all.txt")
 
 # Get REML results from the files
 reml_res <- data.frame()
@@ -188,7 +188,7 @@ reml_res[, se := as.numeric(se)]
 # df22 <- compareH2(reml_res = reml_res, names = reml_names)
 # 
 # # OS
-# reml_names <- c("ldak_p1s_ldak_list_OS_unrel_15_OS.reml", "ldak_p1ps_ldak_list_OS_unrel_15_OS.reml", 
+# reml_names <- c("ldak_p1s_ldak_list_OS_unrel_15_OS.reml", "ldak_p1ps_ldak_list_OS_unrel_15_OS.reml",
 #                 "ldak_p2s_ldak_list_OS_unrel_15_OS.reml", "ldak_p2ps_ldak_list_OS_unrel_15_OS.reml")
 # pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.1, 0.27), step = 0.1)
 # df24 <- compareH2(reml_res = reml_res, names = reml_names)
@@ -256,48 +256,45 @@ reml_res[, se := as.numeric(se)]
 
 # Cutoff 10, both waves together #
 # EA
-reml_names <- c("ldak_s_15.reml", "ldak_ps_10.reml")
-pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "EA", lim = c(-0.2, 0.9), step = 0.3)
+reml_names <- c("ldak_kin0.05_s_10.reml", "ldak_ps_10.reml")
+pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "EA", step = 0.1) #, lim = c(-0.2, 0.9)
 df12 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # OS
-reml_names <- c("ldak_s_ldak_list_OS_unrel_10_OS.reml", "ldak_ps_ldak_list_OS_unrel_10_OS.reml")
-pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "OS", lim = c(-0.05, 1.1), step = 0.3)
+reml_names <- c("ldak_OS_kin0.05_s_10.reml", "ldak_OS_kin0.05_ps_10.reml")
+pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "OS", step = 0.05) #, lim = c(-0.05, 1.1)
 df14 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # Height
-reml_names <- c("ldak_s_ldak_list_unrel_10_logHeight.reml", "ldak_ps_ldak_list_unrel_10_logHeight.reml")
-pl15 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Height", lim = c(-0.05, 1.1), step = 0.3)
+reml_names <- c("ldak_Height_kin0.05_s_10.reml", "ldak_Height_kin0.05_ps_10.reml")
+pl15 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Height", step = 0.2) #, lim = c(-0.05, 1.1)
 df15 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # BMI
-reml_names <- c("ldak_s_ldak_list_unrel_10_logBMI.reml", "ldak_ps_ldak_list_unrel_10_logBMI.reml")
-pl16 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "BMI", lim = c(-0.05, 1.15), step = 0.3)
+reml_names <- c("ldak_BMI_kin0.05_s_10.reml", "ldak_BMI_kin0.05_ps_10.reml")
+pl16 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "BMI", step = 0.1) #, lim = c(-0.05, 1.15)
 df16 <- compareH2(reml_res = reml_res, names = reml_names)
 
 
 # Cutoff 10, by wave #
 # EA
-reml_names <- c("ldak_p1s_10.reml", "ldak_p1ps_10.reml", "ldak_p2s_10.reml", "ldak_p2ps_10.reml")
-pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.2, 0.9), step = 0.3)
+reml_names <- c("ldak_kin0.05_p1s_10.reml", "ldak_kin0.05_p1ps_10.reml", "ldak_kin0.05_p2s_10.reml", "ldak_kin0.05_p2ps_10.reml")
+pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.3) #, lim = c(-0.2, 0.9)
 df22 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # OS
-reml_names <- c("ldak_p1s_ldak_list_OS_unrel_10_OS.reml", "ldak_p1ps_ldak_list_OS_unrel_10_OS.reml",
-                "ldak_p2s_ldak_list_OS_unrel_10_OS.reml", "ldak_p2ps_ldak_list_OS_unrel_10_OS.reml")
-pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.05, 1.1), step = 0.3)
+reml_names <- c("ldak_OS_kin0.05_p1s_10.reml", "ldak_OS_kin0.05_p1ps_10.reml", "ldak_OS_kin0.05_p2s_10.reml", "ldak_OS_kin0.05_p2ps_10.reml")
+pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.3) #, lim = c(-0.05, 1.1)
 df24 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # Height
-reml_names <- c("ldak_p1s_ldak_list_unrel_10_logHeight.reml", "ldak_p1ps_ldak_list_unrel_10_logHeight.reml",
-                "ldak_p2s_ldak_list_unrel_10_logHeight.reml", "ldak_p2ps_ldak_list_unrel_10_logHeight.reml")
-pl25 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(0, 1.15), step = 0.3)
+reml_names <- c("ldak_Height_kin0.05_p1s_10.reml", "ldak_Height_kin0.05_p1ps_10.reml", "ldak_Height_kin0.05_p2s_10.reml", "ldak_Height_kin0.05_p2ps_10.reml")
+pl25 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.3) #, lim = c(0, 1.15)
 df25 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # BMI
-reml_names <- c("ldak_p1s_ldak_list_unrel_10_logBMI.reml", "ldak_p1ps_ldak_list_unrel_10_logBMI.reml",
-                "ldak_p2s_ldak_list_unrel_10_logBMI.reml", "ldak_p2ps_ldak_list_unrel_10_logBMI.reml")
-pl26 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.05, 1.15), step = 0.3)
+reml_names <- c("ldak_BMI_kin0.05_p1s_10.reml", "ldak_BMI_kin0.05_p1ps_10.reml", "ldak_BMI_kin0.05_p2s_10.reml", "ldak_BMI_kin0.05_p2ps_10.reml")
+pl26 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.3) #, lim = c(-0.05, 1.15)
 df26 <- compareH2(reml_res = reml_res, names = reml_names)
 
 
@@ -315,8 +312,8 @@ df_p[, cutoff := 10]
 df_p_cutoff10 <- df_p
 
 # Save p-value table for both cutoffs
-df_p <- rbind(df_p_cutoff15, df_p_cutoff10)
-write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_main_pval.tsv",
+# df_p <- rbind(df_p_cutoff15, df_p_cutoff10)
+write.table(df_p_cutoff10, "~/EA_heritability/figures/paper/revision/h2_main_pval_10.tsv",
             row.names = F, quote = F, sep = "\t")
 
 
@@ -359,38 +356,38 @@ dev.off()
 
 # no waves
 reml_files <- c("s", "ps")
-reml_res <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = ".hsq")
-pl11 <- plotH2(reml_res = reml_res, names = reml_res$name, errors = "CI", title = "EA, GCTA", lim = c(0, 0.4), step = 0.1)
-df11 <- compareH2(reml_res = reml_res, names = reml_res$name)
+reml_res_gcta <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = "_kin0.05.hsq")
+pl11 <- plotH2(reml_res = reml_res_gcta, names = reml_res_gcta$name, errors = "CI", title = "EA, GCTA", step = 0.1) #, lim = c(0, 0.4)
+df11 <- compareH2(reml_res = reml_res_gcta, names = reml_res_gcta$name)
 
 # by wave
 reml_files <- c("p1s", "p1ps", "p2s", "p2ps")
-reml_res <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = ".hsq")
-pl21 <- plotH2(reml_res = reml_res, names = reml_res$name, errors = "CI", title = "", lim = c(0, 0.4), step = 0.1)
-df21 <- compareH2(reml_res = reml_res, names = reml_res$name)
+reml_res_gcta <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = "_kin0.05.hsq")
+pl21 <- plotH2(reml_res = reml_res_gcta, names = reml_res_gcta$name, errors = "CI", title = "", step = 0.1) #, lim = c(0, 0.4)
+df21 <- compareH2(reml_res = reml_res_gcta, names = reml_res_gcta$name)
 
 
 
 # binary EA, cutoff 15
-reml_names <- c("ldak_s_ldak_list_unrel_EA_binary.reml.liab", "ldak_ps_ldak_list_unrel_EA_binary.reml.liab")
-pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Univ. degree, 15 yo", lim = c(-0.04, 0.5), step = 0.1)
+reml_names <- c("ldak_EA_binary_kin0.05_s_15.reml.liab", "ldak_EA_binary_kin0.05_ps_15.reml.liab")
+pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Univ. degree, 15 yo", step = 0.1) #, lim = c(-0.04, 0.5)
 df12 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # binary EA, cutoff 15, phases (waves)
-reml_names <- c("ldak_p1s_ldak_list_unrel_EA_binary.reml.liab", "ldak_p1ps_ldak_list_unrel_EA_binary.reml.liab",
-                "ldak_p2s_ldak_list_unrel_EA_binary.reml.liab", "ldak_p2ps_ldak_list_unrel_EA_binary.reml.liab")
-pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.04, 0.5), step = 0.1)
+reml_names <- c("ldak_EA_binary_kin0.05_p1s_15.reml.liab", "ldak_EA_binary_kin0.05_p1ps_15.reml.liab",
+                "ldak_EA_binary_kin0.05_p2s_15.reml.liab", "ldak_EA_binary_kin0.05_p2ps_15.reml.liab")
+pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.2) #, lim = c(-0.04, 0.5)
 df22 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # binary EA, cutoff 10
-reml_names <- c("ldak_s_ldak_list_unrel_10_EA_binary.reml.liab", "ldak_ps_ldak_list_unrel_10_EA_binary.reml.liab")
-pl13 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Univ. degree, 10 yo", lim = c(-0.4, 1.4), step = 0.3)
+reml_names <- c("ldak_EA_binary_kin0.05_s_10.reml.liab", "ldak_EA_binary_kin0.05_ps_10.reml.liab")
+pl13 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Univ. degree, 10 yo", step = 0.1) #, lim = c(-0.4, 1.4)
 df13 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # binary EA, cutoff 10, phases (waves)
-reml_names <- c("ldak_p1s_ldak_list_unrel_10_EA_binary.reml.liab", "ldak_p1ps_ldak_list_unrel_10_EA_binary.reml.liab",
-                "ldak_p2s_ldak_list_unrel_10_EA_binary.reml.liab", "ldak_p2ps_ldak_list_unrel_10_EA_binary.reml.liab")
-pl23 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.35, 1.35), step = 0.3)
+reml_names <- c("ldak_EA_binary_kin0.05_p1s_10.reml.liab", "ldak_EA_binary_kin0.05_p1ps_10.reml.liab",
+                "ldak_EA_binary_kin0.05_p2s_10.reml.liab", "ldak_EA_binary_kin0.05_p2ps_10.reml.liab")
+pl23 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.5) #, lim = c(-0.35, 1.35)
 df23 <- compareH2(reml_res = reml_res, names = reml_names)
 
 
@@ -434,62 +431,63 @@ dev.off()
 # By sex
 
 # Male cutoff 15
-reml_names <- c("ldak_s_male_15.reml", "ldak_ps_male_15.reml")
+reml_names <- c("ldak_kin0.05_s_male_15.reml", "ldak_kin0.05_ps_male_15.reml")
 # pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "EA")
-pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Men, cutoff 15", lim = c(0, 0.31), step = 0.1)
+pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Men, cutoff 15", lim = c(0, 0.32), step = 0.1)
 df12 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # Female cutoff 15
-reml_names <- c("ldak_s_female_15.reml", "ldak_ps_female_15.reml")
+reml_names <- c("ldak_kin0.05_s_female_15.reml", "ldak_kin0.05_ps_female_15.reml")
 # pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "OS")
-pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Women, cutoff 15", lim = c(0, 0.31), step = 0.1)
+pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Women, cutoff 15", lim = c(0, 0.32), step = 0.1)
 df14 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # Male cutoff 10
-reml_names <- c("ldak_s_male_10.reml", "ldak_ps_male_10.reml")
+reml_names <- c("ldak_kin0.05_s_male_10.reml", "ldak_kin0.05_ps_male_10.reml")
 # pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "EA")
-pl15 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Men, cutoff 10", lim = c(0, 0.31), step = 0.1)
+pl15 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Men, cutoff 10", lim = c(0, 0.32), step = 0.1)
 df15 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # Female cutoff 10
-reml_names <- c("ldak_s_female_10.reml", "ldak_ps_female_10.reml")
+reml_names <- c("ldak_kin0.05_s_female_10.reml", "ldak_kin0.05_ps_female_10.reml")
 # pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "OS")
-pl16 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Women, cutoff 10", lim = c(0, 0.31), step = 0.1)
+pl16 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Women, cutoff 10", lim = c(0, 0.32), step = 0.1)
 df16 <- compareH2(reml_res = reml_res, names = reml_names)
 
 
-# Phases Male cutoff 15
-reml_names <- c("ldak_s_p1male_15.reml", "ldak_ps_p1male_15.reml", "ldak_s_p2_male_15.reml", "ldak_ps_p2_male_15.reml")
-pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.2)
-# pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(0, 0.4), step = 0.1)
-df22 <- compareH2(reml_res = reml_res, names = reml_names)
-
-# Phases Female cutoff 15
-reml_names <- c("ldak_s_p1female_15.reml", "ldak_ps_p1female_15.reml", "ldak_s_p2_female_15.reml", "ldak_ps_p2_female_15.reml")
-pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.2)
-# pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.1, 0.27), step = 0.1)
-df24 <- compareH2(reml_res = reml_res, names = reml_names)
-
-# Phases Male cutoff 10
-reml_names <- c("ldak_s_p1male_10.reml", "ldak_ps_p1male_10.reml", "ldak_s_p2_male_10.reml", "ldak_ps_p2_male_10.reml")
-pl25 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.5)
-# pl25 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(0, 0.85), step = 0.2)
-df25 <- compareH2(reml_res = reml_res, names = reml_names)
-
-# Phases Female cutoff 10
-reml_names <- c("ldak_s_p1female_10.reml", "ldak_ps_p1female_10.reml", "ldak_s_p2_female_10.reml", "ldak_ps_p2_female_10.reml")
-pl26 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.5)
-# pl26 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(0, 0.5), step = 0.1)
-df26 <- compareH2(reml_res = reml_res, names = reml_names)
+# # Phases Male cutoff 15
+# reml_names <- c("ldak_s_p1male_15.reml", "ldak_ps_p1male_15.reml", "ldak_s_p2_male_15.reml", "ldak_ps_p2_male_15.reml")
+# pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.2)
+# # pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(0, 0.4), step = 0.1)
+# df22 <- compareH2(reml_res = reml_res, names = reml_names)
+# 
+# # Phases Female cutoff 15
+# reml_names <- c("ldak_s_p1female_15.reml", "ldak_ps_p1female_15.reml", "ldak_s_p2_female_15.reml", "ldak_ps_p2_female_15.reml")
+# pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.2)
+# # pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.1, 0.27), step = 0.1)
+# df24 <- compareH2(reml_res = reml_res, names = reml_names)
+# 
+# # Phases Male cutoff 10
+# reml_names <- c("ldak_s_p1male_10.reml", "ldak_ps_p1male_10.reml", "ldak_s_p2_male_10.reml", "ldak_ps_p2_male_10.reml")
+# pl25 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.5)
+# # pl25 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(0, 0.85), step = 0.2)
+# df25 <- compareH2(reml_res = reml_res, names = reml_names)
+# 
+# # Phases Female cutoff 10
+# reml_names <- c("ldak_s_p1female_10.reml", "ldak_ps_p1female_10.reml", "ldak_s_p2_female_10.reml", "ldak_ps_p2_female_10.reml")
+# pl26 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.5)
+# # pl26 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(0, 0.5), step = 0.1)
+# df26 <- compareH2(reml_res = reml_res, names = reml_names)
 
 
 # table p-values
 df1 <- list(df12, df14, df15, df16)
-df2 <- list(df22, df24, df25, df26)
+# df2 <- list(df22, df24, df25, df26)
 df_p <- data.frame()
 for(i in 1:4){
-  df_p_tmp <- cbind(df1[[i]], df2[[i]])
-  df_p <- rbind(df_p, df_p_tmp)
+  # df_p_tmp <- cbind(df1[[i]], df2[[i]])
+  df_p_tmp <- cbind(df1[[i]])
+  df_p <- rbind(df_p, df1[[i]])
 }
 df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
 df_p[, Sex := c("M", "W", "M", "W")]
@@ -499,8 +497,8 @@ write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_bysex_pval.tsv",
 
 
 plots1 <- list(pl12, pl14, pl15, pl16)
-plots2_15 <- list(pl12, pl22, pl14, pl24)
-plots2_10 <- list(pl15, pl25, pl16, pl26)
+# plots2_15 <- list(pl12, pl22, pl14, pl24)
+# plots2_10 <- list(pl15, pl25, pl16, pl26)
 
 pdf("/gpfs/helios/home/kuznetsi/EA_heritability/figures/paper/revision/h2_bysex.pdf", width=4.4, height=3)
 
@@ -518,99 +516,99 @@ grid.text("d", x = 0.52, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
 
-pdf("/gpfs/helios/home/kuznetsi/EA_heritability/figures/paper/revision/h2_bysex_all_15_10.pdf", width=5.5, height=3)
-
-print(
-  grid.arrange(
-    grobs = plots2_15,
-    layout_matrix = matrix(1:4, ncol = 2, byrow = T),
-    widths = c(1, 1.5)
-  )
-)
-
-grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("d", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
-
-
-print(
-  grid.arrange(
-    grobs = plots2_10,
-    layout_matrix = matrix(1:4, ncol = 2, byrow = T),
-    widths = c(1, 1.5)
-  )
-)
-
-
-grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("d", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
-
-dev.off()
+# pdf("/gpfs/helios/home/kuznetsi/EA_heritability/figures/paper/revision/h2_bysex_all_15_10.pdf", width=5.5, height=3)
+# 
+# print(
+#   grid.arrange(
+#     grobs = plots2_15,
+#     layout_matrix = matrix(1:4, ncol = 2, byrow = T),
+#     widths = c(1, 1.5)
+#   )
+# )
+# 
+# grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("d", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+# 
+# 
+# print(
+#   grid.arrange(
+#     grobs = plots2_10,
+#     layout_matrix = matrix(1:4, ncol = 2, byrow = T),
+#     widths = c(1, 1.5)
+#   )
+# )
+# 
+# 
+# grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("d", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+# 
+# dev.off()
 
 
 
 # By settlement type
 
 # Rural cutoff 15
-reml_names <- c("ldak_s_rural_15.reml", "ldak_ps_rural_15.reml")
+reml_names <- c("ldak_kin0.05_s_rural_15.reml", "ldak_kin0.05_ps_rural_15.reml")
 # pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "EA")
-pl11 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Rural", lim = c(0, 0.31), step = 0.1)
+pl11 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Rural, cutoff 15", lim = c(0, 0.31), step = 0.1)
 df11 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # Town cutoff 15
-reml_names <- c("ldak_s_town_15.reml", "ldak_ps_town_15.reml")
+reml_names <- c("ldak_kin0.05_s_town_15.reml", "ldak_kin0.05_ps_town_15.reml")
 # pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "OS")
-pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Town", lim = c(0, 0.31), step = 0.1)
+pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Town, cutoff 15", lim = c(0, 0.31), step = 0.1)
 df12 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # City cutoff 15
-reml_names <- c("ldak_s_city_15.reml", "ldak_ps_city_15.reml")
+reml_names <- c("ldak_kin0.05_s_city_15.reml", "ldak_kin0.05_ps_city_15.reml")
 # pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "OS")
-pl13 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "City", lim = c(0, 0.31), step = 0.1)
+pl13 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "City, cutoff 15", lim = c(0, 0.31), step = 0.1)
 df13 <- compareH2(reml_res = reml_res, names = reml_names)
 
 
-# # Rural cutoff 10
-# reml_names <- c("ldak_s_rural_10.reml", "ldak_ps_rural_10.reml")
-# # pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "EA")
-# pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Rural, cutoff 10", lim = c(0, 0.31), step = 0.1)
-# df14 <- compareH2(reml_res = reml_res, names = reml_names)
+# Rural cutoff 10
+reml_names <- c("ldak_kin0.05_s_rural_10.reml", "ldak_kin0.05_ps_rural_10.reml")
+# pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "EA")
+pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Rural, cutoff 10", lim = c(0, 0.39), step = 0.1)
+df14 <- compareH2(reml_res = reml_res, names = reml_names)
+
+# Town cutoff 10
+reml_names <- c("ldak_kin0.05_s_town_10.reml", "ldak_kin0.05_ps_town_10.reml")
+# pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "OS")
+pl15 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Town, cutoff 10", lim = c(0, 0.39), step = 0.1)
+df15 <- compareH2(reml_res = reml_res, names = reml_names)
+
+# City cutoff 10
+reml_names <- c("ldak_kin0.05_s_city_10.reml", "ldak_kin0.05_ps_city_10.reml")
+# pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "OS")
+pl16 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "City, cutoff 10", lim = c(0, 0.39), step = 0.1)
+df16 <- compareH2(reml_res = reml_res, names = reml_names)
+
+
+# # Phases Rural cutoff 15
+# reml_names <- c("ldak_s_p1rural_15.reml", "ldak_ps_p1rural_15.reml", "ldak_s_p2rural_15.reml", "ldak_ps_p2rural_15.reml")
+# pl21 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.2)
+# # pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(0, 0.45), step = 0.1)
+# df21 <- compareH2(reml_res = reml_res, names = reml_names)
 # 
-# # Town cutoff 10
-# reml_names <- c("ldak_s_town_10.reml", "ldak_ps_town_10.reml")
-# # pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "OS")
-# pl15 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Town, cutoff 10", lim = c(0, 0.31), step = 0.1)
-# df15 <- compareH2(reml_res = reml_res, names = reml_names)
+# # Phases Town cutoff 15
+# reml_names <- c("ldak_s_p1town_15.reml", "ldak_ps_p1town_15.reml", "ldak_s_p2town_15.reml", "ldak_ps_p2town_15.reml")
+# pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.5)
+# # pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.1, 0.27), step = 0.1)
+# df22 <- compareH2(reml_res = reml_res, names = reml_names)
 # 
-# # City cutoff 10
-# reml_names <- c("ldak_s_city_10.reml", "ldak_ps_city_10.reml")
-# # pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "OS")
-# pl16 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "City, cutoff 10", lim = c(0, 0.31), step = 0.1)
-# df16 <- compareH2(reml_res = reml_res, names = reml_names)
-
-
-# Phases Rural cutoff 15
-reml_names <- c("ldak_s_p1rural_15.reml", "ldak_ps_p1rural_15.reml", "ldak_s_p2rural_15.reml", "ldak_ps_p2rural_15.reml")
-pl21 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.2)
-# pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(0, 0.45), step = 0.1)
-df21 <- compareH2(reml_res = reml_res, names = reml_names)
-
-# Phases Town cutoff 15
-reml_names <- c("ldak_s_p1town_15.reml", "ldak_ps_p1town_15.reml", "ldak_s_p2town_15.reml", "ldak_ps_p2town_15.reml")
-pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.5)
-# pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.1, 0.27), step = 0.1)
-df22 <- compareH2(reml_res = reml_res, names = reml_names)
-
-# Phases City cutoff 15
-reml_names <- c("ldak_s_p1city_15.reml", "ldak_ps_p1city_15.reml", "ldak_s_p2city_15.reml", "ldak_ps_p2city_15.reml")
-pl23 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.2)
-# pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.1, 0.27), step = 0.1)
-df23 <- compareH2(reml_res = reml_res, names = reml_names)
-
-
+# # Phases City cutoff 15
+# reml_names <- c("ldak_s_p1city_15.reml", "ldak_ps_p1city_15.reml", "ldak_s_p2city_15.reml", "ldak_ps_p2city_15.reml")
+# pl23 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.2)
+# # pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.1, 0.27), step = 0.1)
+# df23 <- compareH2(reml_res = reml_res, names = reml_names)
+# 
+# 
 # # Phases Rural cutoff 10
 # reml_names <- c("ldak_s_p1rural_10.reml", "ldak_ps_p1rural_10.reml", "ldak_s_p2rural_10.reml", "ldak_ps_p2rural_10.reml")
 # pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "")
@@ -632,44 +630,47 @@ df23 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # table p-values
 df1 <- list(df11, df12, df13)
-df2 <- list(df21, df22, df23)
+# df2 <- list(df21, df22, df23)
+df2 <- list(df14, df15, df16)
 df_p <- data.frame()
 for(i in 1:3){
   df_p_tmp <- cbind(df1[[i]], df2[[i]])
   df_p <- rbind(df_p, df_p_tmp)
 }
 df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
+colnames(df_p) <- c("s_ps_15", "s_ps_10")
 df_p[, Settlement := c("Rural", "Town", "Urban")]
-write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_rural-urban_15_pval.tsv",
-            row.names = F, quote = F, sep = "\t")
-
-
-# cutoff 15
-df1 <- list(df11, df12, df13)
-df2 <- list(df21, df22, df23)
-df_p <- data.frame()
-for(i in 1:3){
-  df_p_tmp <- cbind(df1[[i]], df2[[i]])
-  df_p <- rbind(df_p, df_p_tmp)
-}
-df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
-df_p[, Settelment := c("Rural", "Town", "City")]
-df_p[, cutoff := c(15, 15, 15)]
 write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_rural-urban_pval.tsv",
             row.names = F, quote = F, sep = "\t")
 
 
+# # cutoff 15
+# df1 <- list(df11, df12, df13)
+# df2 <- list(df21, df22, df23)
+# df_p <- data.frame()
+# for(i in 1:3){
+#   df_p_tmp <- cbind(df1[[i]], df2[[i]])
+#   df_p <- rbind(df_p, df_p_tmp)
+# }
+# df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
+# df_p[, Settelment := c("Rural", "Town", "City")]
+# df_p[, cutoff := c(15, 15, 15)]
+# write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_rural-urban_pval.tsv",
+#             row.names = F, quote = F, sep = "\t")
+
+
 # plots <- list(pl12, pl22, pl14, pl24, pl15, pl25, pl16, pl26)
-plots <- list(pl11, pl21, pl12, pl22, pl13, pl23)
+# plots <- list(pl11, pl21, pl12, pl22, pl13, pl23)
+plots <- list(pl11, pl14, pl12, pl15, pl13, pl16)
 
 # pdf("/gpfs/helios/home/kuznetsi/EA_heritability/figures/BGA/h2_main.pdf", width=5.5, height=10)
-pdf("/gpfs/helios/home/kuznetsi/EA_heritability/figures/paper/revision/h2_rural-urban.pdf", width=5.5, height=4.5)
+pdf("/gpfs/helios/home/kuznetsi/EA_heritability/figures/paper/revision/h2_rural-urban.pdf", width=4.4, height=4.5)
 
 print(
   grid.arrange(
     grobs = plots,
     layout_matrix = matrix(1:6, ncol = 2, byrow = T),
-    widths = c(1, 1.5)
+    widths = c(1, 1)
   )
 )
 
