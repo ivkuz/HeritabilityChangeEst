@@ -5,12 +5,12 @@ library(gridExtra)
 library(ggsignif)
 
 
-fig2abc <-  readRDS("~/EA_heritability/figures/paper/files_for_figures/fig2abc.rds")
-fig2d <-  readRDS("~/EA_heritability/figures/paper/files_for_figures/fig2d.rds")
+fig2abc <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig2abc.rds")
+fig2d <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig2d.rds")
 
 fig2 <- c(fig2abc, fig2d)
 
-pdf("~/EA_heritability/figures/paper/figure2.pdf", width=5.5, height=5)
+pdf("~/EA_heritability/figures/paper/revision/figure2.pdf", width=5.5, height=5)
 
 print(
   grid.arrange(
@@ -29,12 +29,12 @@ dev.off()
 
 
 
-fig3ab <-  readRDS("~/EA_heritability/figures/paper/files_for_figures/fig3ab.rds")
-fig3cd <-  readRDS("~/EA_heritability/figures/paper/files_for_figures/fig3cd.rds")
+fig3ab <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig3ab.rds")
+fig3cd <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig3cd.rds")
 
 fig3 <- c(fig3ab, fig3cd)
 
-pdf("~/EA_heritability/figures/paper/figure3.pdf", width=5.5, height=6)
+pdf("~/EA_heritability/figures/paper/revision/figure3.pdf", width=5.5, height=6)
 
 print(
   grid.arrange(
@@ -53,13 +53,13 @@ dev.off()
 
 
 
-fig5abde <-  readRDS("~/EA_heritability/figures/paper/files_for_figures/fig5abde.rds")
+fig5abde <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5abde.rds")
 fig5abde <- list(ggplotGrob(fig5abde[[1]]), ggplotGrob(fig5abde[[2]]), ggplotGrob(fig5abde[[3]]), ggplotGrob(fig5abde[[4]]))
-fig5cf <-  readRDS("~/EA_heritability/figures/paper/files_for_figures/fig5cf.rds")
+fig5cf <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf.rds")
 
 fig5 <- c(fig5abde, fig5cf)
 
-pdf("~/EA_heritability/figures/paper/figure5.pdf", width=7.5, height=5.25)
+pdf("~/EA_heritability/figures/paper/revision/figure5.pdf", width=7.5, height=5.25)
 
 print(
   grid.arrange(
