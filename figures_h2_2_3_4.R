@@ -382,3 +382,98 @@ grid.text("g", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
+
+
+
+
+
+
+
+# h2 with kinship threshold 0.05 or default LDAK threshold -min_kin (~0.025)
+
+# list of files with LDAK results
+reml_files = paste0(rep(c("", "p1", "p2"), each = 4), rep(c("s", "ps"), 6), "_", rep(c(15, 15, 10, 10), 3))
+
+# Get REML results from the files
+reml_res <- data.frame()
+for( reml_file in reml_files){
+  # file_path <- paste0("~/EA_heritability/gcta/results/ldak_kin0.05_", reml_file, ".reml")
+  file_path <- paste0("~/EA_heritability/gcta/results/ldak_kin_def_", reml_file, ".reml")
+  if (file.exists(file_path)){
+    res = readLines(file_path)
+    
+    l <- unlist(strsplit(res[grepl("Her_K1", res)], " "))
+    h2 <- l[2]
+    se <- l[3]
+
+    reml_res <- rbind(reml_res, c(reml_file, h2, se))
+
+  } else{
+    print(paste0(reml_file, " doesn't exist"))
+  }
+}
+
+colnames(reml_res) <- c("name", "h2", "se")
+reml_res <- as.data.table(reml_res)
+reml_res[, h2 := as.numeric(h2)]
+reml_res[, se := as.numeric(se)]
+
+# Both phases, cutoff 15
+names <- c("s_15", "ps_15")
+pl1_15_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "Cutoff 15")
+df1_15_h2g <- compareH2(reml_res = reml_res, names = names)
+
+# Both phases, cutoff 10
+names <- c("s_10", "ps_10")
+pl1_10_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "Cutoff 10")
+df1_10_h2g <- compareH2(reml_res = reml_res, names = names)
+
+
+# Phase 1, cutoff 15
+names <- c("p1s_15", "p1ps_15", "p2s_15", "p2ps_15")
+pl2_15_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI")
+df2_15_h2g <- compareH2(reml_res = reml_res, names = names)
+
+
+# Phase 2, cutoff 10
+names <- c("p1s_10", "p1ps_10", "p2s_10", "p2ps_10")
+pl2_10_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "Cutoff 10", step = 0.2)
+df2_10_h2g <- compareH2(reml_res = reml_res, names = names)
+
+# Make and save p-value table
+# cutoff 10, collect p-value results in a table
+df1 <- list(df1_15_h2g, df1_10_h2g)
+df2 <- list(df2_15_h2g, df2_10_h2g)
+df_p <- data.frame()
+for(i in 1:2){
+  df_p_tmp <- cbind(df1[[i]], df2[[i]])
+  df_p <- rbind(df_p, df_p_tmp)
+}
+df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
+df_p[, cutoff := c(15, 10)]
+
+# Save p-value table for both cutoffs
+# write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_kin0.05_pval.tsv",
+write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_kin_def_pval.tsv",
+            row.names = F, quote = F, sep = "\t")
+
+
+plots <- list(pl1_15_h2g, pl1_10_h2g,
+              pl2_15_h2g, pl2_10_h2g)
+# pdf("~/EA_heritability/figures/paper/revision/h2_kin0.05.pdf", width=5.5, height=6)
+pdf("~/EA_heritability/figures/paper/revision/h2_kin_def.pdf", width=5.5, height=6)
+print(
+  grid.arrange(
+    grobs = plots,
+    layout_matrix = matrix(1:4, ncol = 2, byrow = F),
+    widths = c(1, 1.5)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("d", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+
+dev.off()
+
