@@ -121,25 +121,21 @@ bootstrap_v <- c("r2_adj_EduYears_1000.tsv", "r2_adj_OS_1000.tsv",
                  "r2_adj_Height_first_1000.tsv", "r2_adj_BMI_first_1000.tsv")
 
 # parameters for plotting
-titles <- c("Educational Attainment", "Occupational Status", "Height", "BMI") 
-lim_list_inc <- c(0.16, 0.135, 0.20, 0.15)
-lim_list <- c(0.11, 0.10, 0.32, 0.13)
-steps = c(0.03, 0.03, 0.1, 0.05)
+titles <- c("Educational Attainment", "Occupational Status") 
+lim_list_inc <- c(0.17, 0.17)
+steps = c(0.03, 0.03)
 
 # manage data
 plot_list_inc <- list()
 plot_list <- list()
 pval_dt <- data.table()
-for(i in 1:4){
+for(i in 1:2){
   
   r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
   bootstrap <- fread(paste0("~/EA_heritability/results/revision/", bootstrap_v[i]))
   plot_list_inc <- append(plot_list_inc, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
                                                 r2_var = "r2_inc", title = titles[i],
-                                                step = 0.01
-  ))
-                                                # , 
-                                                # lim = lim_list_inc[i], step = steps[i]))
+                                                lim = lim_list_inc[i], step = steps[i]))
   plot_list <- append(plot_list, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
                                         r2_var = "r2", title = titles[i], 
                                         lim = lim_list[i], step = steps[i]))
@@ -182,11 +178,11 @@ pval_dt[, trait := rep(titles, each = 2)]
 
 saveRDS(plot_list_inc[1:4], "~/EA_heritability/figures/paper/revision/files_for_figures/fig5abde.rds")
 
-pdf("~/EA_heritability/figures/paper/revision/working_figures/R2_all_PGI_repository.pdf")
-for(i in 1:8){
-  plot(plot_list_inc[[i]])
-}
-dev.off()
+# pdf("~/EA_heritability/figures/paper/revision/working_figures/R2_all_PGI_repository.pdf")
+# for(i in 1:8){
+#   plot(plot_list_inc[[i]])
+# }
+# dev.off()
 
 # # plot
 # pdf("~/EA_heritability/figures/paper/figure5.pdf", width=5.5, height=5)
