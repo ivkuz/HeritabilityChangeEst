@@ -159,32 +159,33 @@ pca_est <- pca_est[,c("IID", paste0("PC", 1:100))]
 colnames(pca_est)[1] <- "vkood"
 ebb <- merge(ebb, pca_est, by="vkood")
 
-prs <- fread("~/EA_heritability/data/EA4_excl_23andMe_EGCUT/PRS.chrALL.sscore")
-
+prs <-  fread("/gpfs/space/GI/GV/Projects/PGI_repository_v2/SSGAC_PGI_Repository_v2_EstBB.txt", 
+                 select = c("IID", "PGI_EA"))
 colnames(prs) <- c("vkood", "PRS")
 ebb <- merge(ebb, prs)
 ebb[, PRS := scale(PRS)]
+
 
 
 ebb <- ebb[AgeAtAgr > 25,]
 
 
 
-# # 15 years
-# ind_01 <- fread("~/EA_heritability/gcta/data/ps_list_unrel.tsv", header=F)
-# ind_02 <- fread("~/EA_heritability/gcta/data/s_list_unrel.tsv", header=F)
-# ind_11 <- fread("~/EA_heritability/gcta/data/p1ps_list_unrel.tsv", header=F)
-# ind_12 <- fread("~/EA_heritability/gcta/data/p1s_list_unrel.tsv", header=F)
-# ind_21 <- fread("~/EA_heritability/gcta/data/p2ps_list_unrel.tsv", header=F)
-# ind_22 <- fread("~/EA_heritability/gcta/data/p2s_list_unrel.tsv", header=F)
+# 15 years
+ind_01 <- fread("~/EA_heritability/gcta/data/ps_list_unrel.tsv", header=F)
+ind_02 <- fread("~/EA_heritability/gcta/data/s_list_unrel.tsv", header=F)
+ind_11 <- fread("~/EA_heritability/gcta/data/p1ps_list_unrel.tsv", header=F)
+ind_12 <- fread("~/EA_heritability/gcta/data/p1s_list_unrel.tsv", header=F)
+ind_21 <- fread("~/EA_heritability/gcta/data/p2ps_list_unrel.tsv", header=F)
+ind_22 <- fread("~/EA_heritability/gcta/data/p2s_list_unrel.tsv", header=F)
 
-# 10 years
-ind_01 <- fread("~/EA_heritability/gcta/data/ps_list_unrel_10.tsv", header=F)
-ind_02 <- fread("~/EA_heritability/gcta/data/s_list_unrel_10.tsv", header=F)
-ind_11 <- fread("~/EA_heritability/gcta/data/p1ps_list_unrel_10.tsv", header=F)
-ind_12 <- fread("~/EA_heritability/gcta/data/p1s_list_unrel_10.tsv", header=F)
-ind_21 <- fread("~/EA_heritability/gcta/data/p2ps_list_unrel_10.tsv", header=F)
-ind_22 <- fread("~/EA_heritability/gcta/data/p2s_list_unrel_10.tsv", header=F)
+# # 10 years
+# ind_01 <- fread("~/EA_heritability/gcta/data/ps_list_unrel_10.tsv", header=F)
+# ind_02 <- fread("~/EA_heritability/gcta/data/s_list_unrel_10.tsv", header=F)
+# ind_11 <- fread("~/EA_heritability/gcta/data/p1ps_list_unrel_10.tsv", header=F)
+# ind_12 <- fread("~/EA_heritability/gcta/data/p1s_list_unrel_10.tsv", header=F)
+# ind_21 <- fread("~/EA_heritability/gcta/data/p2ps_list_unrel_10.tsv", header=F)
+# ind_22 <- fread("~/EA_heritability/gcta/data/p2s_list_unrel_10.tsv", header=F)
 
 
 ind_01 <- ind_01$V1
@@ -398,7 +399,7 @@ logm_OS_plot_noYoB <- make_forest_plot(tab_logm_all, "", "Odds Ratio (95% CI)")
 plot_logm_list <- list(logm_plot, logm_plot_noYoB, logm_OS_plot, logm_OS_plot_noYoB)
 
 
-pdf("~/EA_heritability/figures/regres_interact_10.pdf", width=7, height=7)
+pdf("~/EA_heritability/figures/paper/revision/regres_interact_15.pdf", width=7, height=7)
 
 print(
   grid.arrange(
