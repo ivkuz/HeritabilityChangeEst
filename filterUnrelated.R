@@ -94,12 +94,38 @@ for(age in c(10, 15)){
   
 }
 
-# Age bins unfiltered
+# Age bins unfilteres (relatedness), filtered for AgeAtAgr
 for(year in seq(1940, 1990, 5)){
   
   ind <- data.table(0, ebb_test[YoB > year & YoB <= year + 10, vkood])
   
   write.table(ind, paste0("~/EA_heritability/gcta/data/ldak_list_all_", year, ".tsv"),
+              row.names = F, col.names = F, quote = F, sep = "\t")
+  
+}
+
+
+# Age bins unfiltered, also unfiltered for AgeAtAgr
+ebb_test <- ebb
+for(year in seq(1940, 1990, 5)){
+  
+  ind <- data.table(0, ebb_test[YoB > year & YoB <= year + 10, vkood])
+  
+  write.table(ind, paste0("~/EA_heritability/gcta/data/ldak_list_all_noAgeAtAgr_", year, ".tsv"),
+              row.names = F, col.names = F, quote = F, sep = "\t")
+  
+}
+
+
+# Bandwidths around 1975
+for(bin in seq(12, 20, 2)){ # seq(2, 8, 2)
+  
+  ind_s <-  data.table(0, ebb_test[YoB > 1975 - bin & YoB <= 1975, vkood])
+  ind_ps <- data.table(0, ebb_test[YoB > 1975 & YoB <= 1975 + bin, vkood])
+  
+  write.table(ind_s, paste0("~/EA_heritability/gcta/data/ldak_list_all_s_bin", bin, ".tsv"),
+              row.names = F, col.names = F, quote = F, sep = "\t")
+  write.table(ind_ps, paste0("~/EA_heritability/gcta/data/ldak_list_all_ps_bin", bin, ".tsv"),
               row.names = F, col.names = F, quote = F, sep = "\t")
   
 }
