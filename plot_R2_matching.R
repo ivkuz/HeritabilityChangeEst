@@ -13,7 +13,7 @@ library(grid)
 library(gridExtra)
 
 
-r2_list <- readRDS("~/EA_heritability/scripts/paper/r2_matched.RDS")
+r2_list <- readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/r2_matched.RDS")
 
 plot_list_EA <- list()
 plot_list_EA_Sex <- list()
@@ -28,7 +28,7 @@ for(l in r2_list){
                            theme(axis.title.x = element_blank(),
                                  axis.title.y = element_blank(),
                                  text = element_text(size = 10)) +
-                         xlim(0.05, 0.13) + ylim(0, 0.33)
+                         xlim(0.07, 0.20) + ylim(0, 0.33)
                     )
   )
   plot_list_EA_Sex <- c(plot_list_EA_Sex,
@@ -40,13 +40,13 @@ for(l in r2_list){
                                theme(axis.title.x = element_blank(),
                                      axis.title.y = element_blank(),
                                      text = element_text(size = 10)) +
-                             xlim(0.04, 0.15) + ylim(0, 0.32)
+                             xlim(0.07, 0.23) + ylim(0, 0.32)
                         )
   )
 }
 
 
-pdf("~/EA_heritability/figures/paper/matching_replacement2.pdf", width=6, height = 6)
+pdf("~/EA_heritability/figures/paper/revision/matching_replacement2.pdf", width=6, height = 6)
 
 print(
   grid.arrange(
