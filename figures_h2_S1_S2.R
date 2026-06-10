@@ -61,7 +61,7 @@ plotH2 <- function(reml_res, names, errors = "CI", title = "", lim = NULL, step 
   return(pl)
 }
 
-# Extract h2 ans se from GCTA-GREML output files where h2 were stored
+# Extract h2 and se from GCTA-GREML output files where h2 were stored
 getH2table <- function(rem_files, prefix = "~/EA_heritability/gcta/results/", suffix = ".hsq"){
   
   reml_res <- data.frame()
