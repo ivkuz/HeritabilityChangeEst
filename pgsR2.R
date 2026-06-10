@@ -696,28 +696,28 @@ getWeights <- function(ebb, ind, Y, census, correct = "all"){
   # EA
   lm_0 <- lm(paste0("EduYears ~ Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
              data = ebb, weights = wt)
-  lm_0prs <- lm(paste0("EduYears ~ PRS_EA + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
+  lm_0prs <- lm(paste0("EduYears ~ PGI_EA + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
                 data = ebb, weights = wt)
   r2_inc_EA <- summary(lm_0prs)$r.squared - summary(lm_0)$r.squared
   
   # OS
   lm_0 <- lm(paste0("OS ~ Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
              data = ebb, weights = wt)
-  lm_0prs <- lm(paste0("OS ~ PRS_EA + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
+  lm_0prs <- lm(paste0("OS ~ PGI_EA + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
                 data = ebb, weights = wt)
   r2_inc_OS <- summary(lm_0prs)$r.squared - summary(lm_0)$r.squared
   
   # Height
   lm_0 <- lm(paste0("Height_first ~ Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
              data = ebb, weights = wt)
-  lm_0prs <- lm(paste0("Height_first ~ PRS_Height + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
+  lm_0prs <- lm(paste0("Height_first ~ PGI_HEIGHT + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
                 data = ebb, weights = wt)
   r2_inc_Height <- summary(lm_0prs)$r.squared - summary(lm_0)$r.squared
   
   # BMI
   lm_0 <- lm(paste0("BMI_first ~ Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
              data = ebb, weights = wt)
-  lm_0prs <- lm(paste0("BMI_first ~ PRS_BMI + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
+  lm_0prs <- lm(paste0("BMI_first ~ PGI_BMI + Sex + Age + Sex*Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")), 
                 data = ebb, weights = wt)
   r2_inc_BMI <- summary(lm_0prs)$r.squared - summary(lm_0)$r.squared
   
@@ -806,10 +806,10 @@ for(i in 1:2){
 ebb_test <- ebb_test[!is.na(Age_group),]
 
 
-r_11 <- bootstrapR2(ebb_test = ebb_test, ind = ind_11, Y = 2011, census = census, correct = "bygroup", B = 1000)
-r_12 <- bootstrapR2(ebb_test = ebb_test, ind = ind_12, Y = 2011, census = census, correct = "bygroup", B = 1000)
-r_21 <- bootstrapR2(ebb_test = ebb_test, ind = ind_21, Y = 2021, census = census, correct = "bygroup", B = 1000)
-r_22 <- bootstrapR2(ebb_test = ebb_test, ind = ind_22, Y = 2021, census = census, correct = "bygroup", B = 1000)
+r_11 <- bootstrapR2(ebb = ebb_test, ind = ind_11, Y = 2011, census = census, correct = "bygroup", B = 1000)
+r_12 <- bootstrapR2(ebb = ebb_test, ind = ind_12, Y = 2011, census = census, correct = "bygroup", B = 1000)
+r_21 <- bootstrapR2(ebb = ebb_test, ind = ind_21, Y = 2021, census = census, correct = "bygroup", B = 1000)
+r_22 <- bootstrapR2(ebb = ebb_test, ind = ind_22, Y = 2021, census = census, correct = "bygroup", B = 1000)
 
 r2_bygroup <- data.table(weights = "by group", # byEA_in_sex_age_groups
                          trait = rep(c("EA", "OS", "Height", "BMI")),
@@ -821,10 +821,10 @@ r2_bygroup <- data.table(weights = "by group", # byEA_in_sex_age_groups
 r2_list_bygroup <- list(r_11 = r_11, r12 = r_12, r_21 = r_21, r_22 = r_22)
 
 
-r_11 <- bootstrapR2(ebb_test = ebb_test, ind = ind_11, Y = 2011, census = census, correct = "all", B = 1000)
-r_12 <- bootstrapR2(ebb_test = ebb_test, ind = ind_12, Y = 2011, census = census, correct = "all", B = 1000)
-r_21 <- bootstrapR2(ebb_test = ebb_test, ind = ind_21, Y = 2021, census = census, correct = "all", B = 1000)
-r_22 <- bootstrapR2(ebb_test = ebb_test, ind = ind_22, Y = 2021, census = census, correct = "all", B = 1000)
+r_11 <- bootstrapR2(ebb = ebb_test, ind = ind_11, Y = 2011, census = census, correct = "all", B = 1000)
+r_12 <- bootstrapR2(ebb = ebb_test, ind = ind_12, Y = 2011, census = census, correct = "all", B = 1000)
+r_21 <- bootstrapR2(ebb = ebb_test, ind = ind_21, Y = 2021, census = census, correct = "all", B = 1000)
+r_22 <- bootstrapR2(ebb = ebb_test, ind = ind_22, Y = 2021, census = census, correct = "all", B = 1000)
 
 r2_all <- data.table(weights = "overall", # byEA_sex_age
                      trait = rep(c("EA", "OS", "Height", "BMI")),
@@ -836,10 +836,10 @@ r2_all <- data.table(weights = "overall", # byEA_sex_age
 r2_list_all <- list(r_11 = r_11, r12 = r_12, r_21 = r_21, r_22 = r_22)
 
 
-r_11 <- bootstrapR2(ebb_test = ebb_test, ind = ind_11, Y = 2011, census = census, correct = "none", B = 1000)
-r_12 <- bootstrapR2(ebb_test = ebb_test, ind = ind_12, Y = 2011, census = census, correct = "none", B = 1000)
-r_21 <- bootstrapR2(ebb_test = ebb_test, ind = ind_21, Y = 2021, census = census, correct = "none", B = 1000)
-r_22 <- bootstrapR2(ebb_test = ebb_test, ind = ind_22, Y = 2021, census = census, correct = "none", B = 1000)
+r_11 <- bootstrapR2(ebb = ebb_test, ind = ind_11, Y = 2011, census = census, correct = "none", B = 1000)
+r_12 <- bootstrapR2(ebb = ebb_test, ind = ind_12, Y = 2011, census = census, correct = "none", B = 1000)
+r_21 <- bootstrapR2(ebb = ebb_test, ind = ind_21, Y = 2021, census = census, correct = "none", B = 1000)
+r_22 <- bootstrapR2(ebb = ebb_test, ind = ind_22, Y = 2021, census = census, correct = "none", B = 1000)
 
 r2_unadj <- data.table(weights = "original",
                        trait = rep(c("EA", "OS", "Height", "BMI")),
@@ -856,8 +856,8 @@ r2 <- as.data.table(r2)
 
 r2_list <- list(unadj = r2_list_unadj, bygroup = r2_list_bygroup, all = r2_list_all)
 
-saveRDS(r2_list, file = "~/EA_heritability/results/r2_15_weighted_ci_alltraits.RDS")
-write.table(r2,  "~/EA_heritability/results/r2_15_weighted_ci_alltraits.tsv", col.names = T, row.names = F, quote = F, sep = "\t")
+saveRDS(r2_list, file = "~/EA_heritability/results/revision/r2_15_weighted_ci_alltraits.RDS")
+write.table(r2,  "~/EA_heritability/results/revision/r2_15_weighted_ci_alltraits.tsv", col.names = T, row.names = F, quote = F, sep = "\t")
 
 
 ######################################
@@ -936,21 +936,21 @@ lm_EA <- lm(paste0("EduYears ~ Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC"
 ebb_test$EduYears_adj2 <- ebb_test$EduYears - predict(object = lm_EA, newdata = ebb_test)
 ebb_test[, EduYears_adj2 := scale(EduYears_adj2)]
 
-
+ebb_test[, PRS := PGI_EA]
 
 r2_list <- list()
 for(i in 3:6){
   for(j in 3:6){
     print(c(i, j))
     r2_matched <- matchCohorts(ref_ind = ind_list[[i]], biased_ind = ind_list[[j]], n = 1000, replacement=T, max_ratio=10)
-    r2_ref <- ebb_test[vkood %in% ind_list[[i]], cor(PRS, EduYears_adj2)^2]
-    r2_biased <- ebb_test[vkood %in% ind_list[[j]], cor(PRS, EduYears_adj2)^2]
-    r2_list_tmp <- list(r2_matched, rw_ref = r2_ref, r2_biased = r2_biased)
+    r2_ref <- ebb_test[vkood %in% ind_list[[i]], cor(PRS, EduYears_adj2, use = "complete.obs")^2]
+    r2_biased <- ebb_test[vkood %in% ind_list[[j]], cor(PRS, EduYears_adj2, use = "complete.obs")^2]
+    r2_list_tmp <- list(r2_matched, r2_ref = r2_ref, r2_biased = r2_biased)
     r2_list <- append(r2_list, list(r2_list_tmp))
   }
 }
 
-saveRDS(r2_list, "~/EA_heritability/scripts/paper/r2_matched.RDS")
+saveRDS(r2_list, "~/EA_heritability/figures/paper/revision/files_for_figures/r2_matched.RDS")
 
 
 
