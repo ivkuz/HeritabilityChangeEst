@@ -42,7 +42,7 @@ compareR2 <- function(r2_res, trait_n = 1){
 
 
 # calculate p-values
-r2_list <- readRDS("~/EA_heritability/results/r2_15_weighted_ci_alltraits.RDS")
+r2_list <- readRDS("~/EA_heritability/results/revision/r2_15_weighted_ci_alltraits.RDS")
 pval_res <- data.frame()
 for(i in 1:4){
   pval <- compareR2(r2_res = r2_list$unadj, trait_n = i)
@@ -54,12 +54,12 @@ for(i in 1:4){
 }
 pval_res <- cbind(rep(c("EA", "OS", "Height", "BMI"), each = 3), pval_res)
 colnames(pval_res) <- c("Trait", "weighting", "p1_s_ps", "p2_s_ps", "p1p2_s", "p1p2_ps")
-write.table(pval_res, "~/EA_heritability/figures/paper/r2_15_weighted_ci_alltraits_pval.tsv", 
+write.table(pval_res, "~/EA_heritability/figures/paper/revision/r2_15_weighted_ci_alltraits_pval.tsv", 
             col.names = T, row.names = F, quote = F, sep = "\t")
 
 
 # make plots
-r2 <- fread("~/EA_heritability/results/r2_15_weighted_ci_alltraits.tsv")
+r2 <- fread("~/EA_heritability/results/revision/r2_15_weighted_ci_alltraits.tsv")
 r2[, Era := factor(rep(rep(c("phase1\npost-soviet", "phase1\nsoviet", "phase2\npost-soviet", "phase2\nsoviet"), each = 4), 3),
                    levels = c("phase1\nsoviet", "phase1\npost-soviet", "phase2\nsoviet", "phase2\npost-soviet"))]
 r2[, weights := factor(weights, levels = c("original", "by group", "overall"))]
@@ -152,7 +152,7 @@ leg <- ggplot() +
 pl_list <- append(pl_list, list(leg))
 
 
-pdf("~/EA_heritability/figures/paper/figure7.pdf", width = 5.5, height = 6)
+pdf("~/EA_heritability/figures/paper/revision/figure7.pdf", width = 5.5, height = 6)
 
 print(
   grid.arrange(
