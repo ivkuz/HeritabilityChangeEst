@@ -2,6 +2,7 @@
 ########################################################################
 # Plot Fig. 5 ##########################################################
 # Trait variance explained by PGS in the post-Soviet and Soviet groups #
+# including inverse-transformed traits INT (EA and OS) #################
 ########################################################################
 
 library(data.table)
@@ -55,11 +56,13 @@ plotR2 <- function(r2_res, names, r2_var = "r2_inc", title = "", lim = NA, step 
 # Extract R2 table with CIs from the input with bootstrap results
 makeR2 <- function(r2_res, bootstrap, r2_var = "r2_inc", title = "", lim = NA, step = 0.05){
   
-  bootstrap_result <- bootstrap[, lapply(.SD, function(x) list(
-    median = median(x, na.rm = TRUE),
-    quantile_0025 = quantile(x, 0.025, na.rm = TRUE),
-    quantile_0975 = quantile(x, 0.975, na.rm = TRUE)
-  ))]
+  bootstrap_result <- bootstrap[, lapply(.SD, function(x)
+    c(
+      median = median(x, na.rm = TRUE),
+      quantile_0025 = quantile(x, 0.025, na.rm = TRUE),
+      quantile_0975 = quantile(x, 0.975, na.rm = TRUE)
+    )
+  )]  
   
   r2_res <- rbind(r2_res, bootstrap_result)
   
@@ -82,28 +85,47 @@ makeR2 <- function(r2_res, bootstrap, r2_var = "r2_inc", title = "", lim = NA, s
 }
 
 # Calculate bootstrap p-values for the difference between R2
-compareR2 <- function(r2_res, bootstrap){
+compareR2 <- function(r2_res, bootstrap, no_inc = F){
   
-  s_ps <- bootstrap[, sum(s_r2 < ps_r2)]
-  s_ps_inc <- bootstrap[, sum(s_r2_inc < ps_r2_inc)]
-  
-  p1_s_ps <- bootstrap[, sum(s_r2_p1 < ps_r2_p1)]
-  p1_s_ps_inc <- bootstrap[, sum(s_r2_inc_p1 < ps_r2_inc_p1)]
-  p2_s_ps <- bootstrap[, sum(s_r2_p2 < ps_r2_p2)]
-  p2_s_ps_inc <- bootstrap[, sum(s_r2_inc_p2 < ps_r2_inc_p2)]
-  
-  p1p2_s <- bootstrap[, sum(s_r2_p1 < s_r2_p2)]
-  p1p2_s_inc <- bootstrap[, sum(s_r2_inc_p1 < s_r2_inc_p2)]
-  p1p2_ps <- bootstrap[, sum(ps_r2_p1 < ps_r2_p2)]
-  p1p2_ps_inc <- bootstrap[, sum(ps_r2_inc_p1 < ps_r2_inc_p2)]
-  
-  comparison_r2 <- c(s_ps, p1_s_ps, p2_s_ps, p1p2_s, p1p2_ps,
-                     s_ps_inc, p1_s_ps_inc, p2_s_ps_inc, p1p2_s_inc, p1p2_ps_inc)
-  pval_r2 <- round(sapply(comparison_r2, function(x) min(x/1000, 1 - x/1000)*2), 3)
-  names_r2 <- c("s_ps", "p1_s_ps", "p2_s_ps", "p1p2_s", "p1p2_ps",
-                "s_ps_inc", "p1_s_ps_inc", "p2_s_ps_inc", "p1p2_s_inc", "p1p2_ps_inc")
-  res <- rbind(c("r2_inc", pval_r2[6:10]), c("r2", pval_r2[1:5]))
-  colnames(res) <- c("r2", names_r2[1:5])
+  if(no_inc == F){
+    s_ps <- bootstrap[, sum(s_r2 < ps_r2)]
+    s_ps_inc <- bootstrap[, sum(s_r2_inc < ps_r2_inc)]
+    
+    p1_s_ps <- bootstrap[, sum(s_r2_p1 < ps_r2_p1)]
+    p1_s_ps_inc <- bootstrap[, sum(s_r2_inc_p1 < ps_r2_inc_p1)]
+    p2_s_ps <- bootstrap[, sum(s_r2_p2 < ps_r2_p2)]
+    p2_s_ps_inc <- bootstrap[, sum(s_r2_inc_p2 < ps_r2_inc_p2)]
+    
+    p1p2_s <- bootstrap[, sum(s_r2_p1 < s_r2_p2)]
+    p1p2_s_inc <- bootstrap[, sum(s_r2_inc_p1 < s_r2_inc_p2)]
+    p1p2_ps <- bootstrap[, sum(ps_r2_p1 < ps_r2_p2)]
+    p1p2_ps_inc <- bootstrap[, sum(ps_r2_inc_p1 < ps_r2_inc_p2)]
+    
+    comparison_r2 <- c(s_ps, p1_s_ps, p2_s_ps, p1p2_s, p1p2_ps,
+                       s_ps_inc, p1_s_ps_inc, p2_s_ps_inc, p1p2_s_inc, p1p2_ps_inc)
+    pval_r2 <- round(sapply(comparison_r2, function(x) min(x/1000, 1 - x/1000)*2), 3)
+    names_r2 <- c("s_ps", "p1_s_ps", "p2_s_ps", "p1p2_s", "p1p2_ps",
+                  "s_ps_inc", "p1_s_ps_inc", "p2_s_ps_inc", "p1p2_s_inc", "p1p2_ps_inc")
+    res <- rbind(c("r2_inc", pval_r2[6:10]), c("r2", pval_r2[1:5]))
+    colnames(res) <- c("r2", names_r2[1:5])
+    
+  } else{
+    
+    s_ps <- bootstrap[, sum(s_r2 < ps_r2)]
+
+    p1_s_ps <- bootstrap[, sum(s_r2_p1 < ps_r2_p1)]
+    p2_s_ps <- bootstrap[, sum(s_r2_p2 < ps_r2_p2)]
+
+    p1p2_s <- bootstrap[, sum(s_r2_p1 < s_r2_p2)]
+    p1p2_ps <- bootstrap[, sum(ps_r2_p1 < ps_r2_p2)]
+
+    comparison_r2 <- c(s_ps, p1_s_ps, p2_s_ps, p1p2_s, p1p2_ps)
+    pval_r2 <- round(sapply(comparison_r2, function(x) min(x/1000, 1 - x/1000)*2), 3)
+    names_r2 <- c("s_ps", "p1_s_ps", "p2_s_ps", "p1p2_s", "p1p2_ps")
+    res <- as.data.table(matrix(pval_r2[1:5], nrow = 1))
+    colnames(res) <- names_r2
+
+  }
   
   return(res)
   
@@ -111,10 +133,6 @@ compareR2 <- function(r2_res, bootstrap){
 
 
 # files with R2 values and bootstrap results
-# r2_res_v <- c("r2_adj_EduYears.tsv", "r2_adj_OS.tsv", 
-#               "r2_adj_Height_first.tsv", "r2_adj_BMI_first.tsv")
-# bootstrap_v <- c("r2_adj_EduYears_1000.tsv", "r2_adj_OS_1000.tsv", 
-#                  "r2_adj_Height_first_1000.tsv", "r2_adj_BMI_first_1000.tsv")
 r2_res_v <- c("r2_adj_EduYears.tsv", "r2_adj_OS.tsv", 
               "r2_adj_Height_first.tsv", "r2_adj_BMI_first.tsv")
 bootstrap_v <- c("r2_adj_EduYears_1000.tsv", "r2_adj_OS_1000.tsv", 
@@ -122,7 +140,8 @@ bootstrap_v <- c("r2_adj_EduYears_1000.tsv", "r2_adj_OS_1000.tsv",
 
 # parameters for plotting
 titles <- c("Educational Attainment", "Occupational Status") 
-lim_list_inc <- c(0.17, 0.17)
+lim_list_inc <- c(0.22, 0.17)
+lim_list <- c(0.17, 0.17)
 steps = c(0.03, 0.03)
 
 # manage data
@@ -147,33 +166,33 @@ for(i in 1:2){
 pval_dt <- as.data.table(pval_dt)
 pval_dt[, trait := rep(titles, each = 2)]
 
-# plot_list_inc[[1]] <- plot_list_inc[[1]] + 
-#   geom_signif(comparisons=list(c("S", "PS")),
-#               annotations = "p<0.002",
-#               textsize=3, size=0.5, vjust = -0.3,
-#               y_position = 0.107, tip_length = c(2, 1.7),
-#               step_increase = 0.3)
-# 
-# plot_list_inc[[2]] <- plot_list_inc[[2]] + 
-#   geom_signif(comparisons=list(c("p1S", "p2S")),
-#               annotations = "p=0.034",
-#               textsize=3, size=0.5, vjust = -0.3,
-#               y_position = 0.107, tip_length = c(0.8, 0.65),
-#               step_increase = 0.3)
-# 
-# plot_list_inc[[3]] <- plot_list_inc[[3]] + 
-#   geom_signif(comparisons=list(c("S", "PS")),
-#               annotations = "p=0.25",
-#               textsize=3, size=0.5, vjust = -0.3,
-#               y_position = 0.095, tip_length = c(4.7, 5),
-#               step_increase = 0.3)
-# 
-# plot_list_inc[[4]] <- plot_list_inc[[4]] + 
-#   geom_signif(comparisons=list(c("p1S", "p1PS"), c("p1S", "p2S")),
-#               annotations = c("p<0.002", "p<0.002"),
-#               textsize=3, size=0.5, vjust = -0.3,
-#               y_position = 0.093, tip_length = c(0.03, 0.84, 0.15, 1.08),
-#               step_increase = 0.23)
+plot_list_inc[[1]] <- plot_list_inc[[1]] +
+  geom_signif(comparisons=list(c("S", "PS")),
+              annotations = "p<0.002",
+              textsize=3, size=0.5, vjust = -0.3,
+              y_position = 0.15, tip_length = c(1.1, 1.7),
+              step_increase = 0.3)
+
+plot_list_inc[[2]] <- plot_list_inc[[2]] +
+  geom_signif(comparisons=list(c("p2S", "p2PS"), c("p1S", "p1PS"), c("p1S", "p2S"), c("p1PS", "p2PS")),
+              annotations = c("p=0.018", "p<0.002", "p=0.034", "p=0.04"),
+              textsize=3, size=0.5, vjust = -0.3,
+              y_position = 0.135, tip_length = c(0.2, 0.36, 0.03, 0.79, 0.1, 0.4, 0.02, 0.7),
+              step_increase = 0.35)
+
+plot_list_inc[[3]] <- plot_list_inc[[3]] +
+  geom_signif(comparisons=list(c("S", "PS")),
+              annotations = "p=0.13",
+              textsize=3, size=0.5, vjust = -0.3,
+              y_position = 0.095, tip_length = c(1.35, 1.7),
+              step_increase = 0.3)
+
+plot_list_inc[[4]] <- plot_list_inc[[4]] +
+  geom_signif(comparisons=list(c("p1S", "p1PS"), c("p1PS", "p2PS")),
+              annotations = c("p<0.002", "p<0.002"),
+              textsize=3, size=0.5, vjust = -0.3,
+              y_position = 0.13, tip_length = c(0.13, 0.97, 0.15, 1.19),
+              step_increase = 0.3)
 
 
 saveRDS(plot_list_inc[1:4], "~/EA_heritability/figures/paper/revision/files_for_figures/fig5abde.rds")
@@ -205,6 +224,69 @@ saveRDS(plot_list_inc[1:4], "~/EA_heritability/figures/paper/revision/files_for_
 # 
 # dev.off()
 # 
+
+
+# Inverse-variance transformed (INT) EA
+# files with R2 values and bootstrap results
+r2_res_v <- c("r2_INT_EduYears.tsv", "r2_INT_OS.tsv", 
+              "r2_INT_Height_first.tsv", "r2_INT_BMI_first.tsv")
+bootstrap_v <- c("r2_INT_EduYears_1000.tsv", "r2_INT_OS_1000.tsv", 
+                 "r2_INT_Height_first_1000.tsv", "r2_INT_BMI_first_1000.tsv")
+
+# parameters for plotting
+titles <- c("Educational Attainment", "Occupational Status") 
+lim_list <- c(0.22, 0.17)
+steps = c(0.03, 0.03)
+
+# manage data
+plot_list_inc <- list()
+plot_list <- list()
+pval_dt <- data.table()
+for(i in 1:2){
+  
+  r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
+  bootstrap <- fread(paste0("~/EA_heritability/results/revision/", bootstrap_v[i]))
+  plot_list <- append(plot_list, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
+                                        r2_var = "r2", title = titles[i], 
+                                        lim = lim_list[i], step = steps[i]))
+  pval_dt <- rbind(pval_dt, compareR2(r2_res = r2_res, bootstrap = bootstrap, no_inc = T))
+  
+}
+
+# save p-value table
+pval_dt <- as.data.table(pval_dt)
+pval_dt[, trait := titles]
+
+plot_list[[1]] <- plot_list[[1]] +
+  geom_signif(comparisons=list(c("S", "PS")),
+              annotations = "p=0.044",
+              textsize=3, size=0.5, vjust = -0.3,
+              y_position = 0.15, tip_length = c(1.1, 1.7),
+              step_increase = 0.3)
+
+plot_list[[2]] <- plot_list[[2]] +
+  geom_signif(comparisons=list(c("p2S", "p2PS"), c("p1S", "p1PS"), c("p1PS", "p2PS")),
+              annotations = c("p=0.024", "p<0.002", "p=0.004"),
+              textsize=3, size=0.5, vjust = -0.3,
+              y_position = 0.135, tip_length = c(0.2, 0.36, 0.03, 0.79, 0.1, 0.4, 0.02, 0.7),
+              step_increase = 0.35)
+
+plot_list[[3]] <- plot_list[[3]] +
+  geom_signif(comparisons=list(c("S", "PS")),
+              annotations = "p=0.77",
+              textsize=3, size=0.5, vjust = -0.3,
+              y_position = 0.095, tip_length = c(1.35, 1.7),
+              step_increase = 0.3)
+
+plot_list[[4]] <- plot_list[[4]] +
+  geom_signif(comparisons=list(c("p1S", "p1PS"), c("p1PS", "p2PS")),
+              annotations = c("p<0.002", "p<0.002"),
+              textsize=3, size=0.5, vjust = -0.3,
+              y_position = 0.13, tip_length = c(0.13, 0.97, 0.15, 1.19),
+              step_increase = 0.3)
+
+
+saveRDS(plot_list[1:4], "~/EA_heritability/figures/paper/revision/files_for_figures/fig5_INT_abde.rds")
 
 
 
