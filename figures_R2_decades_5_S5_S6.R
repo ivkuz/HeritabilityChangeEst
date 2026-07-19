@@ -499,9 +499,9 @@ pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PG
 pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "OS")
 
 table_out <- rbind(pl3[[2]], pl4[[2]], pl1[[2]], pl2[[2]])
-# write.table(table_out, "~/EA_heritability/figures/paper/revision/r2_YoB_bins_weakPGS.tsv", 
+# write.table(table_out, "~/EA_heritability/figures/paper/revision/r2_estimates_YoB_bins_weakPGS.tsv", 
 #             row.names = F, quote = F, sep = "\t")
-write.table(table_out, "~/EA_heritability/figures/paper/revision/r2_YoB_bins.tsv",
+write.table(table_out, "~/EA_heritability/figures/paper/revision/r2_estimates_YoB_bins.tsv",
             row.names = F, quote = F, sep = "\t")
 
 # Make plots
