@@ -83,6 +83,7 @@ makeR2 <- function(r2_res, bootstrap, r2_var = "r2_inc", title = "", lim = NA, s
   
 }
 
+# Make output table with data for the plots
 makeR2table <- function(r2_res, bootstrap, trait){
   
   bootstrap_result <- bootstrap[, lapply(.SD, function(x)
