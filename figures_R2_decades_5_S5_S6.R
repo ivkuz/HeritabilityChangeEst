@@ -263,6 +263,111 @@ r2Decades <- function(ebb_test, trait, age, prs, title, xl = "", ylims = NULL, s
 
 
 
+r2Decades_INT <- function(ebb_test, trait, age, prs, title, xl = "", ylims = NULL, step = NULL){
+  
+  # Format the data
+  colnames(ebb_test)[which(colnames(ebb_test)==trait)] <- "Trait"
+  colnames(ebb_test)[which(colnames(ebb_test)==age)] <- "Age"
+  colnames(ebb_test)[which(colnames(ebb_test)==prs)] <- "PRS"
+  
+  ebb_test <- ebb_test[!is.na(Trait), ]
+  
+  # list for result plots
+  pl_list <- list()
+  
+  # k is the bin size
+  for(k in c(5,10)){
+    
+    # for each bin
+    r2_decades <- data.frame()
+    for(i in seq(1930, 1990, k)){
+      
+      # Calculate incremental R2 for both wave bins
+      ebb_test_bin <- ebb_test[indep_set == TRUE & YoB > i & YoB <= i+k, ]
+      n3 <- nrow(ebb_test_bin)
+      
+      if(n3 > 10){
+        
+        # Select individuals from the current group
+        ebb_test_bin_m <- ebb_test_bin[Sex == 1, ]
+        ebb_test_bin_f <- ebb_test_bin[Sex == 2, ]
+        
+        # Pre-adjust trait by sex
+        # Male
+        lm_prs2_m <- lm(paste0("Trait ~ Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")),
+                        data = ebb_test_bin_m)
+        ebb_test_bin_m$Trait_adj2 <- ebb_test_bin_m$Trait - predict(object = lm_prs2_m, newdata = ebb_test_bin_m)
+        ebb_test_bin_m[, Trait_INT := qnorm((rank(Trait_adj2)-0.5)/nrow(ebb_test_bin_m))]
+        # Female
+        lm_prs2_f <- lm(paste0("Trait ~ Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")),
+                        data = ebb_test_bin_f)
+        ebb_test_bin_f$Trait_adj2 <- ebb_test_bin_f$Trait - predict(object = lm_prs2_f, newdata = ebb_test_bin_f)
+        ebb_test_bin_f[, Trait_INT := qnorm((rank(Trait_adj2)-0.5)/nrow(ebb_test_bin_f))]
+        
+        ebb_test_bin <- rbind(ebb_test_bin_m, ebb_test_bin_f)
+        
+        
+        
+        lm_0prs <- lm("Trait ~ PRS", data = ebb_test_bin)
+        c3 <- summary(lm_0prs)$r.squared
+        r2_decades <- rbind(r2_decades, c(i, paste0(i+1, "-", i+k), c3, n3, "all"))
+        
+      }
+      
+    }
+    colnames(r2_decades) <- c("Birth", "YoB", "R2", "N", "phase")
+    
+    r2_decades <- data.table(r2_decades)
+    r2_decades[, R2 := as.numeric(R2)]
+    r2_decades[, N := as.numeric(N)]
+    # Calculate R2 95% CIs using Fisher’s Z-transformation
+    r2_decades[, FT_0.025 := mapply(function(r, n) CIr(r = r, n = n, level = 0.95)[1]^2, sqrt(R2), N)]
+    r2_decades[, FT_0.975 := mapply(function(r, n) CIr(r = r, n = n, level = 0.95)[2]^2, sqrt(R2), N)]
+    
+    
+    # Make plot with merged waves (phases)
+    pl1 <- ggplot(r2_decades[N>=100 & phase == "all",], aes(x=Birth, y=R2, colour = Birth)) + 
+      geom_point() + 
+      geom_errorbar(aes(ymin=FT_0.025, 
+                        ymax=FT_0.975), 
+                    width=.2, linewidth = 0.3) +
+      theme_bw() + ggtitle(title) + ylab(bquote(R^2)) +
+      theme(text = element_text(size = 10),
+            title = element_text(size = 7.5),
+            panel.grid.major.x = element_blank(),
+            axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+            # axis.title.x=element_blank(),
+            legend.position = "none")  + xlab(xl)
+    if(!is.null(ylims)){pl1 <- pl1 + scale_y_continuous(breaks = seq(0, 2, by = step), limits = ylims)}
+    
+    if(k == 10){
+      pl1 <- pl1 +
+        scale_color_manual(values = c(rep(rgb(254, 0, 0, maxColorValue = 254), 4), "black",
+                                      rep(rgb(80, 148, 205, maxColorValue = 254), 3))) +
+        scale_x_discrete(breaks=r2_decades$Birth, labels=r2_decades$YoB)
+    } else if( k == 5){
+      pl1 <- pl1 +
+        scale_color_manual(values = c(rep(rgb(254, 0, 0, maxColorValue = 254), 9),
+                                      rep(rgb(80, 148, 205, maxColorValue = 254), 4))) +
+        scale_x_discrete(labels = function(x) {
+          # Match factor levels with labels from YoB, show every second one
+          idx <- match(x, r2_decades$Birth)
+          lbls <- r2_decades$YoB[idx]
+          ifelse(seq_along(lbls) %% 2 == 1, lbls, "")
+        })
+    }
+    
+    
+    pl_list <- append(pl_list, list(ggplotGrob(pl1)))
+
+  }
+  
+  
+  return(pl_list)
+  
+}
+
+
 #######################################
 # Prepare the data for the analysis ###
 #######################################
@@ -442,9 +547,18 @@ dev.off()
 
 
 # For figure 5
-pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.17), step=0.03)
+pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.22), step=0.03)
 pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.015, 0.17), step=0.03)
 
 plot_list <- list(pl3[[1]], pl4[[1]])
 
 saveRDS(plot_list, "~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf.rds")
+
+
+# For figure 5 INT
+pl3 <- r2Decades_INT(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.22), step=0.03)
+pl4 <- r2Decades_INT(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.015, 0.17), step=0.03)
+
+plot_list <- list(pl3[[1]], pl4[[1]])
+
+saveRDS(plot_list, "~/EA_heritability/figures/paper/revision/files_for_figures/fig5_INT_cf.rds")
