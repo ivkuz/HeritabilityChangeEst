@@ -129,6 +129,7 @@ r2Decades <- function(ebb_test, trait, age, prs, title, xl = "", ylims = NULL, s
   
   # list for result plots
   pl_list <- list()
+  data_list <- list()
   
   # k is the bin size
   for(k in c(5,10)){
@@ -253,11 +254,13 @@ r2Decades <- function(ebb_test, trait, age, prs, title, xl = "", ylims = NULL, s
     
     pl_list <- append(pl_list, list(ggplotGrob(pl1), ggplotGrob(pl2)))
     # pl_list <- append(pl_list, list(pl1, pl2))
+    data_list <- append(data_list, list(data.table(Trait = title, binwidth = k, r2_decades[, Birth := NULL])))
     
   }
   
-  
-  return(pl_list)
+  data_table <- rbind(data_list[[1]], data_list[[2]])
+  # return(pl_list)
+  return(list(pl_list, data_table))
   
 }
 
@@ -495,7 +498,11 @@ pl2 <- r2Decades(ebb_test = ebb_test, trait = "BMI_first", age = "Age_first", pr
 pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "EA")
 pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "OS")
 
-
+table_out <- rbind(pl3[[2]], pl4[[2]], pl1[[2]], pl2[[2]])
+# write.table(table_out, "~/EA_heritability/figures/paper/revision/r2_YoB_bins_weakPGS.tsv", 
+#             row.names = F, quote = F, sep = "\t")
+write.table(table_out, "~/EA_heritability/figures/paper/revision/r2_YoB_bins.tsv",
+            row.names = F, quote = F, sep = "\t")
 
 # Make plots
 # Including Supplementary Fig. 6
@@ -505,8 +512,8 @@ for(i in 1:4){
 
   # plot_list <- list(ggplotGrob(pl3[[i]]), ggplotGrob(pl4[[i]]),
   #                   ggplotGrob(pl1[[i]]), ggplotGrob(pl2[[i]]))
-  plot_list <- list(pl3[[i]], pl4[[i]],
-                    pl1[[i]], pl2[[i]])
+  plot_list <- list(pl3[[1]][[i]], pl4[[1]][[i]],
+                    pl1[[1]][[i]], pl2[[1]][[i]])
 
   print(
     grid.arrange(
@@ -527,7 +534,7 @@ dev.off()
 # Make plots for Height and BMI separately
 i <- 1
 # plot_list <- list(ggplotGrob(pl1[[i]]), ggplotGrob(pl2[[i]]))
-plot_list <- list(pl1[[i]], pl2[[i]])
+plot_list <- list(pl1[[1]][[i]], pl2[[1]][[i]])
 
 
 # Supplementary figure 5
@@ -550,7 +557,7 @@ dev.off()
 pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.22), step=0.03)
 pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.015, 0.17), step=0.03)
 
-plot_list <- list(pl3[[1]], pl4[[1]])
+plot_list <- list(pl3[[1]][[1]], pl4[[1]][[1]])
 
 saveRDS(plot_list, "~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf.rds")
 
@@ -559,6 +566,6 @@ saveRDS(plot_list, "~/EA_heritability/figures/paper/revision/files_for_figures/f
 pl3 <- r2Decades_INT(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.22), step=0.03)
 pl4 <- r2Decades_INT(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.015, 0.17), step=0.03)
 
-plot_list <- list(pl3[[1]], pl4[[1]])
+plot_list <- list(pl3[[1]][[1]], pl4[[1]][[1]])
 
 saveRDS(plot_list, "~/EA_heritability/figures/paper/revision/files_for_figures/fig5_INT_cf.rds")
