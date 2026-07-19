@@ -3,6 +3,7 @@
 # Heritability in the post-Soviet and Soviet groups and ########
 # the groups additionally divided by the wave of participation #
 # and the estimates from the pedigree-based analysis ###########
+# and INT (inverse-normalised) EA ##############################
 ################################################################
 
 
@@ -13,7 +14,7 @@ library(gridExtra)
 library(ggsignif)
 
 # Plotting h2 bar plot with error bars
-plotH2 <- function(reml_res, names, errors = "CI", title = "", lim = NULL, step = 0.1, h2_type = NA){
+plotH2 <- function(reml_res, names, errors = "CI", title = "", lim = NULL, step = 0.1, h2_type = NA, titlesize = 8){
   
   # Choose whether plot SE or 95% CI error bars
   if(errors %in% c("SE", "se")){
@@ -37,7 +38,7 @@ plotH2 <- function(reml_res, names, errors = "CI", title = "", lim = NULL, step 
                       ymax=(h2+i*se)), 
                   width=.2, linewidth = 0.3) +
     theme_bw() + theme(text = element_text(size=10),
-                       title = element_text(size=8),
+                       title = element_text(size=titlesize),
                        panel.grid.major.x = element_blank(),
                        axis.title.x=element_blank(),
                        legend.position = "none") +
@@ -128,7 +129,7 @@ for( reml_file in reml_files){
     h2 <- l[2]
     se <- l[3]
     reml_res <- rbind(reml_res, c(reml_file, h2, se))
-
+    
   } else{
     print(paste0(reml_file, " doesn't exist"))
   }
@@ -279,7 +280,7 @@ reml_res[, se := as.numeric(se)]
 
 # EA, 15
 reml_names <- c("ldak_kin0.05_s_15.reml", "ldak_kin0.05_ps_15.reml")
-pl1 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Educational Attainment", lim = c(0, 0.32))
+pl1 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Educational Attainment", lim = c(0, 0.32), , titlesize=7.5)
 df1 <- compareH2(reml_res = reml_res, names = reml_names)
 pl2a <- pl1 + geom_signif(comparisons=list(c("ldak_kin0.05_s_15.reml", "ldak_kin0.05_ps_15.reml")),
                           annotations = paste0("p=", round(df1[1, 1], 3)),
@@ -289,7 +290,7 @@ pl2a <- pl1 + geom_signif(comparisons=list(c("ldak_kin0.05_s_15.reml", "ldak_kin
 
 # OS, 15
 reml_names <- c("ldak_OS_kin0.05_s_15.reml", "ldak_OS_kin0.05_ps_15.reml")
-pl2 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Occupational Status", lim = c(0, 0.22))
+pl2 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Occupational Status", lim = c(0, 0.22), titlesize=7.5)
 df2 <- compareH2(reml_res = reml_res, names = reml_names)
 pl2b <- pl2 + geom_signif(comparisons=list(c("ldak_OS_kin0.05_s_15.reml", "ldak_OS_kin0.05_ps_15.reml")),
                           annotations = paste0("p=", round(df2[1, 1], 3)),
@@ -300,7 +301,7 @@ pl2b <- pl2 + geom_signif(comparisons=list(c("ldak_OS_kin0.05_s_15.reml", "ldak_
 
 # binary EA, cutoff 15
 reml_names <- c("ldak_EA_binary_kin0.05_s_15.reml.liab", "ldak_EA_binary_kin0.05_ps_15.reml.liab")
-pl3 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "University degree", lim = c(0, 0.38))
+pl3 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "University degree", lim = c(0, 0.38), titlesize=7.5)
 df3 <- compareH2(reml_res = reml_res, names = reml_names)
 
 pl2c <- pl3 + geom_signif(comparisons=list(c("ldak_EA_binary_kin0.05_s_15.reml.liab", "ldak_EA_binary_kin0.05_ps_15.reml.liab")),
@@ -410,25 +411,32 @@ reml_files = paste0(rep(c("", "p1", "p2"), each = 4), rep(c("s", "ps"), 6), "_",
 
 # Get REML results from the files
 reml_res <- data.frame()
-for( reml_file in reml_files){
-  file_path <- paste0("~/EA_heritability/gcta/results/ldak_pedigree_", reml_file, ".reml")
-  if (file.exists(file_path)){
-    res = readLines(file_path)
-    
-    l_h2g <- unlist(strsplit(res[grepl("Her_K1", res)], " "))
-    h2g <- l_h2g[2]
-    se_h2g <- l_h2g[3]
-
-    l_h2 <- unlist(strsplit(res[grepl("Her_All", res)], " "))
-    h2 <- l_h2[2]
-    se_h2 <- l_h2[3]
-    
-    reml_res <- rbind(reml_res, c(reml_file, "h2g", h2g, se_h2g))
-    reml_res <- rbind(reml_res, c(reml_file, "h2", h2, se_h2))
-    
-  } else{
-    print(paste0(reml_file, " doesn't exist"))
+for(trait in c("EA", "OS", "Height", "BMI", "EA_binary")){
+  for(reml_file in reml_files){
+    if(trait == "EA"){
+      file_path <- paste0("~/EA_heritability/gcta/results/ldak_pedigree_", reml_file, ".reml")
+    }else{
+      file_path <- paste0("~/EA_heritability/gcta/results/ldak_", trait, "_pedigree_", reml_file, ".reml")
+    } 
+    if (file.exists(file_path)){
+      res = readLines(file_path)
+      
+      l_h2g <- unlist(strsplit(res[grepl("Her_K1", res)], " "))
+      h2g <- l_h2g[2]
+      se_h2g <- l_h2g[3]
+      
+      l_h2 <- unlist(strsplit(res[grepl("Her_All", res)], " "))
+      h2 <- l_h2[2]
+      se_h2 <- l_h2[3]
+      
+      reml_res <- rbind(reml_res, c(paste(trait, reml_file, sep = "_"), "h2g", h2g, se_h2g))
+      reml_res <- rbind(reml_res, c(paste(trait, reml_file, sep = "_"), "h2", h2, se_h2))
+      
+    } else{
+      print(paste0(reml_file, " doesn't exist"))
+    }
   }
+  
 }
 
 colnames(reml_res) <- c("name", "type", "h2", "se")
@@ -436,79 +444,182 @@ reml_res <- as.data.table(reml_res)
 reml_res[, h2 := as.numeric(h2)]
 reml_res[, se := as.numeric(se)]
 
-# Both phases, cutoff 15
-names <- c("s_15", "ps_15")
-pl1_15_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "h2g, 15", h2_type = "h2g")
-df1_15_h2g <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
 
-pl1_15_h2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "N-s h2, 15", h2_type = "h2", step = 0.2)
-df1_15_h2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2")
+df1_list <- list()
+df2_list <- list()
+pl_10 <- list()
+pl_15 <- list()
 
-# Both phases, cutoff 10
-names <- c("s_10", "ps_10")
-pl1_10_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "h2g, 10", h2_type = "h2g")
-df1_10_h2g <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
-
-pl1_10_h2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "N-s h2, 10", h2_type = "h2", step = 0.2)
-df1_10_h2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2")
-
-
-# Phase 1, cutoff 15
-names <- c("p1s_15", "p1ps_15", "p2s_15", "p2ps_15")
-pl2_15_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "h2g, 15", h2_type = "h2g")
-df2_15_h2g <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
-
-pl2_15_h2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "N-s h2, 15", h2_type = "h2", step = 0.2)
-df2_15_h2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2")
-
-# Phase 2, cutoff 10
-names <- c("p1s_10", "p1ps_10", "p2s_10", "p2ps_10")
-pl2_10_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "h2g, 10", h2_type = "h2g", step = 0.2)
-df2_10_h2g <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
-
-pl2_10_h2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "N-s h2, 10", h2_type = "h2", step = 0.3)
-df2_10_h2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2")
+traits <- c("EA", "OS", "Height", "BMI", "EA_binary")
+trait_names <- c("Educational Attainment", "Occupational Status", 
+                 "Height", "BMI", "University degree")
+steps_15 <- c(0.1, 0.1, 0.2, 0.1, 0.1)
+steps_10 <- c(0.3, 0.3, 0.3, 0.3, 0.3)
+for(i in 1:5){
+  for(cutoff in c("10", "15")){
+    
+    if(cutoff == 10){
+      step <- steps_10[i]
+    }else{
+      step <- steps_15[i]
+    }
+    
+    names <- paste(traits[i], c("s", "ps"), cutoff, sep = "_")
+    pl1 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = trait_names[i], h2_type = "h2g")
+    df1 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
+    
+    names <- paste(traits[i], c("p1s", "p1ps", "p2s", "p2ps"), cutoff, sep = "_")
+    pl2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", 
+                  title = "", h2_type = "h2g", step = step)
+    df2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
+    
+    df1_list <- append(df1_list, list(cbind(trait = traits[i], cutoff, df1)))
+    df2_list <- append(df2_list, list(cbind(trait = traits[i], cutoff, df2)))
+    
+    if(cutoff == "10"){
+      pl_10 <- append(pl_10, list(pl1, pl2))
+    }else{
+      pl_15 <- append(pl_15, list(pl1, pl2))
+    }
+    
+  }
+}
 
 # Make and save p-value table
 # cutoff 10, collect p-value results in a table
-df1 <- list(df1_15_h2g, df1_10_h2g, df1_15_h2, df1_10_h2)
-df2 <- list(df2_15_h2g, df2_10_h2g, df2_15_h2, df2_10_h2)
 df_p <- data.frame()
-for(i in 1:4){
-  df_p_tmp <- cbind(df1[[i]], df2[[i]])
+for(i in 1:10){
+  df_p_tmp <- cbind(df1_list[[i]], df2_list[[i]])
   df_p <- rbind(df_p, df_p_tmp)
 }
 df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
-df_p[, h2_type := rep(c("h2g", "Narrow-sense h2"), each = 2)]
-df_p[, cutoff := rep(c(15, 10), 2)]
+df_p <- df_p[, .SD, .SDcols = unique(names(df_p))]
 
 # Save p-value table for both cutoffs
-write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_pedigree_pval.tsv",
+write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_alltraits_pedigree_pval.tsv",
             row.names = F, quote = F, sep = "\t")
 
 
-plots <- list(pl1_15_h2g, pl1_10_h2g, pl1_15_h2, pl1_10_h2,
-              pl2_15_h2g, pl2_10_h2g, pl2_15_h2, pl2_10_h2)
-pdf("~/EA_heritability/figures/paper/revision/h2_pedigree.pdf", width=5.5, height=6)
-print(
-  grid.arrange(
-    grobs = plots,
-    layout_matrix = matrix(1:8, ncol = 2, byrow = F),
-    widths = c(1, 1.5)
-  )
-)
+pdf("~/EA_heritability/figures/paper/revision/h2_alltraits_pedigree_15_10.pdf", width=5.5, height=6)
 
-grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("c", x = 0.02, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("d", x = 0.42, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("e", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("f", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("g", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+for(pl in list(pl_15[1:8], pl_10[1:8])){
+  
+  print(
+    grid.arrange(
+      grobs = pl,
+      layout_matrix = matrix(1:8, ncol = 2, byrow = T),
+      widths = c(1, 1.5)
+    )
+  )
+  
+  grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("c", x = 0.02, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("d", x = 0.42, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("e", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("f", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("g", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+  
+  
+}
 
 dev.off()
 
+# University degree
+pdf("~/EA_heritability/figures/paper/revision/h2_EA_binary_pedigree_15_10.pdf", width=5.5, height=1.5)
+
+for(pl in list(pl_15[9:10], pl_10[9:10])){
+  
+  print(
+    grid.arrange(
+      grobs = pl,
+      layout_matrix = matrix(1:2, ncol = 2, byrow = T),
+      widths = c(1, 1.5)
+    )
+  )
+  
+  grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+  
+}
+
+dev.off()
+
+
+# # Both phases, cutoff 15
+# names <- c("s_15", "ps_15")
+# pl1_15_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "h2g, 15", h2_type = "h2g")
+# df1_15_h2g <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
+# 
+# pl1_15_h2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "N-s h2, 15", h2_type = "h2", step = 0.2)
+# df1_15_h2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2")
+# 
+# Both phases, cutoff 10
+# names <- c("s_10", "ps_10")
+# pl1_10_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "h2g, 10", h2_type = "h2g")
+# df1_10_h2g <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
+# 
+# pl1_10_h2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "N-s h2, 10", h2_type = "h2", step = 0.2)
+# df1_10_h2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2")
+
+
+# Phase 1, cutoff 15
+# names <- c("p1s_15", "p1ps_15", "p2s_15", "p2ps_15")
+# pl2_15_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "h2g, 15", h2_type = "h2g")
+# df2_15_h2g <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
+
+# pl2_15_h2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "N-s h2, 15", h2_type = "h2", step = 0.2)
+# df2_15_h2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2")
+
+# # Phase 2, cutoff 10
+# names <- c("p1s_10", "p1ps_10", "p2s_10", "p2ps_10")
+# pl2_10_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "h2g, 10", h2_type = "h2g", step = 0.2)
+# df2_10_h2g <- compareH2(reml_res = reml_res, names = names, h2_type = "h2g")
+
+# pl2_10_h2 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "N-s h2, 10", h2_type = "h2", step = 0.3)
+# df2_10_h2 <- compareH2(reml_res = reml_res, names = names, h2_type = "h2")
+
+# # Make and save p-value table
+# # cutoff 10, collect p-value results in a table
+# df1 <- list(df1_15_h2g, df1_10_h2g, df1_15_h2, df1_10_h2)
+# df2 <- list(df2_15_h2g, df2_10_h2g, df2_15_h2, df2_10_h2)
+# df_p <- data.frame()
+# for(i in 1:4){
+#   df_p_tmp <- cbind(df1[[i]], df2[[i]])
+#   df_p <- rbind(df_p, df_p_tmp)
+# }
+# df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
+# df_p[, h2_type := rep(c("h2g", "Narrow-sense h2"), each = 2)]
+# df_p[, cutoff := rep(c(15, 10), 2)]
+# 
+# # Save p-value table for both cutoffs
+# write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_pedigree_pval.tsv",
+#             row.names = F, quote = F, sep = "\t")
+
+
+# plots <- list(pl1_15_h2g, pl1_10_h2g, pl1_15_h2, pl1_10_h2,
+#               pl2_15_h2g, pl2_10_h2g, pl2_15_h2, pl2_10_h2)
+# pdf("~/EA_heritability/figures/paper/revision/h2_pedigree.pdf", width=5.5, height=6)
+# print(
+#   grid.arrange(
+#     grobs = plots,
+#     layout_matrix = matrix(1:8, ncol = 2, byrow = F),
+#     widths = c(1, 1.5)
+#   )
+# )
+# 
+# grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("c", x = 0.02, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("d", x = 0.42, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("e", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("f", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("g", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+# grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+# 
+# dev.off()
+# 
 
 
 
@@ -531,9 +642,9 @@ for( reml_file in reml_files){
     l <- unlist(strsplit(res[grepl("Her_K1", res)], " "))
     h2 <- l[2]
     se <- l[3]
-
+    
     reml_res <- rbind(reml_res, c(reml_file, h2, se))
-
+    
   } else{
     print(paste0(reml_file, " doesn't exist"))
   }
@@ -579,15 +690,15 @@ df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
 df_p[, cutoff := c(15, 10)]
 
 # Save p-value table for both cutoffs
-# write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_kin0.05_pval.tsv",
-write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_kin_def_pval.tsv",
+write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_kin0.05_pval.tsv",
+# write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_kin_def_pval.tsv",
             row.names = F, quote = F, sep = "\t")
 
 
 plots <- list(pl1_15_h2g, pl1_10_h2g,
               pl2_15_h2g, pl2_10_h2g)
-# pdf("~/EA_heritability/figures/paper/revision/h2_kin0.05.pdf", width=5.5, height=6)
-pdf("~/EA_heritability/figures/paper/revision/h2_kin_def.pdf", width=5.5, height=6)
+pdf("~/EA_heritability/figures/paper/revision/h2_kin0.05.pdf", width=5.5, height=3)
+# pdf("~/EA_heritability/figures/paper/revision/h2_kin_def.pdf", width=5.5, height=3)
 print(
   grid.arrange(
     grobs = plots,
@@ -603,3 +714,68 @@ grid.text("d", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
 
+
+
+
+# h2 of INT traits
+# list of files with LDAK results
+reml_files = paste0(rep(c("", "p1", "p2"), each = 4), rep(c("s", "ps"), 6), "_", rep(c(15, 15, 10, 10), 3))
+
+# Get REML results from the files
+reml_res <- data.frame()
+for(reml_file in reml_files){
+  file_path <- paste0("~/EA_heritability/gcta/results/ldak_EA_INT_kin0.05_", reml_file, ".reml")
+  if (file.exists(file_path)){
+    res = readLines(file_path)
+    
+    l <- unlist(strsplit(res[grepl("Her_K1", res)], " "))
+    h2 <- l[2]
+    se <- l[3]
+    
+    reml_res <- rbind(reml_res, c(reml_file, h2, se))
+    
+  } else{
+    print(paste0(reml_file, " doesn't exist"))
+  }
+}
+
+colnames(reml_res) <- c("name", "h2", "se")
+reml_res <- as.data.table(reml_res)
+reml_res[, h2 := as.numeric(h2)]
+reml_res[, se := as.numeric(se)]
+
+# Both phases, cutoff 15
+names <- c("s_15", "ps_15")
+pl1_15_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "")
+df1_15_h2g <- compareH2(reml_res = reml_res, names = names)
+
+# Phase 1, cutoff 15
+names <- c("p1s_15", "p1ps_15", "p2s_15", "p2ps_15")
+pl2_15_h2g <- plotH2(reml_res = reml_res, names = names, errors = "CI")
+df2_15_h2g <- compareH2(reml_res = reml_res, names = names)
+
+# Make and save p-value table
+# cutoff 10, collect p-value results in a table
+df_p <- cbind(df1_15_h2g, df2_15_h2g)
+df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
+
+# Save p-value table for both cutoffs
+write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_kin0.05_INT_pval.tsv",
+            row.names = F, quote = F, sep = "\t")
+
+
+plots <- list(pl1_15_h2g, pl2_15_h2g)
+# pdf("~/EA_heritability/figures/paper/revision/h2_kin0.05.pdf", width=5.5, height=6)
+pdf("~/EA_heritability/figures/paper/revision/h2_kin0.05_INT.pdf", width=5.5, height=2.5)
+print(
+  grid.arrange(
+    grobs = plots,
+    layout_matrix = matrix(1:2, ncol = 2),
+    widths = c(1, 1.5)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.42, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
+
+dev.off()
