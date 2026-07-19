@@ -286,7 +286,117 @@ analyzeR2 <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA
 
 
 
-# Аunction for transmitted-untransmitted R2 analysis
+# Function for R2 analysis with inverse-normal transformation within groups
+analyzeR2_INT <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = ""){
+  
+  # Format analysed data
+  colnames(ebb_test)[which(colnames(ebb_test)==pheno)] <- "Trait"
+  colnames(ebb_test)[which(colnames(ebb_test)==age)] <- "Age"
+  colnames(ebb_test)[which(colnames(ebb_test)==prs)] <- "PRS"
+  
+  ebb_test[, Age2 := Age^2]
+  
+  ebb_test <- ebb_test[!is.na(Trait), ]
+  
+  # # Generate pre-adjusted trait
+  # lm_prs2 <- lm(paste0("Trait ~ Sex + Age + I(Age^2) + I(Sex*Age) + ", paste("PC", 1:40, sep = "", collapse = " + ")),
+  #               data = ebb_test)
+  # ebb_test$Trait_adj2 <- ebb_test$Trait - predict(object = lm_prs2, newdata = ebb_test)
+  # ebb_test[, Trait_adj2 := (Trait_adj2-mean(Trait_adj2))/sd(Trait_adj2)]
+  
+  # Create empty vectors for summary output values
+  rsq <- c()
+  rsq_top95 <- c()
+  rsq_bottom95 <- c()
+  # rsq_inc <- c()
+  # rsq_inc_top95 <- c()
+  # rsq_inc_bottom95 <- c()
+  N <- c()
+  dt <- data.table()
+  
+  rsq_all <- c() # for with main results
+  n <- c() # for the table with main results
+
+  # Bootstrap for each group
+  for(ind in list(ind_02, ind_01, ind_12, ind_11, ind_22, ind_21)){
+    
+    # Select individuals from the current group
+    ebb_test_bootstrap_m <- ebb_test[vkood %in% ind & Sex == 1]
+    ebb_test_bootstrap_f <- ebb_test[vkood %in% ind & Sex == 2]
+    
+    # Pre-adjust trait by sex
+    # Male
+    lm_prs2_m <- lm(paste0("Trait ~ Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")),
+                  data = ebb_test_bootstrap_m)
+    ebb_test_bootstrap_m$Trait_adj2 <- ebb_test_bootstrap_m$Trait - predict(object = lm_prs2_m, newdata = ebb_test_bootstrap_m)
+    ebb_test_bootstrap_m[, Trait_INT := qnorm((rank(Trait_adj2)-0.5)/nrow(ebb_test_bootstrap_m))]
+    # Female
+    lm_prs2_f <- lm(paste0("Trait ~ Age + I(Age^2) + ", paste("PC", 1:40, sep = "", collapse = " + ")),
+                    data = ebb_test_bootstrap_f)
+    ebb_test_bootstrap_f$Trait_adj2 <- ebb_test_bootstrap_f$Trait - predict(object = lm_prs2_f, newdata = ebb_test_bootstrap_f)
+    ebb_test_bootstrap_f[, Trait_INT := qnorm((rank(Trait_adj2)-0.5)/nrow(ebb_test_bootstrap_f))]
+    
+    ebb_test_bootstrap <- rbind(ebb_test_bootstrap_m, ebb_test_bootstrap_f)
+    
+    set.seed(100)
+    
+    # Create empty vectors for R2 values
+    rsq_bootstrap <- c()
+    rsq_inc_bootstrap <- c()
+    
+    # Bootstrap
+    for(i in 1:bootstrap_n){
+      
+      # Select subsample
+      ebb_test_bootstrap_i <- ebb_test_bootstrap[sample(1:nrow(ebb_test_bootstrap),
+                                                        nrow(ebb_test_bootstrap), replace = T), ]
+      
+      lm_xx <- lm("Trait_INT ~ PRS", data = ebb_test_bootstrap_i)
+      rsq_bootstrap <- c(rsq_bootstrap, summary(lm_xx)$r.squared)
+      
+    }
+
+    # Extract R2 confidence interval 
+    rsq_top95 <- c(rsq_top95, quantile(rsq_bootstrap, probs = 0.975))
+    rsq_bottom95 <- c(rsq_bottom95, quantile(rsq_bootstrap, probs = 0.025))
+    dt <- cbind(dt, rsq_bootstrap)
+    
+    # Original R2
+    lm_xx <- lm("Trait_INT ~ PRS", data = ebb_test_bootstrap)
+    rsq <- c(rsq, summary(lm_xx)$r.squared)
+    rsq_all <- c(rsq_all, summary(lm_xx)$r.squared) # for the table with main results
+    
+    N <- c(N, nrow(ebb_test_bootstrap))
+    n <- c(n, nrow(ebb_test_bootstrap)) # for the table with main results
+    
+  }
+  
+  cohort <- c("s_r2", "ps_r2",
+              "s_r2_p1", "ps_r2_p1", 
+              "s_r2_p2", "ps_r2_p2") # for the table with main results
+  r2 <- rep("r2", 6) # for the table with main results
+  
+  # Save bootstrap results
+  colnames(dt) <- cohort
+  write.table(dt, paste0(out, "/r2_INT_", pheno, suff, "_1000.tsv"),
+              row.names = F, quote = F, sep = "\t")
+  
+  ################################################
+  # save the table with main results #
+  name <- c("S", "PS",
+            "p1S", "p1PS",
+            "p2S", "p2PS")
+  r2_res <- rbind(name, r2, round(rsq_all, 8), n)
+  colnames(r2_res) <- cohort
+  write.table(r2_res, paste0(out, "/r2_INT_", pheno, suff, ".tsv"),
+              row.names = F, quote = F, sep = "\t")
+  
+  
+}
+
+
+
+# Function for transmitted-untransmitted R2 analysis
 analyzeR2_untransmitted <- function(ebb_test, pheno, age, prs, bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = ""){
   
   # Format analysed data
@@ -548,6 +658,19 @@ for(i in 1:4){
   prs <- prses[i]
   
   analyzeR2(ebb_test, pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/")
+  
+}
+
+
+# Analysis of inverse normal transformed (INT) traits
+for(i in 1:4){
+  
+  print(phenotypes[i])
+  pheno <- phenotypes[i]
+  age <- ages[i]
+  prs <- prses[i]
+  
+  analyzeR2_INT(ebb_test, pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/")
   
 }
 
