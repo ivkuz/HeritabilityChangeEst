@@ -500,7 +500,7 @@ plots1 <- list(pl12, pl14, pl15, pl16)
 # plots2_15 <- list(pl12, pl22, pl14, pl24)
 # plots2_10 <- list(pl15, pl25, pl16, pl26)
 
-pdf("/gpfs/helios/home/kuznetsi/EA_heritability/figures/paper/revision/h2_bysex.pdf", width=4.4, height=3)
+pdf("~/EA_heritability/figures/paper/revision/h2_bysex.pdf", width=4.4, height=3)
 
 print(
   grid.arrange(
@@ -516,7 +516,7 @@ grid.text("d", x = 0.52, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
 
-# pdf("/gpfs/helios/home/kuznetsi/EA_heritability/figures/paper/revision/h2_bysex_all_15_10.pdf", width=5.5, height=3)
+# pdf("~/EA_heritability/figures/paper/revision/h2_bysex_all_15_10.pdf", width=5.5, height=3)
 # 
 # print(
 #   grid.arrange(
@@ -663,8 +663,8 @@ write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_rural-urban_pval.
 # plots <- list(pl11, pl21, pl12, pl22, pl13, pl23)
 plots <- list(pl11, pl14, pl12, pl15, pl13, pl16)
 
-# pdf("/gpfs/helios/home/kuznetsi/EA_heritability/figures/BGA/h2_main.pdf", width=5.5, height=10)
-pdf("/gpfs/helios/home/kuznetsi/EA_heritability/figures/paper/revision/h2_rural-urban.pdf", width=4.4, height=4.5)
+# pdf("~/EA_heritability/figures/BGA/h2_main.pdf", width=5.5, height=10)
+pdf("~/EA_heritability/figures/paper/revision/h2_rural-urban.pdf", width=4.4, height=4.5)
 
 print(
   grid.arrange(
@@ -675,11 +675,11 @@ print(
 )
 
 grid.text("a", x = 0.02, y = 0.97, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("b", x = 0.42, y = 0.97, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.52, y = 0.97, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("c", x = 0.02, y = 0.64, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("d", x = 0.42, y = 0.64, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("d", x = 0.52, y = 0.64, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("e", x = 0.02, y = 0.30, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("f", x = 0.42, y = 0.30, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("f", x = 0.52, y = 0.30, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
 
