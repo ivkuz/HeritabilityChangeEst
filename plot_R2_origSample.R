@@ -71,6 +71,37 @@ makeR2 <- function(r2_res, bootstrap, r2_var = "r2_inc", title = "", lim = NA, s
   
 }
 
+# Make output table with data for the plots
+makeR2table <- function(r2_res, bootstrap, trait){
+  
+  bootstrap_result <- bootstrap[, lapply(.SD, function(x)
+    c(
+      median = median(x, na.rm = TRUE),
+      quantile_0025 = quantile(x, 0.025, na.rm = TRUE),
+      quantile_0975 = quantile(x, 0.975, na.rm = TRUE)
+    )
+  )]  
+  r2_res <- rbind(r2_res, bootstrap_result)
+  
+  r2_res <- as.data.table(t(r2_res))
+  colnames(r2_res) <- c("name", "var", "r2", "N", "bstr_0.5", "bstr_0.025", "bstr_0.975")
+  r2_res[, r2 := as.numeric(r2)]
+  r2_res[, N := as.numeric(N)]
+  r2_res[, bstr_0.5 := as.double(bstr_0.5)]
+  r2_res[, bstr_0.025 := as.double(bstr_0.025)]
+  r2_res[, bstr_0.975 := as.double(bstr_0.975)]
+  r2_res[, FT_0.025 := mapply(function(r, n) CIr(r = r, n = n, level = 0.95)[1]^2, sqrt(r2), N)]
+  r2_res[, FT_0.975 := mapply(function(r, n) CIr(r = r, n = n, level = 0.95)[2]^2, sqrt(r2), N)]
+  
+  r2_res <- r2_res[order(unlist(var)),]
+  r2_res <- data.table(trait = trait, r2_res)
+  
+  
+  return(r2_res)
+  
+}
+
+
 # Calculate bootstrap p-values for the difference between R2
 compareR2 <- function(r2_res, bootstrap){
   
@@ -104,6 +135,7 @@ titles <- c("EA years", "EA categories", "OS")
 plot_list_inc <- list()
 plot_list <- list()
 pval_dt <- data.table()
+raw_table <- data.table()
 for(i in 1:3){
 
   # 1:10 are with all nationalities; 11:20 are with self-reported Estonians
@@ -113,17 +145,22 @@ for(i in 1:3){
                                                 r2_var = "r2_inc", title = titles[i]))
   plot_list <- append(plot_list, makeR2(r2_res = r2_res[, 1:10], bootstrap = bootstrap[, 1:10], 
                                         r2_var = "r2", title = titles[i]))
+  raw_table <- rbind(raw_table, data.table(makeR2table(r2_res = r2_res[, 1:10], bootstrap = bootstrap[, 1:10], trait = titles[i]), Ethnicity = "All"))
+                     
   plot_list_inc <- append(plot_list_inc, makeR2(r2_res = r2_res[, 11:20], bootstrap = bootstrap[, 11:20], 
                                                 r2_var = "r2_inc", title = paste0(titles[i], ", Estonians")))
   plot_list <- append(plot_list, makeR2(r2_res = r2_res[, 11:20], bootstrap = bootstrap[, 11:20], 
                                         r2_var = "r2", title = paste0(titles[i], ", Estonians"))) #, 
   pval_dt <- rbind(pval_dt, compareR2(r2_res = r2_res, bootstrap = bootstrap))
+  raw_table <- rbind(raw_table, data.table(makeR2table(r2_res = r2_res[, 11:20], bootstrap = bootstrap[, 11:20], trait = titles[i]), Ethnicity = "Estonian"))
   
 }
 
 pval_dt <- as.data.table(pval_dt)
 pval_dt[, trait := rep(titles, each = 2)]
 write.table(pval_dt, "~/EA_heritability/figures/paper/r2_origSample_pval.tsv",
+            row.names = F, quote = F, sep = "\t")
+write.table(raw_table, "~/EA_heritability/figures/paper/revision/r2_estimates_origSample_pval.tsv",
             row.names = F, quote = F, sep = "\t")
 
 
