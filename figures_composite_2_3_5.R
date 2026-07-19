@@ -83,3 +83,31 @@ grid.text("f", x = 0.64, y = 0.5, gp = gpar(fontsize=14, fontface = "bold"))
 dev.off()
 
 
+# INT
+
+fig5abde <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5_INT_abde.rds")
+fig5abde <- list(ggplotGrob(fig5abde[[1]]), ggplotGrob(fig5abde[[2]]), ggplotGrob(fig5abde[[3]]), ggplotGrob(fig5abde[[4]]))
+fig5cf <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5_INT_cf.rds")
+
+fig5 <- c(fig5abde, fig5cf)
+
+pdf("~/EA_heritability/figures/paper/revision/figure5_INT.pdf", width=7.5, height=5.25)
+
+print(
+  grid.arrange(
+    grobs = fig5,
+    layout_matrix = matrix(c(1,2,5, 3,4,6, NA,NA,6), nrow = 3, byrow = T),
+    widths = c(1, 1.55, 1.55), heights = c(1, 1, 0.04)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.26, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("c", x = 0.64, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("d", x = 0.02, y = 0.5, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("e", x = 0.26, y = 0.5, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("f", x = 0.64, y = 0.5, gp = gpar(fontsize=14, fontface = "bold"))
+
+dev.off()
+
+
