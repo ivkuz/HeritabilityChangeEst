@@ -11,7 +11,7 @@ library(ggplot2)
 library(reshape2)
 library(grid)
 library(gridExtra)
-
+library(Hmisc) # for capitalization
 
 plotR2 <- function(r2_res, names, r2_var = "r2_inc", title = "", lim = NA, step = 0.05){
   
@@ -55,11 +55,13 @@ plotR2 <- function(r2_res, names, r2_var = "r2_inc", title = "", lim = NA, step 
 
 makeR2 <- function(r2_res, bootstrap, r2_var = "r2_inc", title = "", lim = NA, step = 0.05){
   
-  bootstrap_result <- bootstrap[, lapply(.SD, function(x) list(
-    median = median(x, na.rm = TRUE),
-    quantile_0025 = quantile(x, 0.025, na.rm = TRUE),
-    quantile_0975 = quantile(x, 0.975, na.rm = TRUE)
-  ))]
+  bootstrap_result <- bootstrap[, lapply(.SD, function(x)
+    c(
+      median = median(x, na.rm = TRUE),
+      quantile_0025 = quantile(x, 0.025, na.rm = TRUE),
+      quantile_0975 = quantile(x, 0.975, na.rm = TRUE)
+    )
+  )]  
   
   r2_res <- rbind(r2_res, bootstrap_result)
   
@@ -80,6 +82,36 @@ makeR2 <- function(r2_res, bootstrap, r2_var = "r2_inc", title = "", lim = NA, s
   return(pl_list)
   
 }
+
+makeR2table <- function(r2_res, bootstrap, trait){
+  
+  bootstrap_result <- bootstrap[, lapply(.SD, function(x)
+    c(
+      median = median(x, na.rm = TRUE),
+      quantile_0025 = quantile(x, 0.025, na.rm = TRUE),
+      quantile_0975 = quantile(x, 0.975, na.rm = TRUE)
+    )
+  )]  
+  r2_res <- rbind(r2_res, bootstrap_result)
+  
+  r2_res <- as.data.table(t(r2_res))
+  colnames(r2_res) <- c("name", "var", "r2", "N", "bstr_0.5", "bstr_0.025", "bstr_0.975")
+  r2_res[, r2 := as.numeric(r2)]
+  r2_res[, N := as.numeric(N)]
+  r2_res[, bstr_0.5 := as.double(bstr_0.5)]
+  r2_res[, bstr_0.025 := as.double(bstr_0.025)]
+  r2_res[, bstr_0.975 := as.double(bstr_0.975)]
+  r2_res[, FT_0.025 := mapply(function(r, n) CIr(r = r, n = n, level = 0.95)[1]^2, sqrt(r2), N)]
+  r2_res[, FT_0.975 := mapply(function(r, n) CIr(r = r, n = n, level = 0.95)[2]^2, sqrt(r2), N)]
+  
+  r2_res <- r2_res[order(unlist(var)),]
+  r2_res <- data.table(trait = trait, r2_res)
+
+  
+  return(r2_res)
+  
+}
+
 
 compareR2 <- function(r2_res, bootstrap){
   
@@ -128,6 +160,7 @@ steps = c(0.05, 0.04, 0.1, 0.05)
 plot_list_inc <- list()
 plot_list <- list()
 pval_dt <- data.table()
+raw_table <- data.table()
 for(i in 1:4){
   
   r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
@@ -139,6 +172,8 @@ for(i in 1:4){
                                         r2_var = "r2", title = titles[i], 
                                         lim = lim_list[i], step = steps[i]))
   pval_dt <- rbind(pval_dt, compareR2(r2_res = r2_res, bootstrap = bootstrap))
+  raw_table <- rbind(raw_table, makeR2table(r2_res = r2_res, bootstrap = bootstrap, trait = titles[i]))
+  
   
 }
 
@@ -146,6 +181,9 @@ pval_dt <- as.data.table(pval_dt)
 pval_dt[, trait := rep(titles, each = 2)]
 write.table(pval_dt, "~/EA_heritability/figures/paper/revision/r2_pval.tsv",
             row.names = F, quote = F, sep = "\t")
+write.table(raw_table, "~/EA_heritability/figures/paper/revision/r2_estimates.tsv",
+            row.names = F, quote = F, sep = "\t")
+
 
 pdf("~/EA_heritability/figures/paper/revision/r2_main.pdf", width=5.5, height=6)
 print(
@@ -223,6 +261,7 @@ steps = c(0.02, 0.02, 0.02, 0.02)
 plot_list_inc <- list()
 plot_list <- list()
 pval_dt <- data.table()
+raw_table <- data.table()
 for(i in 1:4){
   
   r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
@@ -234,12 +273,15 @@ for(i in 1:4){
                                         r2_var = "r2", title = titles[i], 
                                         lim = lim_list[i], step = steps[i]))
   pval_dt <- rbind(pval_dt, compareR2(r2_res = r2_res, bootstrap = bootstrap))
+  raw_table <- rbind(raw_table, makeR2table(r2_res = r2_res, bootstrap = bootstrap, trait = titles[i]))
   
 }
 
 pval_dt <- as.data.table(pval_dt)
 pval_dt[, trait := rep(titles, each = 2)]
 write.table(pval_dt, "~/EA_heritability/figures/paper/revision/untransmitted_r2_pval.tsv",
+            row.names = F, quote = F, sep = "\t")
+write.table(raw_table, "~/EA_heritability/figures/paper/revision/untransmitted_r2_estimates.tsv",
             row.names = F, quote = F, sep = "\t")
 
 pdf("~/EA_heritability/figures/paper/revision/untransmitted_r2_main.pdf", width=5.5, height=6)
@@ -300,6 +342,7 @@ for(sex in c("male", "female")){
   plot_list_inc <- list()
   plot_list <- list()
   pval_dt <- data.table()
+  raw_table <- data.table()
   for(i in 1:4){
     
     r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
@@ -311,6 +354,7 @@ for(sex in c("male", "female")){
                                           r2_var = "r2", title = titles[i], 
                                           lim = lim_list[i], step = steps[i]))
     pval_dt <- rbind(pval_dt, compareR2(r2_res = r2_res, bootstrap = bootstrap))
+    raw_table <- rbind(raw_table, makeR2table(r2_res = r2_res, bootstrap = bootstrap, trait = titles[i]))
     
   }
   
@@ -318,6 +362,9 @@ for(sex in c("male", "female")){
   pval_dt[, trait := rep(titles, each = 2)]
   write.table(pval_dt, paste0("~/EA_heritability/figures/paper/revision/r2_pval_", sex, ".tsv"),
               row.names = F, quote = F, sep = "\t")
+  write.table(raw_table, "~/EA_heritability/figures/paper/revision/r2_estimates", sex, ".tsv",
+              row.names = F, quote = F, sep = "\t")
+  
   
   pdf(paste0("~/EA_heritability/figures/paper/revision/r2_", sex, ".pdf"), width=5.5, height=6)
   print(
@@ -360,6 +407,49 @@ for(sex in c("male", "female")){
   
 }
 
+# simple plot
+plots_sex <- list()
+for(sex in c("male", "female")){
+
+  r2_res_v <- paste0("r2_adj_EduYears_", sex, ".tsv")
+  bootstrap_v <- paste0("r2_adj_EduYears_", sex, "_1000.tsv")
+  # titles <- c("EA")
+  # lim_list_inc <- c(0.18, 0.175, 0.45, 0.15)
+  # steps_inc = c(0.05, 0.05, 0.1, 0.05)
+  # lim_list <- c(0.18, 0.175, 0.45, 0.15)
+  # steps = c(0.05, 0.05, 0.1, 0.05)
+  if(sex == "male"){
+    sex_name <- "Men"
+  } else(
+    sex_name <- "Women"
+  )
+  r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v))
+  bootstrap <- fread(paste0("~/EA_heritability/results/revision/", bootstrap_v))
+  plots_sex <- append(plots_sex, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
+                                                r2_var = "r2_inc", title = paste0(sex_name, ", incremental R\u00B2"))[1])
+  plots_sex <- append(plots_sex, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
+                                        r2_var = "r2", title = paste0(sex_name, ", R\u00B2"))[1])
+
+  
+}
+
+pdf(paste0("~/EA_heritability/figures/paper/revision/r2_bysex.pdf"), width=4.4, height=3)
+print(
+  grid.arrange(
+    grobs = plots_sex,
+    layout_matrix = matrix(1:4, ncol = 2, byrow = T)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.52, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("d", x = 0.52, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+
+dev.off()
+
+
+
 
 # By settlement type
 for(settlement in c("rural", "town", "city")){
@@ -376,6 +466,7 @@ for(settlement in c("rural", "town", "city")){
   plot_list_inc <- list()
   plot_list <- list()
   pval_dt <- data.table()
+  raw_table <- data.table()
   for(i in 1:4){
     
     r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
@@ -387,6 +478,7 @@ for(settlement in c("rural", "town", "city")){
                                           r2_var = "r2", title = titles[i], 
                                           lim = lim_list[i], step = steps[i]))
     pval_dt <- rbind(pval_dt, compareR2(r2_res = r2_res, bootstrap = bootstrap))
+    raw_table <- rbind(raw_table, makeR2table(r2_res = r2_res, bootstrap = bootstrap, trait = titles[i]))
     
   }
   
@@ -394,6 +486,9 @@ for(settlement in c("rural", "town", "city")){
   pval_dt[, trait := rep(titles, each = 2)]
   write.table(pval_dt, paste0("~/EA_heritability/figures/paper/revision/r2_pval_", settlement, ".tsv"),
               row.names = F, quote = F, sep = "\t")
+  write.table(raw_table, "~/EA_heritability/figures/paper/revision/r2_estimates", settlement, ".tsv",
+              row.names = F, quote = F, sep = "\t")
+  
   
   pdf(paste0("~/EA_heritability/figures/paper/revision/r2_", settlement, ".pdf"), width=5.5, height=6)
   print(
@@ -436,6 +531,47 @@ for(settlement in c("rural", "town", "city")){
   
 }
 
+# simple plot
+plots_settlement <- list()
+for(settlement in c("rural", "town", "city")){
+  
+  r2_res_v <- paste0("r2_adj_EduYears_", settlement, ".tsv")
+  bootstrap_v <- paste0("r2_adj_EduYears_", settlement, "_1000.tsv")
+  # titles <- c("EA")
+  # lim_list_inc <- c(0.18, 0.175, 0.45, 0.15)
+  # steps_inc = c(0.05, 0.05, 0.1, 0.05)
+  # lim_list <- c(0.18, 0.175, 0.45, 0.15)
+  # steps = c(0.05, 0.05, 0.1, 0.05)
+  settlement_name <- capitalize(settlement)
+  # if(settlement == "male"){
+  #   sex_name <- "Men"
+  # } else(
+  #   sex_name <- "Women"
+  # )
+  r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v))
+  bootstrap <- fread(paste0("~/EA_heritability/results/revision/", bootstrap_v))
+  plots_settlement <- append(plots_settlement, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
+                                        r2_var = "r2_inc", title = paste0(settlement_name, ", incremental R\u00B2"))[1])
+  plots_settlement <- append(plots_settlement, makeR2(r2_res = r2_res, bootstrap = bootstrap, 
+                                        r2_var = "r2", title = paste0(settlement_name, ", R\u00B2"))[1])
+  
+  
+}
+
+pdf(paste0("~/EA_heritability/figures/paper/revision/r2_bysettlement.pdf"), width=4.4, height=4.5)
+print(
+  grid.arrange(
+    grobs = plots_settlement,
+    layout_matrix = matrix(1:6, ncol = 2, byrow = T)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.52, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("d", x = 0.52, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+
+dev.off()
 
 
 # Cognitive/noncognitive
@@ -451,6 +587,7 @@ steps = c(0.02, 0.02, 0.02, 0.02)
 plot_list_inc <- list()
 plot_list <- list()
 pval_dt <- data.table()
+raw_table <- data.table()
 for(i in 1:4){
   
   r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
@@ -462,6 +599,7 @@ for(i in 1:4){
                                         r2_var = "r2", title = titles[i], 
                                         lim = lim_list[i], step = steps[i]))
   pval_dt <- rbind(pval_dt, compareR2(r2_res = r2_res, bootstrap = bootstrap))
+  raw_table <- rbind(raw_table, makeR2table(r2_res = r2_res, bootstrap = bootstrap, trait = titles[i]))
   
 }
 
@@ -469,6 +607,9 @@ pval_dt <- as.data.table(pval_dt)
 pval_dt[, trait := rep(titles, each = 2)]
 write.table(pval_dt, paste0("~/EA_heritability/figures/paper/revision/r2_pval_Cog_Noncog.tsv"),
             row.names = F, quote = F, sep = "\t")
+write.table(raw_table, "~/EA_heritability/figures/paper/revision/r2_estimates_Cog_Noncog.tsv",
+            row.names = F, quote = F, sep = "\t")
+
 
 pdf(paste0("~/EA_heritability/figures/paper/revision/r2_Cog_Noncog.pdf"), width=5.5, height=6)
 print(
@@ -524,6 +665,7 @@ steps = c(0.02, 0.02, 0.02, 0.02)
 plot_list_inc <- list()
 plot_list <- list()
 pval_dt <- data.table()
+raw_table <- data.table()
 for(i in 1:4){
   
   r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
@@ -535,6 +677,7 @@ for(i in 1:4){
                                         r2_var = "r2", title = titles[i], 
                                         lim = lim_list[i], step = steps[i]))
   pval_dt <- rbind(pval_dt, compareR2(r2_res = r2_res, bootstrap = bootstrap))
+  raw_table <- rbind(raw_table, makeR2table(r2_res = r2_res, bootstrap = bootstrap, trait = titles[i]))
   
 }
 
@@ -542,6 +685,9 @@ pval_dt <- as.data.table(pval_dt)
 pval_dt[, trait := rep(titles, each = 2)]
 write.table(pval_dt, paste0("~/EA_heritability/figures/paper/revision/untransmitted_r2_pval_Cog_Noncog.tsv"),
             row.names = F, quote = F, sep = "\t")
+write.table(raw_table, "~/EA_heritability/figures/paper/revision/untransmitted_r2_estimates_Cog_Noncog.tsv",
+            row.names = F, quote = F, sep = "\t")
+
 
 pdf(paste0("~/EA_heritability/figures/paper/revision/untransmitted_r2_Cog_Noncog.pdf"), width=5.5, height=6)
 print(
