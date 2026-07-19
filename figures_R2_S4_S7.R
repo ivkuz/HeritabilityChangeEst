@@ -362,7 +362,7 @@ for(sex in c("male", "female")){
   pval_dt[, trait := rep(titles, each = 2)]
   write.table(pval_dt, paste0("~/EA_heritability/figures/paper/revision/r2_pval_", sex, ".tsv"),
               row.names = F, quote = F, sep = "\t")
-  write.table(raw_table, paste0("~/EA_heritability/figures/paper/revision/r2_estimates", sex, ".tsv"),
+  write.table(raw_table, paste0("~/EA_heritability/figures/paper/revision/r2_estimates_", sex, ".tsv"),
               row.names = F, quote = F, sep = "\t")
   
   
@@ -486,7 +486,7 @@ for(settlement in c("rural", "town", "city")){
   pval_dt[, trait := rep(titles, each = 2)]
   write.table(pval_dt, paste0("~/EA_heritability/figures/paper/revision/r2_pval_", settlement, ".tsv"),
               row.names = F, quote = F, sep = "\t")
-  write.table(raw_table, paste0("~/EA_heritability/figures/paper/revision/r2_estimates", settlement, ".tsv"),
+  write.table(raw_table, paste0("~/EA_heritability/figures/paper/revision/r2_estimates_", settlement, ".tsv"),
               row.names = F, quote = F, sep = "\t")
   
   
