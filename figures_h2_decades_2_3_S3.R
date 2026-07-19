@@ -300,6 +300,60 @@ grid.text("b", x = 0.52, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
 dev.off()
 
 
+############################################################
+# INT EA ###################################################
+############################################################
+
+trait <- "EA"
+trait_name <- "Educational Attainment"
+
+# Upload LDAK h2 results for decade bins
+age_res <- fread("~/EA_heritability/gcta/results/ldak_age_h2_kin0.05_noAgeAtAgr_EA_INT.tsv")
+colnames(age_res) <- c("YoB", "h2", "se", "Size", "Mega_Intensity", "Int_SD")
+age_res$YoB <- factor(c("1941-1950", "1946-1955", "1951-1960", "1956-1965","1961-1970", 
+                        "1966-1975", "1971-1980", "1976-1985", "1981-1990", "1986-1995", "1991-2000"), 
+                      levels = c("1941-1950", "1946-1955", "1951-1960", "1956-1965","1961-1970", 
+                                 "1966-1975", "1971-1980", "1976-1985", "1981-1990", "1986-1995", "1991-2000"))
+
+age_res[YoB %in% c("1941-1950", "1946-1955", "1951-1960", "1956-1965","1961-1970", "1966-1975"), 
+        Era := "Soviet"]
+age_res[YoB == "1971-1980", Era := "Transition"]
+age_res[YoB %in% c("1976-1985", "1981-1990", "1986-1995", "1991-2000"), 
+        Era := "post-Soviet"]
+age_res$Era <- factor(age_res$Era, levels = c("Soviet", "Transition", "post-Soviet"))
+
+# Make the LDAK h2 plots
+pl <- ggplot(age_res,
+             aes(x = YoB, y = h2, color = Era)) +
+  geom_point(aes(shape = YoB)) +
+  geom_errorbar(aes(ymin = (h2 - 1.96 * se),
+                    ymax = (h2 + 1.96 * se),
+                    linewidth = YoB),
+                width = 0.2) + # , linewidth = 0.5
+  theme_bw() +
+  theme(text = element_text(size = 10),
+        title = element_text(size=8),
+        panel.grid.major.x = element_blank(),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  scale_shape_manual(values = c(rep(c(19, 1), 5), 19)) +
+  scale_linewidth_manual(values = c(rep(c(0.5, 0.2), 5), 0.5)) +
+  scale_color_manual(values = c(rgb(254, 0, 0, maxColorValue = 254), rgb(38, 65, 140, maxColorValue = 254),
+                                rgb(80, 148, 205, maxColorValue = 254))) +
+  ylab(bquote(h^2)) + xlab("Decade of birth")  + # xlab("Year of Birth") +
+  scale_x_discrete(labels = function(x) ifelse(seq_along(x) %% 2 == 1, x, "")) +
+  guides(linewidth = "none", 
+         shape = "none")
+
+pl
+
+pdf("~/EA_heritability/figures/paper/revision/h2_ages_kin0.05_INT.pdf", width=5.5, height=2.5)
+
+plot(pl)
+
+dev.off()
+
+
+
 
 # Increasing bins around 1976
 # Upload LDAK h2 results for decade bins
