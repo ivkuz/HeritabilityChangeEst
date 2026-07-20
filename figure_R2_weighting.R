@@ -169,3 +169,10 @@ grid.text("d", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
 
+
+
+names(r2_list$unadj) <- c("wave1_PS", "wave1_S", "wave2_PS", "wave2_S")
+names(r2_list$bygroup) <- c("wave1_PS", "wave1_S", "wave2_PS", "wave2_S")
+names(r2_list$all) <- c("wave1_PS", "wave1_S", "wave2_PS", "wave2_S")
+names(r2_list) <- c("No_weighting", "inside_sex-age_groups", "in_overall_sample")
+saveRDS(r2_list, "~/EA_heritability/results/revision/r2_15_weighted_ci_alltraits_pub.RDS")
