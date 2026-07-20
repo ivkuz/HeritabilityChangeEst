@@ -266,7 +266,7 @@ r2Decades <- function(ebb_test, trait, age, prs, title, xl = "", ylims = NULL, s
 
 
 
-r2Decades_INT <- function(ebb_test, trait, age, prs, title, xl = "", ylims = NULL, step = NULL){
+r2Decades_INT <- function(ebb_test, trait, age, prs, title, xl = "", ylims = NULL, step = NULL, trait_name = ""){
   
   # Format the data
   colnames(ebb_test)[which(colnames(ebb_test)==trait)] <- "Trait"
@@ -277,6 +277,7 @@ r2Decades_INT <- function(ebb_test, trait, age, prs, title, xl = "", ylims = NUL
   
   # list for result plots
   pl_list <- list()
+  data_list <- list()
   
   # k is the bin size
   for(k in c(5,10)){
@@ -362,11 +363,14 @@ r2Decades_INT <- function(ebb_test, trait, age, prs, title, xl = "", ylims = NUL
     
     
     pl_list <- append(pl_list, list(ggplotGrob(pl1)))
+    data_list <- append(data_list, list(data.table(Trait = trait_name, binwidth = k, r2_decades[, Birth := NULL])))
+    
 
   }
   
-  
-  return(pl_list)
+  data_table <- rbind(data_list[[1]], data_list[[2]])
+  # return(pl_list)
+  return(list(pl_list, data_table))
   
 }
 
@@ -461,7 +465,8 @@ colnames(pgi_ea)[1] <- "vkood"
 ebb <- merge(ebb, pgi_ea)
 
 # We analyse individuals older than 25 years at the time of recruitment
-ebb_test <- ebb[AgeAtAgr > 25,]
+# ebb_test <- ebb[AgeAtAgr > 25,]
+ebb_test <- ebb
 
 # Keep unrelated subsample
 ind_all <- fread("~/EBB_project/data_filtering/non_relatives_est_perfect.tsv")
@@ -499,14 +504,15 @@ pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PG
 pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "OS")
 
 table_out <- rbind(pl3[[2]], pl4[[2]], pl1[[2]], pl2[[2]])
-# write.table(table_out, "~/EA_heritability/figures/paper/revision/r2_estimates_YoB_bins_weakPGS.tsv", 
+# write.table(table_out, "~/EA_heritability/figures/paper/revision/r2_estimates_YoB_bins_weakPGS_noAgeAtAgr.tsv",
 #             row.names = F, quote = F, sep = "\t")
-write.table(table_out, "~/EA_heritability/figures/paper/revision/r2_estimates_YoB_bins.tsv",
+write.table(table_out, "~/EA_heritability/figures/paper/revision/r2_estimates_YoB_bins_noAgeAtAgr.tsv",
             row.names = F, quote = F, sep = "\t")
 
 # Make plots
 # Including Supplementary Fig. 6
-pdf("~/EA_heritability/figures/paper/revision/r2_ages.pdf", width=5, height=5)
+# pdf("~/EA_heritability/figures/paper/revision/r2_ages_weakPGS_noAgeAtAgr.pdf", width=5, height=5)
+pdf("~/EA_heritability/figures/paper/revision/r2_ages_noAgeAtAgr.pdf", width=5, height=5)
 
 for(i in 1:4){
 
@@ -538,7 +544,8 @@ plot_list <- list(pl1[[1]][[i]], pl2[[1]][[i]])
 
 
 # Supplementary figure 5
-pdf("~/EA_heritability/figures/paper/revision/r2_ages_height_bmi.pdf", width=5, height=2.5)
+# pdf("~/EA_heritability/figures/paper/revision/r2_ages_height_bmi_weakPGS_noAgeAtAgr.pdf", width=5, height=2.5)
+pdf("~/EA_heritability/figures/paper/revision/r2_ages_height_bmi_noAgeAtAgr.pdf", width=5, height=2.5)
 
 print(
   grid.arrange(
@@ -554,18 +561,30 @@ dev.off()
 
 
 # For figure 5
-pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.22), step=0.03)
-pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.015, 0.17), step=0.03)
+# pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PRS_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.125), step=0.03)
+# pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PRS_EA", title = "", xl = "Decade of birth", ylims = c(0.015, 0.115), step=0.03)
+pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.041, 0.22), step=0.03)
+pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.0215, 0.17), step=0.03)
 
 plot_list <- list(pl3[[1]][[1]], pl4[[1]][[1]])
 
-saveRDS(plot_list, "~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf.rds")
+# saveRDS(plot_list, "~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf_weakPGS_noAgeAtAgr.rds")
+saveRDS(plot_list, "~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf_noAgeAtAgr.rds")
 
 
 # For figure 5 INT
-pl3 <- r2Decades_INT(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.22), step=0.03)
-pl4 <- r2Decades_INT(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.015, 0.17), step=0.03)
+# pl3 <- r2Decades_INT(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PRS_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.22), step=0.03, trait_name = "EA")
+# pl4 <- r2Decades_INT(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PRS_EA", title = "", xl = "Decade of birth", ylims = c(0.015, 0.17), step=0.03, trait_name = "OS")
+pl3 <- r2Decades_INT(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.22), step=0.03, trait_name = "EA")
+pl4 <- r2Decades_INT(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.015, 0.17), step=0.03, trait_name = "OS")
+
+table_out <- rbind(pl3[[2]], pl4[[2]])
+# write.table(table_out, "~/EA_heritability/figures/paper/revision/r2_estimates_INT_YoB_bins_weakPGS_noAgeAtAgr.tsv",
+#             row.names = F, quote = F, sep = "\t")
+write.table(table_out, "~/EA_heritability/figures/paper/revision/r2_estimates_INT_YoB_bins_noAgeAtAgr.tsv",
+            row.names = F, quote = F, sep = "\t")
 
 plot_list <- list(pl3[[1]][[1]], pl4[[1]][[1]])
 
-saveRDS(plot_list, "~/EA_heritability/figures/paper/revision/files_for_figures/fig5_INT_cf.rds")
+# saveRDS(plot_list, "~/EA_heritability/figures/paper/revision/files_for_figures/fig5_INT_cf_weakPGS_noAgeAtAgr.rds")
+saveRDS(plot_list, "~/EA_heritability/figures/paper/revision/files_for_figures/fig5_INT_cf_noAgeAtAgr.rds")
