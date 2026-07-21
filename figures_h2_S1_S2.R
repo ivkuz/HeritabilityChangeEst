@@ -156,94 +156,6 @@ reml_res[, h2 := as.numeric(h2)]
 reml_res[, se := as.numeric(se)]
 
 
-# #############
-# # Cutoff 15 #
-# #############
-# 
-# # Cutoff 15, both waves together #
-# # EA
-# reml_names <- c("ldak_s_15.reml", "ldak_ps_15.reml")
-# pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "EA", lim = c(0, 0.4), step = 0.1)
-# df12 <- compareH2(reml_res = reml_res, names = reml_names)
-# 
-# # OS
-# reml_names <- c("ldak_s_ldak_list_OS_unrel_15_OS.reml", "ldak_ps_ldak_list_OS_unrel_15_OS.reml")
-# pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "OS", lim = c(-0.1, 0.27), step = 0.1)
-# df14 <- compareH2(reml_res = reml_res, names = reml_names)
-# 
-# # Height
-# reml_names <- c("ldak_s_ldak_list_unrel_logHeight.reml", "ldak_ps_ldak_list_unrel_logHeight.reml")
-# pl15 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Height", lim = c(0, 0.85), step = 0.2)
-# df15 <- compareH2(reml_res = reml_res, names = reml_names)
-# 
-# # BMI
-# reml_names <- c("ldak_s_ldak_list_unrel_logBMI.reml", "ldak_ps_ldak_list_unrel_logBMI.reml")
-# pl16 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "BMI", lim = c(0, 0.5), step = 0.1)
-# df16 <- compareH2(reml_res = reml_res, names = reml_names)
-# 
-# # Cutoff 15, by wave #
-# # EA
-# reml_names <- c("ldak_p1s_15.reml", "ldak_p1ps_15.reml", "ldak_p2s_15.reml", "ldak_p2ps_15.reml")
-# pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(0, 0.4), step = 0.1)
-# df22 <- compareH2(reml_res = reml_res, names = reml_names)
-# 
-# # OS
-# reml_names <- c("ldak_p1s_ldak_list_OS_unrel_15_OS.reml", "ldak_p1ps_ldak_list_OS_unrel_15_OS.reml",
-#                 "ldak_p2s_ldak_list_OS_unrel_15_OS.reml", "ldak_p2ps_ldak_list_OS_unrel_15_OS.reml")
-# pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(-0.1, 0.27), step = 0.1)
-# df24 <- compareH2(reml_res = reml_res, names = reml_names)
-# 
-# # Height
-# reml_names <- c("ldak_p1s_ldak_list_unrel_logHeight.reml", "ldak_p1ps_ldak_list_unrel_logHeight.reml",
-#                 "ldak_p2s_ldak_list_unrel_logHeight.reml", "ldak_p2ps_ldak_list_unrel_logHeight.reml")
-# pl25 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(0, 0.85), step = 0.2)
-# df25 <- compareH2(reml_res = reml_res, names = reml_names)
-# 
-# # BMI
-# reml_names <- c("ldak_p1s_ldak_list_unrel_logBMI.reml", "ldak_p1ps_ldak_list_unrel_logBMI.reml",
-#                 "ldak_p2s_ldak_list_unrel_logBMI.reml", "ldak_p2ps_ldak_list_unrel_logBMI.reml")
-# pl26 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", lim = c(0, 0.5), step = 0.1)
-# df26 <- compareH2(reml_res = reml_res, names = reml_names)
-# 
-# 
-# # cutoff 15, collect p-value results in a table
-# df1 <- list(df12, df14, df15, df16)
-# df2 <- list(df22, df24, df25, df26)
-# df_p <- data.frame()
-# for(i in 1:4){
-#   df_p_tmp <- cbind(df1[[i]], df2[[i]])
-#   df_p <- rbind(df_p, df_p_tmp)
-# }
-# df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
-# df_p[, Trait := c("EA", "OS", "Height", "BMI")]
-# df_p[, cutoff := 15]
-# df_p_cutoff15 <- df_p
-# 
-# 
-# # cutoff 15, collect plots
-# plots <- list(pl12, pl22, pl14, pl24, pl15, pl25, pl16, pl26)
-# 
-# # Make the plot
-# pdf("~/EA_heritability/figures/paper/h2_main.pdf", width=5.5, height=6)
-# 
-# print(
-#   grid.arrange(
-#     grobs = plots,
-#     layout_matrix = matrix(1:8, ncol = 2, byrow = T),
-#     widths = c(1, 1.5)
-#   )
-# )
-# 
-# grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
-# grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
-# grid.text("c", x = 0.02, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
-# grid.text("d", x = 0.42, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
-# grid.text("e", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
-# grid.text("f", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
-# grid.text("g", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
-# grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
-# 
-# dev.off()
 
 #############################################
 # Export tables with h2 results #############
@@ -441,6 +353,50 @@ write.table(reml_res_selected, "~/EA_heritability/figures/paper/revision/h2_esti
             row.names = F, quote = F, sep = "\t")
 
 
+# #############
+# # Cutoff 15 #
+# #############
+# 
+# Cutoff 15, both waves together #
+# EA
+reml_names <- c("ldak_kin0.05_s_15.reml", "ldak_ps_15.reml")
+df12 <- compareH2(reml_res = reml_res, names = reml_names)
+# OS
+reml_names <- c("ldak_OS_kin0.05_s_15.reml", "ldak_OS_kin0.05_ps_15.reml")
+df14 <- compareH2(reml_res = reml_res, names = reml_names)
+# Height
+reml_names <- c("ldak_Height_kin0.05_s_15.reml", "ldak_Height_kin0.05_ps_15.reml")
+df15 <- compareH2(reml_res = reml_res, names = reml_names)
+# BMI
+reml_names <- c("ldak_BMI_kin0.05_s_15.reml", "ldak_BMI_kin0.05_ps_15.reml")
+df16 <- compareH2(reml_res = reml_res, names = reml_names)
+# Cutoff 15, by wave #
+# EA
+reml_names <- c("ldak_kin0.05_p1s_15.reml", "ldak_kin0.05_p1ps_15.reml", "ldak_kin0.05_p2s_15.reml", "ldak_kin0.05_p2ps_15.reml")
+df22 <- compareH2(reml_res = reml_res, names = reml_names)
+# OS
+reml_names <- c("ldak_OS_kin0.05_p1s_15.reml", "ldak_OS_kin0.05_p1ps_15.reml", "ldak_OS_kin0.05_p2s_15.reml", "ldak_OS_kin1.05_p2ps_15.reml")
+df24 <- compareH2(reml_res = reml_res, names = reml_names)
+# Height
+reml_names <- c("ldak_Height_kin0.05_p1s_15.reml", "ldak_Height_kin0.05_p1ps_15.reml", "ldak_Height_kin0.05_p2s_15.reml", "ldak_Height_kin1.05_p2ps_15.reml")
+df25 <- compareH2(reml_res = reml_res, names = reml_names)
+# BMI
+reml_names <- c("ldak_BMI_kin0.05_p1s_15.reml", "ldak_BMI_kin0.05_p1ps_15.reml", "ldak_BMI_kin0.05_p2s_15.reml", "ldak_BMI_kin1.05_p2ps_15.reml")
+df26 <- compareH2(reml_res = reml_res, names = reml_names)
+
+# cutoff 15, collect p-value results in a table
+df1 <- list(df12, df14, df15, df16)
+df2 <- list(df22, df24, df25, df26)
+df_p <- data.frame()
+for(i in 1:4){
+  df_p_tmp <- cbind(df1[[i]], df2[[i]])
+  df_p <- rbind(df_p, df_p_tmp)
+}
+df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
+df_p[, Trait := c("EA", "OS", "Height", "BMI")]
+df_p[, cutoff := 15]
+df_p_cutoff15 <- df_p
+
 ########################
 # Supplementary Fig. 2 #
 # Cutoff 10 ############
@@ -504,8 +460,8 @@ df_p[, cutoff := 10]
 df_p_cutoff10 <- df_p
 
 # Save p-value table for both cutoffs
-# df_p <- rbind(df_p_cutoff15, df_p_cutoff10)
-write.table(df_p_cutoff10, "~/EA_heritability/figures/paper/revision/h2_main_pval_10.tsv",
+df_p <- rbind(df_p_cutoff15, df_p_cutoff10)
+write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_kin0.05_main_pval.tsv",
             row.names = F, quote = F, sep = "\t")
 
 
