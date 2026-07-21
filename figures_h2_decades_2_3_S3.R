@@ -14,6 +14,8 @@ plots <- list()
 traits <- c("EA", "EA_binary_liab", "OS", "logHeight", "logBMI")
 trait_names <- c("Educational Attainment", "University degree", "Occupational Status", "Height", "BMI")
 limits <- c(0.32, NA, NA, 0.7, 0.4)
+traits_for_table <- c("EA", "EA_binary", "OS", "Height", "BMI")
+results_tab <- data.frame()
 for(i in 1:5){
   
   trait <- traits[i]
@@ -30,6 +32,10 @@ for(i in 1:5){
   age_res[YoB %in% c("1976-1985", "1981-1990", "1986-1995", "1991-2000"), 
           Era := "post-Soviet"]
   age_res$Era <- factor(age_res$Era, levels = c("Soviet", "Transition", "post-Soviet"))
+  
+  age_res_tab <- age_res[, Trait := traits_for_table[i]]
+  age_res_tab <- age_res_tab[order(YoB), .(Trait, YoB, Era, h2, se)]
+  results_tab <- rbind(results_tab, age_res_tab)
   
   if(trait == "OS"){
     age_res[YoB == "1991-2000", h2 := NA]
@@ -95,6 +101,9 @@ plots1 <- list(plots[[1]], plots[[3]], plots[[4]], plots[[5]])
 saveRDS(plots[1], "~/EA_heritability/figures/paper/files_for_figures/fig2d.rds")
 saveRDS(c(plots[4], plots[5]), "~/EA_heritability/figures/paper/files_for_figures/fig3cd.rds")
 
+write.table(results_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_alltraits_unrel_2nd_degree.tsv",
+            row.names = F, quote = F, sep = "\t")
+
 
 # Upload GCTA h2 results for decade bins
 age_res <- fread("~/EA_heritability/gcta/results/age_h2.tsv")
@@ -103,6 +112,10 @@ age_res$YoB <- factor(c("1986-1995", "1941-1950", "1991-2000", "1981-1990", "197
                         "1971-1980", "1966-1975", "1961-1970", "1956-1965", "1951-1960", "1946-1955"), 
                       levels = c("1941-1950", "1946-1955", "1951-1960", "1956-1965","1961-1970", 
                                  "1966-1975", "1971-1980", "1976-1985", "1981-1990", "1986-1995", "1991-2000"))
+
+age_res <- age_res[order(YoB), ]
+write.table(age_res, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_EA_gcta_unrel_2nd_degree.tsv",
+            row.names = F, quote = F, sep = "\t")
 
 # Make the GCTA h2 plot
 pl1 <- ggplot(age_res, 
@@ -175,6 +188,8 @@ plots <- list()
 traits <- c("EA", "EA_binary_liab", "OS", "Height", "BMI")
 trait_names <- c("Educational Attainment", "University degree", "Occupational Status", "Height", "BMI")
 limits <- c(0.32, NA, NA, 0.73, 0.4)
+traits_for_table <- c("EA", "EA_binary", "OS", "Height", "BMI")
+results_tab <- data.frame()
 for(i in 1:5){
   
   trait <- traits[i]
@@ -192,6 +207,10 @@ for(i in 1:5){
   age_res[YoB %in% c("1976-1985", "1981-1990", "1986-1995", "1991-2000"), 
           Era := "post-Soviet"]
   age_res$Era <- factor(age_res$Era, levels = c("Soviet", "Transition", "post-Soviet"))
+  
+  age_res_tab <- age_res[, Trait := traits_for_table[i]]
+  age_res_tab <- age_res_tab[order(YoB), .(Trait, YoB, Era, h2, se)]
+  results_tab <- rbind(results_tab, age_res_tab)
   
   if(trait == "OS"){
     age_res[YoB == "1991-2000", h2 := NA]
@@ -247,6 +266,11 @@ plots1 <- list(plots[[1]], plots[[3]], plots[[4]], plots[[5]])
 saveRDS(plots[1], "~/EA_heritability/figures/paper/revision/files_for_figures/fig2d_noAgeAtAgr.rds")
 saveRDS(c(plots[4], plots[5]), "~/EA_heritability/figures/paper/revision/files_for_figures/fig3cd_noAgeAtAgr.rds")
 
+# write.table(results_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_alltraits_kin0.05.tsv",
+#             row.names = F, quote = F, sep = "\t")
+write.table(results_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_alltraits_kin0.05_noAgeAtAgr.tsv",
+            row.names = F, quote = F, sep = "\t")
+
 
 # Upload GCTA h2 results for decade bins
 age_res <- fread("~/EA_heritability/gcta/results/age_h2_kin0.05.tsv")
@@ -255,6 +279,10 @@ age_res$YoB <- factor(c("1941-1950", "1991-2000", "1986-1995", "1981-1990", "197
                         "1971-1980", "1966-1975", "1961-1970", "1956-1965", "1951-1960", "1946-1955"), 
                       levels = c("1941-1950", "1946-1955", "1951-1960", "1956-1965","1961-1970", 
                                  "1966-1975", "1971-1980", "1976-1985", "1981-1990", "1986-1995", "1991-2000"))
+
+age_res <- age_res[order(YoB), ]
+write.table(age_res, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_EA_gcta_kin0.05.tsv",
+            row.names = F, quote = F, sep = "\t")
 
 # age_res <- age_res[YoB != "1991-2000", ]
 
@@ -321,6 +349,10 @@ age_res[YoB == "1971-1980", Era := "Transition"]
 age_res[YoB %in% c("1976-1985", "1981-1990", "1986-1995", "1991-2000"), 
         Era := "post-Soviet"]
 age_res$Era <- factor(age_res$Era, levels = c("Soviet", "Transition", "post-Soviet"))
+
+age_res_tab <- age_res[order(YoB), .(YoB, Era, h2, se)]
+write.table(age_res_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_INT_EA_kin0.05_noAgeAtAgr.tsv",
+            row.names = F, quote = F, sep = "\t")
 
 # Make the LDAK h2 plots
 pl <- ggplot(age_res,

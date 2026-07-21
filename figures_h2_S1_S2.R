@@ -245,8 +245,200 @@ reml_res[, se := as.numeric(se)]
 # 
 # dev.off()
 
+#############################################
+# Export tables with h2 results #############
+#############################################
+Trait <- rep(rep(c("EA", "OS", "Height", "BMI", "EA_binary"), each = 2), 6)
+Wave <- rep(rep(c("All", "1", "2"), each = 10), 2)
+Era <- rep(c("S", "PS"), 30)
+Cutoff <- rep(c("15", "10"), each = 30)
+
+# Export table with h2 results - 2nd-degree unrelated, both age cutoffs
+selected_lines <- c(
+  "ldak_s_15.reml", "ldak_ps_15.reml", 
+  "ldak_s_ldak_list_OS_unrel_15_OS.reml", "ldak_ps_ldak_list_OS_unrel_15_OS.reml", 
+  "ldak_s_ldak_list_unrel_logHeight.reml", "ldak_ps_ldak_list_unrel_logHeight.reml", 
+  "ldak_s_ldak_list_unrel_logBMI.reml", "ldak_ps_ldak_list_unrel_logBMI.reml", 
+  "ldak_s_ldak_list_unrel_EA_binary.reml.liab", "ldak_ps_ldak_list_unrel_EA_binary.reml.liab", 
+  "ldak_p1s_15.reml", "ldak_p1ps_15.reml", 
+  "ldak_p1s_ldak_list_OS_unrel_15_OS.reml", "ldak_p1ps_ldak_list_OS_unrel_15_OS.reml", 
+  "ldak_p1s_ldak_list_unrel_logHeight.reml", "ldak_p1ps_ldak_list_unrel_logHeight.reml", 
+  "ldak_p1s_ldak_list_unrel_logBMI.reml", "ldak_p1ps_ldak_list_unrel_logBMI.reml", 
+  "ldak_p1s_ldak_list_unrel_EA_binary.reml.liab", "ldak_p1ps_ldak_list_unrel_EA_binary.reml.liab", 
+  "ldak_p2s_15.reml", "ldak_p2ps_15.reml", 
+  "ldak_p2s_ldak_list_OS_unrel_15_OS.reml", "ldak_p2ps_ldak_list_OS_unrel_15_OS.reml", 
+  "ldak_p2s_ldak_list_unrel_logHeight.reml", "ldak_p2ps_ldak_list_unrel_logHeight.reml", 
+  "ldak_p2s_ldak_list_unrel_logBMI.reml", "ldak_p2ps_ldak_list_unrel_logBMI.reml", 
+  "ldak_p2s_ldak_list_unrel_EA_binary.reml.liab", "ldak_p2ps_ldak_list_unrel_EA_binary.reml.liab", 
+  
+  "ldak_s_10.reml", "ldak_ps_10.reml", 
+  "ldak_s_ldak_list_OS_unrel_10_OS.reml", "ldak_ps_ldak_list_OS_unrel_10_OS.reml", 
+  "ldak_s_ldak_list_unrel_10_logHeight.reml", "ldak_ps_ldak_list_unrel_10_logHeight.reml", 
+  "ldak_s_ldak_list_unrel_10_logBMI.reml", "ldak_ps_ldak_list_unrel_10_logBMI.reml", 
+  "ldak_s_ldak_list_unrel_10_EA_binary.reml.liab", "ldak_ps_ldak_list_unrel_10_EA_binary.reml.liab", 
+  "ldak_p1s_10.reml", "ldak_p1ps_10.reml", 
+  "ldak_p1s_ldak_list_OS_unrel_10_OS.reml", "ldak_p1ps_ldak_list_OS_unrel_10_OS.reml", 
+  "ldak_p1s_ldak_list_unrel_10_logHeight.reml", "ldak_p1ps_ldak_list_unrel_10_logHeight.reml", 
+  "ldak_p1s_ldak_list_unrel_10_logBMI.reml", "ldak_p1ps_ldak_list_unrel_10_logBMI.reml", 
+  "ldak_p1s_ldak_list_unrel_10_EA_binary.reml.liab", "ldak_p1ps_ldak_list_unrel_10_EA_binary.reml.liab", 
+  "ldak_p2s_10.reml", "ldak_p2ps_10.reml", 
+  "ldak_p2s_ldak_list_OS_unrel_10_OS.reml", "ldak_p2ps_ldak_list_OS_unrel_10_OS.reml", 
+  "ldak_p2s_ldak_list_unrel_10_logHeight.reml", "ldak_p2ps_ldak_list_unrel_10_logHeight.reml", 
+  "ldak_p2s_ldak_list_unrel_10_logBMI.reml", "ldak_p2ps_ldak_list_unrel_10_logBMI.reml",
+  "ldak_p2s_ldak_list_unrel_10_EA_binary.reml.liab", "ldak_p2ps_ldak_list_unrel_10_EA_binary.reml.liab" 
+)
+reml_res_selected <- reml_res[match(selected_lines, reml_res$name), ]
+reml_res_selected <- data.table(Trait, Wave, Era, Cutoff, reml_res_selected[, name := NULL])
+write.table(reml_res_selected, "~/EA_heritability/figures/paper/revision/h2_estimates_main_unrel_2nd_degree.tsv",
+            row.names = F, quote = F, sep = "\t")
 
 
+# Export table with h2 results - kinship 0.05 unrelated, both age cutoffs
+selected_lines <- c(
+  "ldak_kin0.05_s_15.reml", "ldak_kin0.05_ps_15.reml", 
+  "ldak_OS_kin0.05_s_15.reml", "ldak_OS_kin0.05_ps_15.reml", 
+  "ldak_Height_kin0.05_s_15.reml", "ldak_Height_kin0.05_ps_15.reml", 
+  "ldak_BMI_kin0.05_s_15.reml", "ldak_BMI_kin0.05_ps_15.reml", 
+  "ldak_EA_binary_kin0.05_s_15.reml.liab", "ldak_EA_binary_kin0.05_ps_15.reml.liab", 
+  "ldak_kin0.05_p1s_15.reml", "ldak_kin0.05_p1ps_15.reml", 
+  "ldak_OS_kin0.05_p1s_15.reml", "ldak_OS_kin0.05_p1ps_15.reml", 
+  "ldak_Height_kin0.05_p1s_15.reml", "ldak_Height_kin0.05_p1ps_15.reml", 
+  "ldak_BMI_kin0.05_p1s_15.reml", "ldak_BMI_kin0.05_p1ps_15.reml", 
+  "ldak_EA_binary_kin0.05_p1s_15.reml.liab", "ldak_EA_binary_kin0.05_p1ps_15.reml.liab", 
+  "ldak_kin0.05_p2s_15.reml", "ldak_kin0.05_p2ps_15.reml", 
+  "ldak_OS_kin0.05_p2s_15.reml", "ldak_OS_kin0.05_p2ps_15.reml", 
+  "ldak_Height_kin0.05_p2s_15.reml", "ldak_Height_kin0.05_p2ps_15.reml", 
+  "ldak_BMI_kin0.05_p2s_15.reml", "ldak_BMI_kin0.05_p2ps_15.reml", 
+  "ldak_EA_binary_kin0.05_p2s_15.reml.liab", "ldak_EA_binary_kin0.05_p2ps_15.reml.liab", 
+  
+  "ldak_kin0.05_s_10.reml", "ldak_kin0.05_ps_10.reml", 
+  "ldak_OS_kin0.05_s_10.reml", "ldak_OS_kin0.05_ps_10.reml", 
+  "ldak_Height_kin0.05_s_10.reml", "ldak_Height_kin0.05_ps_10.reml", 
+  "ldak_BMI_kin0.05_s_10.reml", "ldak_BMI_kin0.05_ps_10.reml", 
+  "ldak_EA_binary_kin0.05_s_10.reml.liab", "ldak_EA_binary_kin0.05_ps_10.reml.liab", 
+  "ldak_kin0.05_p1s_10.reml", "ldak_kin0.05_p1ps_10.reml", 
+  "ldak_OS_kin0.05_p1s_10.reml", "ldak_OS_kin0.05_p1ps_10.reml", 
+  "ldak_Height_kin0.05_p1s_10.reml", "ldak_Height_kin0.05_p1ps_10.reml", 
+  "ldak_BMI_kin0.05_p1s_10.reml", "ldak_BMI_kin0.05_p1ps_10.reml", 
+  "ldak_EA_binary_kin0.05_p1s_10.reml.liab", "ldak_EA_binary_kin0.05_p1ps_10.reml.liab", 
+  "ldak_kin0.05_p2s_10.reml", "ldak_kin0.05_p2ps_10.reml", 
+  "ldak_OS_kin0.05_p2s_10.reml", "ldak_OS_kin0.05_p2ps_10.reml", 
+  "ldak_Height_kin0.05_p2s_10.reml", "ldak_Height_kin0.05_p2ps_10.reml", 
+  "ldak_BMI_kin0.05_p2s_10.reml", "ldak_BMI_kin0.05_p2ps_10.reml", 
+  "ldak_EA_binary_kin0.05_p2s_10.reml.liab", "ldak_EA_binary_kin0.05_p2ps_10.reml.liab" 
+)
+reml_res_selected <- reml_res[match(selected_lines, reml_res$name), ]
+reml_res_selected <- data.table(Trait, Wave, Era, Cutoff, reml_res_selected[, name := NULL])
+write.table(reml_res_selected, "~/EA_heritability/figures/paper/revision/h2_estimates_main_kin0.05.tsv",
+            row.names = F, quote = F, sep = "\t")
+
+
+# Export table with h2 results - pedigree data (two matrices), both age cutoffs
+selected_lines <- c(
+  "ldak_pedigree_s_15.reml", "ldak_pedigree_ps_15.reml", 
+  "ldak_OS_pedigree_s_15.reml", "ldak_OS_pedigree_ps_15.reml", 
+  "ldak_Height_pedigree_s_15.reml", "ldak_Height_pedigree_ps_15.reml", 
+  "ldak_BMI_pedigree_s_15.reml", "ldak_BMI_pedigree_ps_15.reml", 
+  "ldak_EA_binary_pedigree_s_15.reml.liab", "ldak_EA_binary_pedigree_ps_15.reml.liab", 
+  "ldak_pedigree_p1s_15.reml", "ldak_pedigree_p1ps_15.reml", 
+  "ldak_OS_pedigree_p1s_15.reml", "ldak_OS_pedigree_p1ps_15.reml", 
+  "ldak_Height_pedigree_p1s_15.reml", "ldak_Height_pedigree_p1ps_15.reml", 
+  "ldak_BMI_pedigree_p1s_15.reml", "ldak_BMI_pedigree_p1ps_15.reml", 
+  "ldak_EA_binary_pedigree_p1s_15.reml.liab", "ldak_EA_binary_pedigree_p1ps_15.reml.liab", 
+  "ldak_pedigree_p2s_15.reml", "ldak_pedigree_p2ps_15.reml", 
+  "ldak_OS_pedigree_p2s_15.reml", "ldak_OS_pedigree_p2ps_15.reml", 
+  "ldak_Height_pedigree_p2s_15.reml", "ldak_Height_pedigree_p2ps_15.reml", 
+  "ldak_BMI_pedigree_p2s_15.reml", "ldak_BMI_pedigree_p2ps_15.reml", 
+  "ldak_EA_binary_pedigree_p2s_15.reml.liab", "ldak_EA_binary_pedigree_p2ps_15.reml.liab", 
+  
+  "ldak_pedigree_s_10.reml", "ldak_pedigree_ps_10.reml", 
+  "ldak_OS_pedigree_s_10.reml", "ldak_OS_pedigree_ps_10.reml", 
+  "ldak_Height_pedigree_s_10.reml", "ldak_Height_pedigree_ps_10.reml", 
+  "ldak_BMI_pedigree_s_10.reml", "ldak_BMI_pedigree_ps_10.reml", 
+  "ldak_EA_binary_pedigree_s_10.reml.liab", "ldak_EA_binary_pedigree_ps_10.reml.liab", 
+  "ldak_pedigree_p1s_10.reml", "ldak_pedigree_p1ps_10.reml", 
+  "ldak_OS_pedigree_p1s_10.reml", "ldak_OS_pedigree_p1ps_10.reml", 
+  "ldak_Height_pedigree_p1s_10.reml", "ldak_Height_pedigree_p1ps_10.reml", 
+  "ldak_BMI_pedigree_p1s_10.reml", "ldak_BMI_pedigree_p1ps_10.reml", 
+  "ldak_EA_binary_pedigree_p1s_10.reml.liab", "ldak_EA_binary_pedigree_p1ps_10.reml.liab", 
+  "ldak_pedigree_p2s_10.reml", "ldak_pedigree_p2ps_10.reml", 
+  "ldak_OS_pedigree_p2s_10.reml", "ldak_OS_pedigree_p2ps_10.reml", 
+  "ldak_Height_pedigree_p2s_10.reml", "ldak_Height_pedigree_p2ps_10.reml", 
+  "ldak_BMI_pedigree_p2s_10.reml", "ldak_BMI_pedigree_p2ps_10.reml", 
+  "ldak_EA_binary_pedigree_p2s_10.reml.liab", "ldak_EA_binary_pedigree_p2ps_10.reml.liab" 
+)
+reml_res_selected <- reml_res[match(selected_lines, reml_res$name), ]
+reml_res_selected <- data.table(Trait, Wave, Era, Cutoff, reml_res_selected[, name := NULL])
+write.table(reml_res_selected, "~/EA_heritability/figures/paper/revision/h2_estimates_main_pedigree.tsv",
+            row.names = F, quote = F, sep = "\t")
+
+
+# GCTA
+reml_files <- c("s", "ps", "p1s", "p1ps", "p2s", "p2ps")
+reml_res_gcta_2nd_degree <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = ".hsq")
+reml_res_gcta_kin0.05 <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = "_kin0.05.hsq")
+reml_res_gcta <- data.table(
+  relate_thr = rep(c("2nd_degree", "kin0.05"), each = 6),
+  wave = rep(rep(c("All", "1", "2"), each = 2), 2),
+  rbind(reml_res_gcta_2nd_degree, reml_res_gcta_kin0.05)[, name := NULL]
+)
+write.table(reml_res_gcta, "~/EA_heritability/figures/paper/revision/h2_estimates_EA_gcta.tsv",
+            row.names = F, quote = F, sep = "\t")
+
+
+# Export table with h2 results for EA by sex - kinship 0.05 unrelated, both age cutoffs
+selected_lines <- c(
+  "ldak_kin0.05_s_female_15.reml", "ldak_kin0.05_ps_female_15.reml", 
+  "ldak_kin0.05_s_male_15.reml", "ldak_kin0.05_ps_male_15.reml", 
+  "ldak_kin0.05_s_female_10.reml", "ldak_kin0.05_ps_female_10.reml", 
+  "ldak_kin0.05_s_male_10.reml", "ldak_kin0.05_ps_male_10.reml"
+)
+reml_res_selected <- reml_res[match(selected_lines, reml_res$name), ]
+reml_res_selected <- data.table(
+  Sex = rep(rep(c("Female", "Male"), each = 2), 2),
+  Era = rep(c("S", "PS"), 4), 
+  Cutoff = rep(c("15, 10"), each = 4), 
+  reml_res_selected[, name := NULL]
+  )
+write.table(reml_res_selected, "~/EA_heritability/figures/paper/revision/h2_estimates_bysex_EA_kin0.05.tsv",
+            row.names = F, quote = F, sep = "\t")
+
+
+# Export table with h2 results for EA by settlement - kinship 0.05 unrelated, both age cutoffs
+selected_lines <- c(
+  "ldak_kin0.05_s_rural_15.reml", "ldak_kin0.05_ps_rural_15.reml", 
+  "ldak_kin0.05_s_town_15.reml", "ldak_kin0.05_ps_town_15.reml", 
+  "ldak_kin0.05_s_city_15.reml", "ldak_kin0.05_ps_city_15.reml", 
+  "ldak_kin0.05_s_rural_10.reml", "ldak_kin0.05_ps_rural_10.reml", 
+  "ldak_kin0.05_s_town_10.reml", "ldak_kin0.05_ps_town_10.reml", 
+  "ldak_kin0.05_s_city_10.reml", "ldak_kin0.05_ps_city_10.reml"
+)
+reml_res_selected <- reml_res[match(selected_lines, reml_res$name), ]
+reml_res_selected <- data.table(
+  Settlement = rep(rep(c("Rural", "Town", "City"), each = 2), 2),
+  Era = rep(c("S", "PS"), 6), 
+  Cutoff = rep(c("15, 10"), each = 6), 
+  reml_res_selected[, name := NULL]
+)
+write.table(reml_res_selected, "~/EA_heritability/figures/paper/revision/h2_estimates_bysettlement_EA_kin0.05.tsv",
+            row.names = F, quote = F, sep = "\t")
+
+
+
+# Export table with h2 results for INT EA - kinship 0.05 unrelated, 15-years-old age cutoffs
+selected_lines <- c(
+  "ldak_EA_INT_kin0.05_s_15.reml", "ldak_EA_INT_kin0.05_ps_15.reml", 
+  "ldak_EA_INT_kin0.05_p1s_15.reml", "ldak_EA_INT_kin0.05_p1ps_15.reml", 
+  "ldak_EA_INT_kin0.05_p2s_15.reml", "ldak_EA_INT_kin0.05_p2ps_15.reml"
+)
+reml_res_selected <- reml_res[match(selected_lines, reml_res$name), ]
+reml_res_selected <- data.table(
+  Era = rep(c("S", "PS"), 3), 
+  Wave = rep(c("All", "1", "2"), each = 2),
+  reml_res_selected[, name := NULL]
+)
+write.table(reml_res_selected, "~/EA_heritability/figures/paper/revision/h2_estimates_INT_EA_kin0.05_15.tsv",
+            row.names = F, quote = F, sep = "\t")
 
 
 ########################
