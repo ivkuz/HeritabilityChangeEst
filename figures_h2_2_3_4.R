@@ -535,9 +535,11 @@ for(trait in c("EA", "OS", "Height", "BMI", "EA_binary")){
   for(reml_file in reml_files){
     if(trait == "EA"){
       file_path <- paste0("~/EA_heritability/gcta/results/ldak_pedigree_", reml_file, ".reml")
-    }else{
+    } else if(trait != "EA_binary"){
       file_path <- paste0("~/EA_heritability/gcta/results/ldak_", trait, "_pedigree_", reml_file, ".reml")
-    } 
+    } else{
+      file_path <- paste0("~/EA_heritability/gcta/results/ldak_", trait, "_pedigree_", reml_file, ".reml.liab")
+    }
     if (file.exists(file_path)){
       res = readLines(file_path)
       
@@ -647,7 +649,7 @@ for(pl in list(pl_15[1:8], pl_10[1:8])){
 dev.off()
 
 # University degree
-pdf("~/EA_heritability/figures/paper/revision/h2_EA_binary_pedigree_15_10.pdf", width=5.5, height=1.5)
+pdf("~/EA_heritability/figures/paper/revision/h2_EA_binary_pedigree_15_10.pdf", width=5.5, height=2.5)
 
 for(pl in list(pl_15[9:10], pl_10[9:10])){
   
