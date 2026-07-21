@@ -180,21 +180,27 @@ dev.off()
 
 
 ############################################################
-# Relatedness threshold 0.05 ###############################
+# Relatedness threshold 0.05 or pedigree ###################
 ############################################################
 
 # Upload LDAK h2 results for decade bins
 plots <- list()
-traits <- c("EA", "EA_binary_liab", "OS", "Height", "BMI")
-trait_names <- c("Educational Attainment", "University degree", "Occupational Status", "Height", "BMI")
-limits <- c(0.32, NA, NA, 0.73, 0.4)
-traits_for_table <- c("EA", "EA_binary", "OS", "Height", "BMI")
+# traits <- c("EA", "EA_binary_liab", "OS", "Height", "BMI")
+# trait_names <- c("Educational Attainment", "University degree", "Occupational Status", "Height", "BMI")
+# limits <- c(0.32, NA, NA, 0.73, 0.4)
+# traits_for_table <- c("EA", "EA_binary", "OS", "Height", "BMI")
+traits <- c("EA", "OS", "Height", "BMI")
+trait_names <- c("Educational Attainment", "Occupational Status", "Height", "BMI")
+limits <- c(0.29, NA, 0.7, 0.4)
+traits_for_table <- c("EA", "OS", "Height", "BMI")
 results_tab <- data.frame()
-for(i in 1:5){
+# for(i in 1:5){
+for(i in 1:4){
   
   trait <- traits[i]
   # age_res <- fread(paste0("~/EA_heritability/gcta/results/ldak_age_h2_kin0.05_", trait, ".tsv"))
-  age_res <- fread(paste0("~/EA_heritability/gcta/results/ldak_age_h2_kin0.05_noAgeAtAgr_", trait, ".tsv"))
+  # age_res <- fread(paste0("~/EA_heritability/gcta/results/ldak_age_h2_kin0.05_noAgeAtAgr_", trait, ".tsv"))
+  age_res <- fread(paste0("~/EA_heritability/gcta/results/ldak_age_h2_pedigree_noAgeAtAgr_", trait, ".tsv"))
   colnames(age_res) <- c("YoB", "h2", "se", "Size", "Mega_Intensity", "Int_SD")
   age_res$YoB <- factor(c("1941-1950", "1946-1955", "1951-1960", "1956-1965","1961-1970", 
                           "1966-1975", "1971-1980", "1976-1985", "1981-1990", "1986-1995", "1991-2000"), 
@@ -258,17 +264,24 @@ for(i in 1:5){
 }
 
 # for the main figure
-plots1 <- list(plots[[1]], plots[[3]], plots[[4]], plots[[5]])
+# plots1 <- list(plots[[1]], plots[[3]], plots[[4]], plots[[5]])
+plots1 <- list(plots[[1]], plots[[2]], plots[[3]], plots[[4]])
 
 
 # saveRDS(plots[1], "~/EA_heritability/figures/paper/revision/files_for_figures/fig2d.rds")
 # saveRDS(c(plots[4], plots[5]), "~/EA_heritability/figures/paper/revision/files_for_figures/fig3cd.rds")
-saveRDS(plots[1], "~/EA_heritability/figures/paper/revision/files_for_figures/fig2d_noAgeAtAgr.rds")
-saveRDS(c(plots[4], plots[5]), "~/EA_heritability/figures/paper/revision/files_for_figures/fig3cd_noAgeAtAgr.rds")
+
+# saveRDS(plots[1], "~/EA_heritability/figures/paper/revision/files_for_figures/fig2d_noAgeAtAgr.rds")
+# saveRDS(c(plots[4], plots[5]), "~/EA_heritability/figures/paper/revision/files_for_figures/fig3cd_noAgeAtAgr.rds")
+
+saveRDS(plots[1], "~/EA_heritability/figures/paper/revision/files_for_figures/fig2d_pedigree_noAgeAtAgr.rds")
+saveRDS(c(plots[3], plots[4]), "~/EA_heritability/figures/paper/revision/files_for_figures/fig3cd_pedigree_noAgeAtAgr.rds")
 
 # write.table(results_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_alltraits_kin0.05.tsv",
 #             row.names = F, quote = F, sep = "\t")
-write.table(results_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_alltraits_kin0.05_noAgeAtAgr.tsv",
+# write.table(results_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_alltraits_kin0.05_noAgeAtAgr.tsv",
+#             row.names = F, quote = F, sep = "\t")
+write.table(results_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_alltraits_pedigree_noAgeAtAgr.tsv",
             row.names = F, quote = F, sep = "\t")
 
 
