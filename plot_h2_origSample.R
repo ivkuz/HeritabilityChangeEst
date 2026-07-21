@@ -85,6 +85,7 @@ compareH2 <- function(reml_res, names){
 }
 
 
+
 # Upload GCTA h2 results
 reml_files <- c("all", "s10", "ps10", "s15", "ps15")
 
@@ -123,6 +124,7 @@ reml_res <- as.data.table(reml_res)
 reml_res[, h2 := as.numeric(h2)]
 reml_res[, se := as.numeric(se)]
 
+reml_res_LDAK <- reml_res
 
 names <- c("all", "s10", "ps10", "s15", "ps15")
 pl32 <- plotH2(reml_res = reml_res, names = names, errors = "CI", title = "LDAK, EA, Estonians")
@@ -168,4 +170,48 @@ grid.text("e", x = 0.02, y = 0.3133, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("f", x = 0.52, y = 0.3133, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
+
+
+
+
+# Table output with estimates and SE
+
+# GCTA
+reml_files <-  c("all", "s10", "ps10", "s15", "ps15")
+reml_res_INT_EA_Est <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = "_norm_origSample_unrelEst.hsq")
+reml_res_EA_Est <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = "_origSample_unrelEst.hsq")
+reml_res_INT_EA_Eur <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = "_norm_origSample_unrel05.hsq")
+reml_res_EA_Eur <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = "_origSample_unrel05.hsq")
+
+reml_res_GCTA <- rbind(reml_res_INT_EA_Eur,
+                       reml_res_EA_Eur,
+                       reml_res_INT_EA_Est,
+                       reml_res_EA_Est)
+reml_res_GCTA <- data.table(
+  Method = "GCTA",
+  Trait = "EA",
+  Transformed = rep(rep(c("INT", "No"), each = 5), 2),
+  Ethnicity = rep(c("Estonian", "European"), each = 10),
+  Cutoff = rep(c("No", rep(c("10", "15"), each = 2)), 4),
+  Era = rep(c("All", "S", "PS", "S", "PS"), 4),
+  reml_res_GCTA[, name := NULL]
+  
+)
+
+# LDAK
+reml_res_LDAK <- data.table(
+  Method = "LDAK",
+  Trait = rep(c("EA", "OS"), each = 5),
+  Transformed = "No",
+  Ethnicity = "Estonian",
+  Cutoff = rep(c("No", rep(c("10", "15"), each = 2)), 2),
+  Era = rep(c("All", "S", "PS", "S", "PS"), 2),
+  reml_res_LDAK[, name := NULL]
+)
+
+reml_res_origSample <- rbind(reml_res_GCTA, reml_res_LDAK)
+
+write.table(reml_res_origSample, "~/EA_heritability/figures/paper/revision/h2_estimates_origSample.tsv",
+            row.names = F, quote = F, sep = "\t")
+
 
