@@ -514,7 +514,7 @@ plotHereroscedastic <- function(s, pcs = 40, include_PRS_YoB = TRUE){
       legend.position = "none"
     ) +
     labs(
-      x = x_label,
+      x = "Beta (95% CI)",
       y = "Interaction factor",
     ) + scale_color_manual(values = c(
       "Sex" = "#D55E00",      # vermilion
@@ -582,8 +582,8 @@ write.table(s1, "~/EA_heritability/figures/paper/revision/heteroschedRegrYoB.tsv
 write.table(s1, "~/EA_heritability/figures/paper/revision/heteroschedRegrNoYoB.tsv",
             col.names = T, row.names = T, quote = F, sep = "\t")
 
-pl_list <- list(plotHereroscedastic(s2, pcs = 40, include_PRS_YoB = FALSE),
-                plotHereroscedastic(s1, pcs = 40, include_PRS_YoB = TRUE))
+pl_list <- list(plotHereroscedastic(s1, pcs = 40, include_PRS_YoB = TRUE),
+                plotHereroscedastic(s2, pcs = 40, include_PRS_YoB = FALSE))
 
 pdf("~/EA_heritability/figures/paper/revision/heteroschedRegr_15.pdf", width=7, height=7/3)
 
