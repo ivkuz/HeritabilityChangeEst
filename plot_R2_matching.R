@@ -64,4 +64,19 @@ print(
 dev.off()
 
 
+r2_source <- c()
+r2_target <- c()
+res_EA <- data.table()
+res_EA_Sex <- data.table()
+seq <- c(6,5,8,7,2,1,4,3,14,13,16,15,10,9,12,11)
+for(i in seq){
+  r2_source <- c(r2_source, r2_list[[i]]$r2_ref)
+  r2_target <- c(r2_target, r2_list[[i]]$r2_biased)
+  res_EA <- cbind(res_EA, r2_list[[i]][[1]]$r2_EA)
+  res_EA_Sex <- cbind(res_EA_Sex, r2_list[[i]][[1]]$r2_EA_Sex)
+}
 
+write.table(res_EA, "~/EA_heritability/figures/paper/revision/matching_replacement_EA.tsv",
+            row.names = F, col.names = F, quote = F, sep = "\t")
+write.table(res_EA_Sex, "~/EA_heritability/figures/paper/revision/matching_replacement_EA_Sex.tsv",
+            row.names = F, col.names = F, quote = F, sep = "\t")
