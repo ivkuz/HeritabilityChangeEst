@@ -131,6 +131,37 @@ compareR2 <- function(r2_res, bootstrap, no_inc = F){
   
 }
 
+# Make output table with data for the plots
+makeR2table <- function(r2_res, bootstrap, trait){
+  
+  bootstrap_result <- bootstrap[, lapply(.SD, function(x)
+    c(
+      median = median(x, na.rm = TRUE),
+      quantile_0025 = quantile(x, 0.025, na.rm = TRUE),
+      quantile_0975 = quantile(x, 0.975, na.rm = TRUE)
+    )
+  )]  
+  r2_res <- rbind(r2_res, bootstrap_result)
+  
+  r2_res <- as.data.table(t(r2_res))
+  colnames(r2_res) <- c("name", "var", "r2", "N", "bstr_0.5", "bstr_0.025", "bstr_0.975")
+  r2_res[, r2 := as.numeric(r2)]
+  r2_res[, N := as.numeric(N)]
+  r2_res[, bstr_0.5 := as.double(bstr_0.5)]
+  r2_res[, bstr_0.025 := as.double(bstr_0.025)]
+  r2_res[, bstr_0.975 := as.double(bstr_0.975)]
+  r2_res[, FT_0.025 := mapply(function(r, n) CIr(r = r, n = n, level = 0.95)[1]^2, sqrt(r2), N)]
+  r2_res[, FT_0.975 := mapply(function(r, n) CIr(r = r, n = n, level = 0.95)[2]^2, sqrt(r2), N)]
+  
+  r2_res <- r2_res[order(unlist(var)),]
+  r2_res <- data.table(trait = trait, r2_res)
+  
+  
+  return(r2_res)
+  
+}
+
+
 
 # files with R2 values and bootstrap results
 r2_res_v <- c("r2_adj_EduYears.tsv", "r2_adj_OS.tsv", 
@@ -140,7 +171,8 @@ bootstrap_v <- c("r2_adj_EduYears_1000.tsv", "r2_adj_OS_1000.tsv",
 
 # parameters for plotting
 titles <- c("Educational Attainment", "Occupational Status") 
-lim_list_inc <- c(0.22, 0.17)
+# lim_list_inc <- c(0.22, 0.17)
+lim_list_inc <- c(0.18, 0.17)
 lim_list <- c(0.17, 0.17)
 steps = c(0.03, 0.03)
 
@@ -174,10 +206,15 @@ plot_list_inc[[1]] <- plot_list_inc[[1]] +
               step_increase = 0.3)
 
 plot_list_inc[[2]] <- plot_list_inc[[2]] +
-  geom_signif(comparisons=list(c("p2S", "p2PS"), c("p1S", "p1PS"), c("p1S", "p2S"), c("p1PS", "p2PS")),
-              annotations = c("p=0.018", "p<0.002", "p=0.034", "p=0.04"),
+  # geom_signif(comparisons=list(c("p2S", "p2PS"), c("p1S", "p1PS"), c("p1S", "p2S"), c("p1PS", "p2PS")),
+  #             annotations = c("p=0.018", "p<0.002", "p=0.034", "p=0.04"),
+  #             textsize=3, size=0.5, vjust = -0.3,
+  #             y_position = 0.135, tip_length = c(0.2, 0.36, 0.03, 0.79, 0.1, 0.4, 0.02, 0.7),
+  #             step_increase = 0.35)
+  geom_signif(comparisons=list(c("p1S", "p1PS")),
+              annotations = c("p<0.002"),
               textsize=3, size=0.5, vjust = -0.3,
-              y_position = 0.135, tip_length = c(0.2, 0.36, 0.03, 0.79, 0.1, 0.4, 0.02, 0.7),
+              y_position = 0.157, tip_length = c(0.03, 0.79),
               step_increase = 0.35)
 
 plot_list_inc[[3]] <- plot_list_inc[[3]] +
@@ -234,7 +271,8 @@ bootstrap_v <- c("r2_INT_EduYears_1000.tsv", "r2_INT_OS_1000.tsv",
                  "r2_INT_Height_first_1000.tsv", "r2_INT_BMI_first_1000.tsv")
 
 # parameters for plotting
-titles <- c("Educational Attainment", "Occupational Status") 
+# titles <- c("Educational Attainment", "Occupational Status") 
+titles <- c("INT EA", "INT OS") 
 lim_list <- c(0.22, 0.17)
 steps = c(0.03, 0.03)
 
@@ -242,6 +280,7 @@ steps = c(0.03, 0.03)
 plot_list_inc <- list()
 plot_list <- list()
 pval_dt <- data.table()
+raw_table <- data.table()
 for(i in 1:2){
   
   r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
@@ -250,6 +289,7 @@ for(i in 1:2){
                                         r2_var = "r2", title = titles[i], 
                                         lim = lim_list[i], step = steps[i]))
   pval_dt <- rbind(pval_dt, compareR2(r2_res = r2_res, bootstrap = bootstrap, no_inc = T))
+  raw_table <- rbind(raw_table, makeR2table(r2_res = r2_res, bootstrap = bootstrap, trait = titles[i]))
   
 }
 
@@ -265,10 +305,15 @@ plot_list[[1]] <- plot_list[[1]] +
               step_increase = 0.3)
 
 plot_list[[2]] <- plot_list[[2]] +
-  geom_signif(comparisons=list(c("p2S", "p2PS"), c("p1S", "p1PS"), c("p1PS", "p2PS")),
-              annotations = c("p=0.024", "p<0.002", "p=0.004"),
+  # geom_signif(comparisons=list(c("p2S", "p2PS"), c("p1S", "p1PS"), c("p1PS", "p2PS")),
+  #             annotations = c("p=0.024", "p<0.002", "p=0.004"),
+  #             textsize=3, size=0.5, vjust = -0.3,
+  #             y_position = 0.135, tip_length = c(0.2, 0.36, 0.03, 0.79, 0.1, 0.4, 0.02, 0.7),
+  #             step_increase = 0.35)
+  geom_signif(comparisons=list(c("p1S", "p1PS"), c("p1PS", "p2PS")),
+              annotations = c("p<0.002", "p=0.004"),
               textsize=3, size=0.5, vjust = -0.3,
-              y_position = 0.135, tip_length = c(0.2, 0.36, 0.03, 0.79, 0.1, 0.4, 0.02, 0.7),
+              y_position = 0.15, tip_length = c(0.03, 0.79, 0.1, 1.1),
               step_increase = 0.35)
 
 plot_list[[3]] <- plot_list[[3]] +
@@ -287,6 +332,8 @@ plot_list[[4]] <- plot_list[[4]] +
 
 
 saveRDS(plot_list[1:4], "~/EA_heritability/figures/paper/revision/files_for_figures/fig5_INT_abde.rds")
-
+write.table(pval_dt, "~/EA_heritability/figures/paper/revision/r2_pval_INT.tsv", row.names = F, quote = F, sep = "\t")
+write.table(raw_table, "~/EA_heritability/figures/paper/revision/r2_estimates_INT.tsv",
+            row.names = F, quote = F, sep = "\t")
 
 
