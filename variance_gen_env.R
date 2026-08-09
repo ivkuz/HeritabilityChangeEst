@@ -4,8 +4,11 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 
+#########################
+# kin 0.05 noAgeatAgr ###
+#########################
 
-traits <- c("kin2.05", "OS_kin0.05", "Height_kin0.05", "BMI_kin0.05")
+traits <- c("kin0.05_noAgeAtAgr", "OS_kin0.05_noAgeAtAgr", "Height_kin0.05_noAgeAtAgr", "BMI_kin0.05_noAgeAtAgr")
 names <- c("EA", "OS", "Height", "BMI")
 plots <- list()
 results <- data.frame()
@@ -13,12 +16,12 @@ results <- data.frame()
 for(j in 1:4){
   
   trait <- traits[j]
-  if(trait == "kin2.05"){
+  if(trait == "kin0.05_noAgeAtAgr"){
     trait_name <- "Educational Attainment"
-  }else if(trait == "OS_kin0.05"){
+  }else if(trait == "OS_kin0.05_noAgeAtAgr"){
     trait_name <- "Occupational Status"
   }else {
-    trait_name <- sub("_kin0.05", "", trait)
+    trait_name <- sub("_kin0.05_noAgeAtAgr", "", trait)
   }
 
   res <- data.table()
@@ -72,10 +75,10 @@ for(j in 1:4){
   
 }
 
-write.table(results, "~/EA_heritability/figures/paper/revision/var_GE_ages.tsv", 
+write.table(results, "~/EA_heritability/figures/paper/revision/var_GE_ages_kin0.05_noAgeatAgr.tsv", 
             row.names = F, quote = F, sep = "\t")
 
-pdf("~/EA_heritability/figures/paper/revision/var_GE_ages.pdf", width=7, height = 6)
+pdf("~/EA_heritability/figures/paper/revision/var_GE_ages_kin0.05_noAgeatAgr.pdf", width=7, height = 6)
 
 print(
   grid.arrange(
@@ -90,3 +93,4 @@ grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("d", x = 0.52, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
+
