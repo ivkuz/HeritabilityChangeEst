@@ -563,8 +563,8 @@ dev.off()
 # For figure 5
 # pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PRS_EA", title = "", xl = "Decade of birth", ylims = c(0.023, 0.125), step=0.03)
 # pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PRS_EA", title = "", xl = "Decade of birth", ylims = c(0.015, 0.115), step=0.03)
-pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.041, 0.22), step=0.03)
-pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.0215, 0.17), step=0.03)
+pl3 <- r2Decades(ebb_test = ebb_test, trait = "EduYears", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.036, 0.18), step=0.03)
+pl4 <- r2Decades(ebb_test = ebb_test, trait = "OS", age = "Age", prs = "PGI_EA", title = "", xl = "Decade of birth", ylims = c(0.0245, 0.17), step=0.03)
 
 plot_list <- list(pl3[[1]][[1]], pl4[[1]][[1]])
 
