@@ -218,9 +218,9 @@ selected_lines <- c(
   "ldak_BMI_kin0.05_p1s_15.reml", "ldak_BMI_kin0.05_p1ps_15.reml", 
   "ldak_EA_binary_kin0.05_p1s_15.reml.liab", "ldak_EA_binary_kin0.05_p1ps_15.reml.liab", 
   "ldak_kin0.05_p2s_15.reml", "ldak_kin0.05_p2ps_15.reml", 
-  "ldak_OS_kin0.05_p2s_15.reml", "ldak_OS_kin0.05_p2ps_15.reml", 
-  "ldak_Height_kin0.05_p2s_15.reml", "ldak_Height_kin0.05_p2ps_15.reml", 
-  "ldak_BMI_kin0.05_p2s_15.reml", "ldak_BMI_kin0.05_p2ps_15.reml", 
+  "ldak_OS_kin0.05_p2s_15.reml", "ldak_OS_kin1.05_p2ps_15.reml", 
+  "ldak_Height_kin0.05_p2s_15.reml", "ldak_Height_kin1.05_p2ps_15.reml", 
+  "ldak_BMI_kin0.05_p2s_15.reml", "ldak_BMI_kin1.05_p2ps_15.reml", 
   "ldak_EA_binary_kin0.05_p2s_15.reml.liab", "ldak_EA_binary_kin0.05_p2ps_15.reml.liab", 
   
   "ldak_kin0.05_s_10.reml", "ldak_kin0.05_ps_10.reml", 
@@ -360,28 +360,36 @@ write.table(reml_res_selected, "~/EA_heritability/figures/paper/revision/h2_esti
 # Cutoff 15, both waves together #
 # EA
 reml_names <- c("ldak_kin0.05_s_15.reml", "ldak_ps_15.reml")
+pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "EA", step = 0.1) #, lim = c(-0.2, 0.9)
 df12 <- compareH2(reml_res = reml_res, names = reml_names)
 # OS
 reml_names <- c("ldak_OS_kin0.05_s_15.reml", "ldak_OS_kin0.05_ps_15.reml")
+pl14 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "OS", step = 0.05) #, lim = c(-0.05, 1.1)
 df14 <- compareH2(reml_res = reml_res, names = reml_names)
 # Height
 reml_names <- c("ldak_Height_kin0.05_s_15.reml", "ldak_Height_kin0.05_ps_15.reml")
+pl15 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Height", step = 0.2) #, lim = c(-0.05, 1.1)
 df15 <- compareH2(reml_res = reml_res, names = reml_names)
 # BMI
 reml_names <- c("ldak_BMI_kin0.05_s_15.reml", "ldak_BMI_kin0.05_ps_15.reml")
+pl16 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "BMI", step = 0.1) #, lim = c(-0.05, 1.15)
 df16 <- compareH2(reml_res = reml_res, names = reml_names)
 # Cutoff 15, by wave #
 # EA
 reml_names <- c("ldak_kin0.05_p1s_15.reml", "ldak_kin0.05_p1ps_15.reml", "ldak_kin0.05_p2s_15.reml", "ldak_kin0.05_p2ps_15.reml")
+pl22 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.3) #, lim = c(-0.2, 0.9)
 df22 <- compareH2(reml_res = reml_res, names = reml_names)
 # OS
 reml_names <- c("ldak_OS_kin0.05_p1s_15.reml", "ldak_OS_kin0.05_p1ps_15.reml", "ldak_OS_kin0.05_p2s_15.reml", "ldak_OS_kin1.05_p2ps_15.reml")
+pl24 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.3) #, lim = c(-0.05, 1.1)
 df24 <- compareH2(reml_res = reml_res, names = reml_names)
 # Height
 reml_names <- c("ldak_Height_kin0.05_p1s_15.reml", "ldak_Height_kin0.05_p1ps_15.reml", "ldak_Height_kin0.05_p2s_15.reml", "ldak_Height_kin1.05_p2ps_15.reml")
+pl25 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.3) #, lim = c(0, 1.15)
 df25 <- compareH2(reml_res = reml_res, names = reml_names)
 # BMI
 reml_names <- c("ldak_BMI_kin0.05_p1s_15.reml", "ldak_BMI_kin0.05_p1ps_15.reml", "ldak_BMI_kin0.05_p2s_15.reml", "ldak_BMI_kin1.05_p2ps_15.reml")
+pl26 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "", step = 0.3) #, lim = c(-0.05, 1.15)
 df26 <- compareH2(reml_res = reml_res, names = reml_names)
 
 # cutoff 15, collect p-value results in a table
@@ -396,6 +404,8 @@ df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
 df_p[, Trait := c("EA", "OS", "Height", "BMI")]
 df_p[, cutoff := 15]
 df_p_cutoff15 <- df_p
+
+plots_15 <- list(pl12, pl22, pl14, pl24, pl15, pl25, pl16, pl26)
 
 ########################
 # Supplementary Fig. 2 #
@@ -466,27 +476,31 @@ write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_kin0.05_main_pval
 
 
 # cutoff 10, collect plots
-plots <- list(pl12, pl22, pl14, pl24, pl15, pl25, pl16, pl26)
+plots_10 <- list(pl12, pl22, pl14, pl24, pl15, pl25, pl16, pl26)
 
 # Make the plot 
-pdf("~/EA_heritability/figures/paper/revision/h2_main_10.pdf", width=5.5, height=6)
+pdf("~/EA_heritability/figures/paper/revision/h2_main_kin0.05_15_10.pdf", width=5.5, height=6)
 
-print(
-  grid.arrange(
-    grobs = plots,
-    layout_matrix = matrix(1:8, ncol = 2, byrow = T),
-    widths = c(1, 1.5)
+for(plots in list(plots_15, plots_10)){
+  
+  print(
+    grid.arrange(
+      grobs = plots,
+      layout_matrix = matrix(1:8, ncol = 2, byrow = T),
+      widths = c(1, 1.5)
+    )
   )
-)
-
-grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("c", x = 0.02, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("d", x = 0.42, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("e", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("f", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("g", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
-grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+  
+  grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("c", x = 0.02, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("d", x = 0.42, y = 0.73, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("e", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("f", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("g", x = 0.02, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
+  
+}
 
 dev.off()
 
@@ -502,10 +516,24 @@ dev.off()
 # GCTA #
 ########
 
+# relaxed-threshold
+# no waves
+reml_files <- c("s", "ps")
+reml_res_gcta <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = ".hsq")
+pl11_2nd_degree <- plotH2(reml_res = reml_res_gcta, names = reml_res_gcta$name, errors = "CI", title = "EA, GCTA, relaxed", step = 0.1) #, lim = c(0, 0.4)
+df11_2nd_degree <- compareH2(reml_res = reml_res_gcta, names = reml_res_gcta$name)
+
+# by wave
+reml_files <- c("p1s", "p1ps", "p2s", "p2ps")
+reml_res_gcta <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = ".hsq")
+pl21_2nd_degree <- plotH2(reml_res = reml_res_gcta, names = reml_res_gcta$name, errors = "CI", title = "", step = 0.1) #, lim = c(0, 0.4)
+df21_2nd_degree <- compareH2(reml_res = reml_res_gcta, names = reml_res_gcta$name)
+
+# stringent-threshold
 # no waves
 reml_files <- c("s", "ps")
 reml_res_gcta <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results/", suffix = "_kin0.05.hsq")
-pl11 <- plotH2(reml_res = reml_res_gcta, names = reml_res_gcta$name, errors = "CI", title = "EA, GCTA", step = 0.1) #, lim = c(0, 0.4)
+pl11 <- plotH2(reml_res = reml_res_gcta, names = reml_res_gcta$name, errors = "CI", title = "EA, GCTA, stringent", step = 0.1) #, lim = c(0, 0.4)
 df11 <- compareH2(reml_res = reml_res_gcta, names = reml_res_gcta$name)
 
 # by wave
@@ -514,7 +542,7 @@ reml_res_gcta <- getH2table(reml_files, prefix = "~/EA_heritability/gcta/results
 pl21 <- plotH2(reml_res = reml_res_gcta, names = reml_res_gcta$name, errors = "CI", title = "", step = 0.1) #, lim = c(0, 0.4)
 df21 <- compareH2(reml_res = reml_res_gcta, names = reml_res_gcta$name)
 
-
+plots_GCTA <- list(pl11, pl21, pl11_2nd_degree, pl21_2nd_degree)
 
 # binary EA, cutoff 15
 reml_names <- c("ldak_EA_binary_kin0.05_s_15.reml.liab", "ldak_EA_binary_kin0.05_ps_15.reml.liab")
@@ -540,21 +568,41 @@ df23 <- compareH2(reml_res = reml_res, names = reml_names)
 
 
 # p-value table
-df1 <- list(df11, df12, df13)
-df2 <- list(df21, df22, df23)
+df1 <- list(df11, df11_2nd_degree) #, df12, df13)
+df2 <- list(df21, df21_2nd_degree) #, df22, df23)
 df_p <- data.frame()
-for(i in 1:3){
+# for(i in 1:3){
+for(i in 1:2){
   df_p_tmp <- cbind(df1[[i]], df2[[i]])
   df_p <- rbind(df_p, df_p_tmp)
 }
 df_p <- as.data.table(format(df_p, scientific = TRUE, digits = 2))
-df_p[, Trait := c("EA, GCTA", "EA, bin, 15", "EA, bin, 10")]
-write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_suppl_pval.tsv",
+# df_p[, Trait := c("EA, GCTA, kin0.05", "EA, bin, 15", "EA, bin, 10")]
+df_p[, thresh := c("kin0.05", "2nd_deg")]
+# write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_suppl_pval.tsv",
+write.table(df_p, "~/EA_heritability/figures/paper/revision/h2_suppl_EA_GCTA.tsv",
             row.names = F, quote = F, sep = "\t")
 
 plots <- list(pl11, pl21, pl12, pl22, pl13, pl23)
 
 # Make the plot
+pdf("~/EA_heritability/figures/paper/revision/h2_EA_GCTA.pdf", width=5.5, height=3)
+print(
+  grid.arrange(
+    grobs = plots_GCTA,
+    layout_matrix = matrix(1:4, ncol = 2, byrow = T),
+    widths = c(1, 1.5)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("d", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+
+dev.off()
+
+
 pdf("~/EA_heritability/figures/paper/revision/h2_suppl.pdf", width=5.5, height=4.5)
 print(
   grid.arrange(
