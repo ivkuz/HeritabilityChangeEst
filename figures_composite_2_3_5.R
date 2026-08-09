@@ -63,19 +63,19 @@ dev.off()
 
 
 
-# fig5abde <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5abde_weakPGS.rds")
-fig5abde <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5abde.rds")
+fig5abde <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5abde_weakPGS.rds")
+# fig5abde <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5abde.rds")
 fig5abde <- list(ggplotGrob(fig5abde[[1]]), ggplotGrob(fig5abde[[2]]), ggplotGrob(fig5abde[[3]]), ggplotGrob(fig5abde[[4]]))
 # fig5cf <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf_weakPGS.rds")
-# fig5cf <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf_weakPGS_noAgeAtAgr.rds")
-fig5cf <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf.rds")
+fig5cf <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf_weakPGS_noAgeAtAgr.rds")
+# fig5cf <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf.rds")
 # fig5cf <-  readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/fig5cf_noAgeAtAgr.rds")
 
 fig5 <- c(fig5abde, fig5cf)
 
 # pdf("~/EA_heritability/figures/paper/revision/figure5_weakPGS.pdf", width=7.5, height=5.25)
-# pdf("~/EA_heritability/figures/paper/revision/figure5_weakPGS_noAgeAtAgr.pdf", width=7.5, height=5.25)
-pdf("~/EA_heritability/figures/paper/revision/figure5.pdf", width=7.5, height=5.25)
+pdf("~/EA_heritability/figures/paper/revision/figure5_weakPGS_noAgeAtAgr.pdf", width=7.5, height=5.25)
+# pdf("~/EA_heritability/figures/paper/revision/figure5.pdf", width=7.5, height=5.25)
 # pdf("~/EA_heritability/figures/paper/revision/figure5_noAgeAtAgr.pdf", width=7.5, height=5.25)
 
 print(
@@ -120,6 +120,29 @@ grid.text("c", x = 0.64, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("d", x = 0.02, y = 0.5, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("e", x = 0.26, y = 0.5, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("f", x = 0.64, y = 0.5, gp = gpar(fontsize=14, fontface = "bold"))
+
+dev.off()
+
+
+
+fig5abde <- list(fig5abde[[1]], fig5abde[[2]])
+fig5cf <-  fig5cf[1]
+
+fig5 <- c(fig5abde, fig5cf)
+
+pdf("~/EA_heritability/figures/paper/revision/figure5_INT_ea.pdf", width=7.5, height=2.625)
+
+print(
+  grid.arrange(
+    grobs = fig5,
+    layout_matrix = matrix(1:3, nrow = 1),
+    widths = c(1, 1.55, 1.55)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.26, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("c", x = 0.64, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
 
