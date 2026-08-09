@@ -134,6 +134,38 @@ colnames(ebb) <- c("skood", "ParishBirth", "ParishRes", "Age_meas", "BMI", "Heig
 ebb <- merge(estbb_filtered, ebb, by="skood")
 ebb <- ebb[Nat=="Eestlane", ]
 
+
+# Process Height & BMI
+# Extract the first measurements
+ebb_hb <- ebb[, c("skood", "Age_meas", "BMI", "Height")]
+ebb_hb[, Age_first := getValue(trait_vector = Age_meas, measurement = "first")]
+ebb_hb[, BMI_first := getValue(trait_vector = BMI, measurement = "first")]
+ebb_hb[, Height_first := getValue(trait_vector = Height, measurement = "first")]
+# Exclude empty values
+ebb_hb <- ebb_hb[!(is.na(Age_first) | is.na(BMI_first) | is.na(Height_first)), ]
+
+# Extract the last measurements
+ebb_hb[, Age_last := getValue(trait_vector = Age_meas, measurement = "last")]
+ebb_hb[, BMI_last := getValue(trait_vector = BMI, measurement = "last")]
+ebb_hb[, Height_last := getValue(trait_vector = Height, measurement = "last")]
+
+# Exclude zero values
+ebb_hb <- ebb_hb[BMI_first != 0 & BMI_last != 0 & Height_first != 0 & Height_last != 0]
+# Transform to the logarithmic scale
+ebb_hb[, BMI_first := log10(BMI_first)]
+ebb_hb[, BMI_last := log10(BMI_last)]
+ebb_hb[, Height_first := log10(Height_first)]
+ebb_hb[, Height_last := log10(Height_last)]
+
+# Exclude outliers 
+ebb_hb <- ebb_hb[abs(BMI_first-mean(BMI_first))<4*sd(BMI_first) &
+                   abs(BMI_last-mean(BMI_last))<4*sd(BMI_last) &
+                   abs(Height_first-mean(Height_first))<4*sd(Height_first) &
+                   abs(Height_last-mean(Height_last))<4*sd(Height_last),]
+
+ebb <- merge(ebb, ebb_hb, by="skood", all.x = TRUE)
+
+
 # Upload and process EA
 ebb2 <- fread("~/EBB_project/phenotypes/query_bmi_edu.tsv")
 ebb2 <- ebb2[, c("Person skood", "PersonPortrait lastEducation code")]
@@ -274,7 +306,7 @@ run_all_models <- function(outcome, data, family = NULL, pcs = 40,
 }
 
 # ---- Format table for forest plot ----
-format_forest_table <- function(tab_list, is_logistic = FALSE, include_PRS_YoB = TRUE) {
+format_forest_table <- function(tab_list, is_logistic = FALSE, include_PRS_YoB = TRUE, n_tests = 4) {
   # adjust row selection depending on whether PRS*YoB is present
   n_terms <- if (include_PRS_YoB) c(4, 3, 3) else c(3, 2, 2)
   
@@ -298,9 +330,11 @@ format_forest_table <- function(tab_list, is_logistic = FALSE, include_PRS_YoB =
   
   tab_all[, `:=`(
     interact = factor(interact_vals, levels = full_levels),  # fixed
-    wave = factor(wave_vals, levels = c("Waves 1 & 2", "Wave 1", "Wave 2")),
-    sign = p < 0.05
+    wave = factor(wave_vals, levels = c("Waves 1 & 2", "Wave 1", "Wave 2"))
   )]
+  
+  tab_all[wave == "Waves 1 & 2", sign := p < 0.05/4]
+  tab_all[wave %in% c("Wave 1", "Wave 2"), sign := p < 0.05/8]
   
   # Compute CI or OR CI
   if (is_logistic) {
@@ -369,55 +403,82 @@ saveCoefTabs <- function(tab_list, trait, prefix, suffix){
 
 # Linear model for years of education
 lm_years <- run_all_models("EA_p_years", ebb_test)
-tab_lm_all <- format_forest_table(lm_years)
-lm_plot <- make_forest_plot(tab_lm_all, "EA (years of education)", "Beta (95% CI)")
-saveCoefTabs(tab_list = lm_years, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "EA", suffix = "withYoB_15")
+tab_lm_years_all <- format_forest_table(lm_years)
+lm_years_plot <- make_forest_plot(tab_lm_years_all, "EA (years of education)", "Beta (95% CI)")
+# saveCoefTabs(tab_list = lm_years, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "EA", suffix = "withYoB_15")
 
 lm_years <- run_all_models("EA_p_years", ebb_test, include_PRS_YoB = FALSE)
-tab_lm_all <- format_forest_table(lm_years, include_PRS_YoB = FALSE)
-lm_plot_noYoB <- make_forest_plot(tab_lm_all, "", "Beta (95% CI)")
-saveCoefTabs(tab_list = lm_years, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "EA", suffix = "noYoB_15")
+tab_lm_years_all <- format_forest_table(lm_years, include_PRS_YoB = FALSE)
+lm_years_plot_noYoB <- make_forest_plot(tab_lm_years_all, "", "Beta (95% CI)")
+# saveCoefTabs(tab_list = lm_years, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "EA", suffix = "noYoB_15")
 
 # Linear model for occupational status
 lm_os <- run_all_models("OS", ebb_test)
 tab_lm_OS_all <- format_forest_table(lm_os)
 lm_OS_plot <- make_forest_plot(tab_lm_OS_all, "Occupational status", "Beta (95% CI)")
-saveCoefTabs(tab_list = lm_years, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "OS", suffix = "withYoB_15")
+# saveCoefTabs(tab_list = lm_os, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "OS", suffix = "withYoB_15")
 
 
 lm_os <- run_all_models("OS", ebb_test, include_PRS_YoB = FALSE)
 tab_lm_OS_all <- format_forest_table(lm_os, include_PRS_YoB = FALSE)
 lm_OS_plot_noYoB <- make_forest_plot(tab_lm_OS_all, "", "Beta (95% CI)")
-saveCoefTabs(tab_list = lm_years, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "EA", suffix = "noYoB_15")
+# saveCoefTabs(tab_list = lm_os, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "OS", suffix = "noYoB_15")
 
-plot_lm_list <- list(lm_plot, lm_plot_noYoB, lm_OS_plot, lm_OS_plot_noYoB)
+plot_lm_list <- list(lm_years_plot, lm_years_plot_noYoB, lm_OS_plot, lm_OS_plot_noYoB)
 
 # Logistic model for binary education
-glm_binary <- run_all_models("EA_p_binary", ebb_test, family = binomial(link = "logit"))
-tab_logm_all <- format_forest_table(glm_binary, is_logistic = TRUE)
-logm_plot <- make_forest_plot(tab_logm_all, "EA (university degree)", "Odds Ratio (95% CI)")
-saveCoefTabs(tab_list = lm_years, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "EA_binary", suffix = "withYoB_15")
+glm_EA_binary <- run_all_models("EA_p_binary", ebb_test, family = binomial(link = "logit"))
+tab_EA_logm_all <- format_forest_table(glm_EA_binary, is_logistic = TRUE)
+logm_EA_plot <- make_forest_plot(tab_EA_logm_all, "EA (university degree)", "Odds Ratio (95% CI)")
+# saveCoefTabs(tab_list = glm_EA_binary, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "EA_binary", suffix = "withYoB_15")
 
-glm_binary <- run_all_models("EA_p_binary", ebb_test, 
+glm_EA_binary <- run_all_models("EA_p_binary", ebb_test, 
                              family = binomial(link = "logit"), include_PRS_YoB = FALSE)
-tab_logm_all <- format_forest_table(glm_binary, is_logistic = TRUE, include_PRS_YoB = FALSE)
-logm_plot_noYoB <- make_forest_plot(tab_logm_all, "", "Odds Ratio (95% CI)")
-saveCoefTabs(tab_list = lm_years, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "EA_binary", suffix = "noYoB_15")
+tab_EA_logm_all <- format_forest_table(glm_EA_binary, is_logistic = TRUE, include_PRS_YoB = FALSE)
+logm_EA_plot_noYoB <- make_forest_plot(tab_EA_logm_all, "", "Odds Ratio (95% CI)")
+# saveCoefTabs(tab_list = glm_EA_binary, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "EA_binary", suffix = "noYoB_15")
 
 # Logistic model for binary OS
 ebb_test[!is.na(OS), OS_binary := ifelse(OS < 7, 0, 1)]
-glm_binary <- run_all_models("OS_binary", ebb_test, family = binomial(link = "logit"))
-tab_logm_all <- format_forest_table(glm_binary, is_logistic = TRUE)
-logm_OS_plot <- make_forest_plot(tab_logm_all, "Occupational status (3/4 vs. 1/2)", "Odds Ratio (95% CI)")
-saveCoefTabs(tab_list = lm_years, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "OS_binary", suffix = "withYoB_15")
+glm_OS_binary <- run_all_models("OS_binary", ebb_test, family = binomial(link = "logit"))
+tab_OS_logm_all <- format_forest_table(glm_OS_binary, is_logistic = TRUE)
+logm_OS_plot <- make_forest_plot(tab_OS_logm_all, "Occupational status (3/4 vs. 1/2)", "Odds Ratio (95% CI)")
+# saveCoefTabs(tab_list = glm_OS_binary, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "OS_binary", suffix = "withYoB_15")
 
-glm_binary <- run_all_models("OS_binary", ebb_test, 
+glm_OS_binary <- run_all_models("OS_binary", ebb_test, 
                              family = binomial(link = "logit"), include_PRS_YoB = FALSE)
-tab_logm_all <- format_forest_table(glm_binary, is_logistic = TRUE, include_PRS_YoB = FALSE)
-logm_OS_plot_noYoB <- make_forest_plot(tab_logm_all, "", "Odds Ratio (95% CI)")
-saveCoefTabs(tab_list = lm_years, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "OS_binary", suffix = "noYoB_15")
+tab_OS_logm_all <- format_forest_table(glm_OS_binary, is_logistic = TRUE, include_PRS_YoB = FALSE)
+logm_OS_plot_noYoB <- make_forest_plot(tab_OS_logm_all, "", "Odds Ratio (95% CI)")
+# saveCoefTabs(tab_list = glm_OS_binary, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "OS_binary", suffix = "noYoB_15")
 
-plot_logm_list <- list(logm_plot, logm_plot_noYoB, logm_OS_plot, logm_OS_plot_noYoB)
+plot_logm_list <- list(logm_EA_plot, logm_EA_plot_noYoB, logm_OS_plot, logm_OS_plot_noYoB)
+
+
+
+# Linear model for height
+lm_height <- run_all_models("Height_first", ebb_test)
+tab_height_lm_all <- format_forest_table(lm_height)
+lm_height_plot <- make_forest_plot(tab_height_lm_all, "Height", "Beta (95% CI)")
+# saveCoefTabs(tab_list = lm_height, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "height", suffix = "withYoB_15")
+
+lm_height <- run_all_models("Height_first", ebb_test, include_PRS_YoB = FALSE)
+tab_height_lm_all <- format_forest_table(lm_height, include_PRS_YoB = FALSE)
+lm_height_plot_noYoB <- make_forest_plot(tab_height_lm_all, "", "Beta (95% CI)")
+# saveCoefTabs(tab_list = lm_height, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "height", suffix = "noYoB_15")
+
+# Linear model for BMI
+lm_BMI <- run_all_models("BMI_first", ebb_test)
+tab_BMI_lm_all <- format_forest_table(lm_BMI)
+lm_BMI_plot <- make_forest_plot(tab_BMI_lm_all, "BMI", "Beta (95% CI)")
+# saveCoefTabs(tab_list = lm_BMI, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "BMI", suffix = "withYoB_15")
+
+
+lm_BMI <- run_all_models("BMI_first", ebb_test, include_PRS_YoB = FALSE)
+tab_BMI_lm_all <- format_forest_table(lm_BMI, include_PRS_YoB = FALSE)
+lm_BMI_plot_noYoB <- make_forest_plot(tab_BMI_lm_all, "", "Beta (95% CI)")
+# saveCoefTabs(tab_list = lm_BMI, prefix = "~/EA_heritability/figures/paper/revision/regres_interact", trait = "BMI", suffix = "noYoB_15")
+
+plot_control_lm_list <- list(lm_height_plot, lm_height_plot_noYoB, lm_BMI_plot, lm_BMI_plot_noYoB)
 
 
 pdf("~/EA_heritability/figures/paper/revision/regres_interact_15.pdf", width=7, height=7)
@@ -446,6 +507,20 @@ grid.text("b", x = 0.52, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
 grid.text("d", x = 0.52, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
 
+
+print(
+  grid.arrange(
+    grobs = plot_control_lm_list,
+    layout_matrix = matrix(1:4, ncol = 2, byrow = T)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.52, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("d", x = 0.52, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+
+
 dev.off()
 
 
@@ -457,7 +532,7 @@ dev.off()
 
 library(gamlss)
 
-plotHereroscedastic <- function(s, pcs = 40, include_PRS_YoB = TRUE){
+plotHereroscedastic <- function(s, pcs = 40, include_PRS_YoB = TRUE, n_tests = 4){
   
   variables <- rownames(s)[1:(nrow(s)/2 - pcs)]
   # separate mu and sigma coefficients
@@ -486,7 +561,7 @@ plotHereroscedastic <- function(s, pcs = 40, include_PRS_YoB = TRUE){
   tab[, `:=`(
     interact = factor(interact_vals, levels = full_levels),  # fixed
     coef_type = factor(coef_type, levels = c("mu", "sigma")),
-    sign = p < 0.05,
+    sign = p < 0.05/n_tests,
     lower = beta - 1.96 * se,
     upper = beta + 1.96 * se
   )]
@@ -579,7 +654,7 @@ s2 <- readRDS("~/EA_heritability/figures/paper/revision/files_for_figures/hetero
 
 write.table(s1, "~/EA_heritability/figures/paper/revision/heteroschedRegrYoB.tsv",
             col.names = T, row.names = T, quote = F, sep = "\t")
-write.table(s1, "~/EA_heritability/figures/paper/revision/heteroschedRegrNoYoB.tsv",
+write.table(s2, "~/EA_heritability/figures/paper/revision/heteroschedRegrNoYoB.tsv",
             col.names = T, row.names = T, quote = F, sep = "\t")
 
 pl_list <- list(plotHereroscedastic(s1, pcs = 40, include_PRS_YoB = TRUE),
