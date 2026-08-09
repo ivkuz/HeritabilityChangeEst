@@ -63,7 +63,8 @@ r2 <- fread("~/EA_heritability/results/revision/r2_15_weighted_ci_alltraits.tsv"
 r2[, Era := factor(rep(rep(c("phase1\npost-soviet", "phase1\nsoviet", "phase2\npost-soviet", "phase2\nsoviet"), each = 4), 3),
                    levels = c("phase1\nsoviet", "phase1\npost-soviet", "phase2\nsoviet", "phase2\npost-soviet"))]
 r2[, weights := factor(weights, levels = c("original", "by group", "overall"))]
-
+write.table(r2, "~/EA_heritability/figures/paper/revision/r2_estimates_15_weighted_ci_alltraits.tsv", 
+            col.names = T, row.names = F, quote = F, sep = "\t")
 
 # Make palette
 # Red and blue shades (darker to lighter or vice versa)
