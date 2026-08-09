@@ -425,11 +425,10 @@ pl4b <- pl2
 reml_names <- c("ldak_Height_kin0.05_p1s_15.reml", "ldak_Height_kin0.05_p1ps_15.reml", "ldak_Height_kin0.05_p2s_15.reml", "ldak_Height_kin1.05_p2ps_15.reml")
 pl3 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Height", lim = c(0, 0.92), step = 0.2)
 df3 <- compareH2(reml_res = reml_res, names = reml_names)
-pl4c <- pl3 + geom_signif(comparisons=list(c("ldak_Height_kin0.05_p2s_15.reml", "ldak_Height_kin1.05_p2ps_15.reml"),
-                                           c("ldak_Height_kin0.05_p1s_15.reml", "ldak_Height_kin0.05_p2s_15.reml")),
-                          annotations = paste0("p=", round(c(df3[1, 2], df3[1, 3]), 3)),
+pl4c <- pl3 + geom_signif(comparisons=list(c("ldak_Height_kin0.05_p1s_15.reml", "ldak_Height_kin0.05_p2s_15.reml")),
+                          annotations = paste0("p=", format(df3[1, 3], scientific = T, digits = 2)),
                           textsize=3, size=0.5, vjust = -0.3,
-                          y_position = 0.75, tip_length = c(0.35, 0.25, 0.82, 0.15),
+                          y_position = 0.83, tip_length = c(0.77, 0.6),
                           step_increase = 0.25)
 
 # BMI
@@ -469,24 +468,25 @@ dev.off()
 reml_names <- c("ldak_pedigree_p1s_15.reml", "ldak_pedigree_p1ps_15.reml", "ldak_pedigree_p2s_15.reml", "ldak_pedigree_p2ps_15.reml")
 pl1 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Educational Attainment")
 df1 <- compareH2(reml_res = reml_res, names = reml_names)
-pl4a <- pl1 + geom_signif(comparisons=list(c("ldak_pedigree_p2s_15.reml", "ldak_pedigree_p2ps_15.reml")),
-                          annotations = paste0("p=", round(df1[1, 2], 3)),
-                          textsize=3, size=0.5, vjust = -0.3,
-                          y_position = 0.28, tip_length = c(0.15, 0.23),
-                          step_increase = 0.25)
-
+pl4a <- pl1 #+ 
+  # geom_signif(comparisons=list(c("ldak_pedigree_p2s_15.reml", "ldak_pedigree_p2ps_15.reml")),
+  #                         annotations = paste0("p=", format(df1[1, 2], scientific = TRUE, digits = 2)),
+  #                         textsize=3, size=0.5, vjust = -0.3,
+  #                         y_position = 0.28, tip_length = c(0.15, 0.23),
+  #                         step_increase = 0.25)
+  # 
 # OS
-reml_names <- c("ldak_OS_pedigree_p1s_15.reml", "ldak_OS_pedigree_p1ps_15.reml", "ldak_OS_pedigree_p2s_15.reml", "ldak_OS_kin1.05_p2ps_15.reml")
+reml_names <- c("ldak_OS_pedigree_p1s_15.reml", "ldak_OS_pedigree_p1ps_15.reml", "ldak_OS_pedigree_p2s_15.reml", "ldak_OS_pedigree_p2ps_15.reml")
 pl2 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Occupational Status", step = 0.1)
 df2 <- compareH2(reml_res = reml_res, names = reml_names)
 pl4b <- pl2
 
 
 # Height
-reml_names <- c("ldak_Height_pedigree_p1s_15.reml", "ldak_Height_pedigree_p1ps_15.reml", "ldak_Height_pedigree_p2s_15.reml", "ldak_Height_kin1.05_p2ps_15.reml")
+reml_names <- c("ldak_Height_pedigree_p1s_15.reml", "ldak_Height_pedigree_p1ps_15.reml", "ldak_Height_pedigree_p2s_15.reml", "ldak_Height_pedigree_p2ps_15.reml")
 pl3 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "Height", lim = c(0, 0.92), step = 0.2)
 df3 <- compareH2(reml_res = reml_res, names = reml_names)
-pl4c <- pl3 + geom_signif(comparisons=list(c("ldak_Height_pedigree_p2s_15.reml", "ldak_Height_kin1.05_p2ps_15.reml"),
+pl4c <- pl3 + geom_signif(comparisons=list(c("ldak_Height_pedigree_p2s_15.reml", "ldak_Height_pedigree_p2ps_15.reml"),
                                            c("ldak_Height_pedigree_p1s_15.reml", "ldak_Height_pedigree_p2s_15.reml")),
                           annotations = paste0("p=", format(c(df3[1, 2], df3[1, 3]), scientific = TRUE, digits = 2)),
                           textsize=3, size=0.5, vjust = -0.3,
@@ -494,10 +494,14 @@ pl4c <- pl3 + geom_signif(comparisons=list(c("ldak_Height_pedigree_p2s_15.reml",
                           step_increase = 0.25)
 
 # BMI
-reml_names <- c("ldak_BMI_pedigree_p1s_15.reml", "ldak_BMI_pedigree_p1ps_15.reml", "ldak_BMI_pedigree_p2s_15.reml", "ldak_BMI_kin1.05_p2ps_15.reml")
+reml_names <- c("ldak_BMI_pedigree_p1s_15.reml", "ldak_BMI_pedigree_p1ps_15.reml", "ldak_BMI_pedigree_p2s_15.reml", "ldak_BMI_pedigree_p2ps_15.reml")
 pl4 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "BMI")
 df4 <- compareH2(reml_res = reml_res, names = reml_names)
-pl4d <- pl4 
+pl4d <- pl4 + geom_signif(comparisons=list(c("ldak_BMI_pedigree_p2s_15.reml", "ldak_BMI_pedigree_p2ps_15.reml")),
+                          annotations = paste0("p=", format(df4[1, 2], scientific = TRUE, digits = 2)),
+                          textsize=3, size=0.5, vjust = -0.3,
+                          y_position = 0.37, tip_length = c(0.05, 0.18),
+                          step_increase = 0.25)
 
 
 # cutoff 10, collect plots
@@ -665,6 +669,29 @@ for(pl in list(pl_15[9:10], pl_10[9:10])){
   grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
   
 }
+
+dev.off()
+
+pdf("~/EA_heritability/figures/paper/revision/h2_EA_binary_pedigree.pdf", width=5.5, height=3)
+
+pl_15_10 <- list(pl_15[[9]] + ggtitle("Cutoff 15"),
+                pl_15[[10]] + ggtitle(""),
+                pl_10[[9]] + ggtitle("Cutoff 10"),
+                pl_10[[10]] + ggtitle(""))
+  
+print(
+  grid.arrange(
+    grobs = pl_15_10,
+    layout_matrix = matrix(1:4, ncol = 2, byrow = T),
+    widths = c(1, 1.5)
+  )
+)
+
+  grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("b", x = 0.42, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+  grid.text("d", x = 0.42, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+  
 
 dev.off()
 
