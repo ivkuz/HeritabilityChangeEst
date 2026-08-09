@@ -118,7 +118,7 @@ write.table(age_res, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBb
             row.names = F, quote = F, sep = "\t")
 
 # Make the GCTA h2 plot
-pl1 <- ggplot(age_res, 
+pl1_GCTA_2nd_deg <- ggplot(age_res, 
               aes(x = YoB, y = h2)) + 
   geom_point(aes(shape = YoB, color = YoB)) + 
   geom_errorbar(aes(ymin = (h2 - 1.96 * se), 
@@ -135,11 +135,11 @@ pl1 <- ggplot(age_res,
   scale_linewidth_manual(values = c(rep(c(0.5, 0.2), 5), 0.5)) +
   scale_color_manual(values = c(rep(rgb(254, 0, 0, maxColorValue = 254), 6), rgb(38, 65, 140, maxColorValue = 254),
                                 rep(rgb(80, 148, 205, maxColorValue = 254), 4))) +
-  ylab(bquote(h^2)) + ggtitle("EA, GCTA") + # xlab("Year of Birth") +
+  ylab(bquote(h^2)) + ggtitle("EA, GCTA, relaxed") + # xlab("Year of Birth") +
   scale_x_discrete(labels = function(x) ifelse(seq_along(x) %% 2 == 1, x, ""))
 
 # for the supplementary figure
-plots2 <- list(pl1, plots[[2]])
+plots2 <- list(pl1_GCTA_2nd_deg, plots[[2]])
 
 
 # # Figure 2
@@ -185,22 +185,22 @@ dev.off()
 
 # Upload LDAK h2 results for decade bins
 plots <- list()
-# traits <- c("EA", "EA_binary_liab", "OS", "Height", "BMI")
-# trait_names <- c("Educational Attainment", "University degree", "Occupational Status", "Height", "BMI")
-# limits <- c(0.32, NA, NA, 0.73, 0.4)
-# traits_for_table <- c("EA", "EA_binary", "OS", "Height", "BMI")
-traits <- c("EA", "OS", "Height", "BMI")
-trait_names <- c("Educational Attainment", "Occupational Status", "Height", "BMI")
-limits <- c(0.29, NA, 0.7, 0.4)
-traits_for_table <- c("EA", "OS", "Height", "BMI")
+traits <- c("EA", "EA_binary_liab", "OS", "Height", "BMI")
+trait_names <- c("Educational Attainment", "University degree", "Occupational Status", "Height", "BMI")
+limits <- c(0.32, NA, NA, 0.73, 0.4)
+traits_for_table <- c("EA", "EA_binary", "OS", "Height", "BMI")
+# traits <- c("EA", "OS", "Height", "BMI")
+# trait_names <- c("Educational Attainment", "Occupational Status", "Height", "BMI")
+# limits <- c(0.29, NA, 0.7, 0.4)
+# traits_for_table <- c("EA", "OS", "Height", "BMI")
 results_tab <- data.frame()
-# for(i in 1:5){
-for(i in 1:4){
+for(i in 1:5){
+# for(i in 1:4){
   
   trait <- traits[i]
-  # age_res <- fread(paste0("~/EA_heritability/gcta/results/ldak_age_h2_kin0.05_", trait, ".tsv"))
+  age_res <- fread(paste0("~/EA_heritability/gcta/results/ldak_age_h2_kin0.05_", trait, ".tsv"))
   # age_res <- fread(paste0("~/EA_heritability/gcta/results/ldak_age_h2_kin0.05_noAgeAtAgr_", trait, ".tsv"))
-  age_res <- fread(paste0("~/EA_heritability/gcta/results/ldak_age_h2_pedigree_noAgeAtAgr_", trait, ".tsv"))
+  # age_res <- fread(paste0("~/EA_heritability/gcta/results/ldak_age_h2_pedigree_noAgeAtAgr_", trait, ".tsv"))
   colnames(age_res) <- c("YoB", "h2", "se", "Size", "Mega_Intensity", "Int_SD")
   age_res$YoB <- factor(c("1941-1950", "1946-1955", "1951-1960", "1956-1965","1961-1970", 
                           "1966-1975", "1971-1980", "1976-1985", "1981-1990", "1986-1995", "1991-2000"), 
@@ -264,25 +264,124 @@ for(i in 1:4){
 }
 
 # for the main figure
-# plots1 <- list(plots[[1]], plots[[3]], plots[[4]], plots[[5]])
-plots1 <- list(plots[[1]], plots[[2]], plots[[3]], plots[[4]])
+plots1 <- list(plots[[1]], plots[[3]], plots[[4]], plots[[5]])
+# plots1 <- list(plots[[1]], plots[[2]], plots[[3]], plots[[4]])
 
 
 # saveRDS(plots[1], "~/EA_heritability/figures/paper/revision/files_for_figures/fig2d.rds")
 # saveRDS(c(plots[4], plots[5]), "~/EA_heritability/figures/paper/revision/files_for_figures/fig3cd.rds")
 
-# saveRDS(plots[1], "~/EA_heritability/figures/paper/revision/files_for_figures/fig2d_noAgeAtAgr.rds")
-# saveRDS(c(plots[4], plots[5]), "~/EA_heritability/figures/paper/revision/files_for_figures/fig3cd_noAgeAtAgr.rds")
+saveRDS(plots[1], "~/EA_heritability/figures/paper/revision/files_for_figures/fig2d_noAgeAtAgr.rds")
+saveRDS(c(plots[4], plots[5]), "~/EA_heritability/figures/paper/revision/files_for_figures/fig3cd_noAgeAtAgr.rds")
 
-saveRDS(plots[1], "~/EA_heritability/figures/paper/revision/files_for_figures/fig2d_pedigree_noAgeAtAgr.rds")
-saveRDS(c(plots[3], plots[4]), "~/EA_heritability/figures/paper/revision/files_for_figures/fig3cd_pedigree_noAgeAtAgr.rds")
+# saveRDS(plots[1], "~/EA_heritability/figures/paper/revision/files_for_figures/fig2d_pedigree_noAgeAtAgr.rds")
+# saveRDS(c(plots[3], plots[4]), "~/EA_heritability/figures/paper/revision/files_for_figures/fig3cd_pedigree_noAgeAtAgr.rds")
 
 # write.table(results_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_alltraits_kin0.05.tsv",
 #             row.names = F, quote = F, sep = "\t")
-# write.table(results_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_alltraits_kin0.05_noAgeAtAgr.tsv",
-#             row.names = F, quote = F, sep = "\t")
-write.table(results_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_alltraits_pedigree_noAgeAtAgr.tsv",
+write.table(results_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_alltraits_kin0.05_noAgeAtAgr.tsv",
             row.names = F, quote = F, sep = "\t")
+# write.table(results_tab, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBbins_alltraits_pedigree_noAgeAtAgr.tsv",
+#             row.names = F, quote = F, sep = "\t")
+
+
+
+#################################################
+# Supplementary Figure with four panels kin0.05 #
+#################################################
+
+plots <- list()
+traits <- c("EA", "EA_binary_liab", "OS", "Height", "BMI")
+trait_names <- c("Educational Attainment", "University degree", "Occupational Status", "Height", "BMI")
+limits <- c(NA, NA, NA, NA, NA)
+traits_for_table <- c("EA", "EA_binary", "OS", "Height", "BMI")
+results_tab <- data.frame()
+for(i in 1:5){
+  # for(i in 1:4){
+  
+  trait <- traits[i]
+  # age_res <- fread(paste0("~/EA_heritability/gcta/results/ldak_age_h2_kin0.05_", trait, ".tsv"))
+  age_res <- fread(paste0("~/EA_heritability/gcta/results/ldak_age_h2_kin0.05_noAgeAtAgr_", trait, ".tsv"))
+  # age_res <- fread(paste0("~/EA_heritability/gcta/results/ldak_age_h2_pedigree_noAgeAtAgr_", trait, ".tsv"))
+  colnames(age_res) <- c("YoB", "h2", "se", "Size", "Mega_Intensity", "Int_SD")
+  age_res$YoB <- factor(c("1941-1950", "1946-1955", "1951-1960", "1956-1965","1961-1970", 
+                          "1966-1975", "1971-1980", "1976-1985", "1981-1990", "1986-1995", "1991-2000"), 
+                        levels = c("1941-1950", "1946-1955", "1951-1960", "1956-1965","1961-1970", 
+                                   "1966-1975", "1971-1980", "1976-1985", "1981-1990", "1986-1995", "1991-2000"))
+  
+  age_res[YoB %in% c("1941-1950", "1946-1955", "1951-1960", "1956-1965","1961-1970", "1966-1975"), 
+          Era := "Soviet"]
+  age_res[YoB == "1971-1980", Era := "Transition"]
+  age_res[YoB %in% c("1976-1985", "1981-1990", "1986-1995", "1991-2000"), 
+          Era := "post-Soviet"]
+  age_res$Era <- factor(age_res$Era, levels = c("Soviet", "Transition", "post-Soviet"))
+  
+  age_res_tab <- age_res[, Trait := traits_for_table[i]]
+  age_res_tab <- age_res_tab[order(YoB), .(Trait, YoB, Era, h2, se)]
+  results_tab <- rbind(results_tab, age_res_tab)
+  
+  if(trait == "OS"){
+    age_res[YoB == "1991-2000", h2 := NA]
+  }
+  # age_res <- age_res[YoB != "1991-2000", ]
+  
+  
+  # Make the LDAK h2 plots
+  pl <- ggplot(age_res,
+               aes(x = YoB, y = h2, color = Era)) +
+    geom_point(aes(shape = YoB)) +
+    geom_errorbar(aes(ymin = (h2 - 1.96 * se),
+                      ymax = (h2 + 1.96 * se),
+                      linewidth = YoB),
+                  width = 0.2) + # , linewidth = 0.5
+    theme_bw() +
+    theme(text = element_text(size = 10),
+          title = element_text(size=8),
+          panel.grid.major.x = element_blank(),
+          axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+          legend.position = "none") +
+    scale_shape_manual(values = c(rep(c(19, 1), 5), 19)) +
+    scale_linewidth_manual(values = c(rep(c(0.5, 0.2), 5), 0.5)) +
+    scale_color_manual(values = c(rgb(254, 0, 0, maxColorValue = 254), rgb(38, 65, 140, maxColorValue = 254),
+                                  rgb(80, 148, 205, maxColorValue = 254))) +
+    ylab(bquote(h^2)) + # xlab("Decade of birth")  + # xlab("Year of Birth") +
+    scale_x_discrete(labels = function(x) ifelse(seq_along(x) %% 2 == 1, x, "")) +
+    guides(linewidth = "none", 
+           shape = "none") + ggtitle(traits[i])
+  
+  
+  plots <- append(plots, list(pl))
+  
+}
+
+# for the main figure
+plots1 <- list(plots[[1]], plots[[3]], plots[[4]], plots[[5]])
+# plots1 <- list(plots[[1]], plots[[2]], plots[[3]], plots[[4]])
+
+
+
+pdf("~/EA_heritability/figures/paper/revision/h2_ages_kin0.05_noAgeAtAgr.pdf", width=7/3*2, height = 5)
+
+print(
+  grid.arrange(
+    grobs = plots1,
+    layout_matrix = matrix(1:4, ncol = 2, byrow = T)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.52, y = 0.98, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("c", x = 0.02, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("d", x = 0.52, y = 0.48, gp = gpar(fontsize=14, fontface = "bold"))
+
+dev.off()
+
+
+
+
+
+
+
 
 
 # Upload GCTA h2 results for decade bins
@@ -300,7 +399,7 @@ write.table(age_res, "~/EA_heritability/figures/paper/revision/h2_estimates_YoBb
 # age_res <- age_res[YoB != "1991-2000", ]
 
 # Make the GCTA h2 plot
-pl1 <- ggplot(age_res, 
+pl1_GCTA_kin0.05 <- ggplot(age_res, 
               aes(x = YoB, y = h2)) + 
   geom_point(aes(shape = YoB, color = YoB)) + 
   geom_errorbar(aes(ymin = (h2 - 1.96 * se), 
@@ -317,11 +416,11 @@ pl1 <- ggplot(age_res,
   scale_linewidth_manual(values = c(rep(c(0.5, 0.2), 5), 0.5)) +
   scale_color_manual(values = c(rep(rgb(254, 0, 0, maxColorValue = 254), 6), rgb(38, 65, 140, maxColorValue = 254),
                                 rep(rgb(80, 148, 205, maxColorValue = 254), 4))) +
-  ylab(bquote(h^2)) + ggtitle("EA, GCTA") + # xlab("Year of Birth") +
+  ylab(bquote(h^2)) + ggtitle("EA, GCTA, stringent") + # xlab("Year of Birth") +
   scale_x_discrete(labels = function(x) ifelse(seq_along(x) %% 2 == 1, x, ""))
 
 # for the supplementary figure
-plots2 <- list(pl1, plots[[2]])
+plots2 <- list(pl1_GCTA_kin0.05, plots[[2]])
 
 
 
@@ -340,6 +439,23 @@ grid.text("b", x = 0.52, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
 
+
+# GCTA-GREML
+plots_GCTA <- list(pl1_GCTA_kin0.05, pl1_GCTA_2nd_deg)
+
+pdf("~/EA_heritability/figures/paper/revision/h2_ages3_suppl_GCTA.pdf", width=7/3*2, height = 2.5)
+
+print(
+  grid.arrange(
+    grobs = plots_GCTA,
+    layout_matrix = matrix(1:2, ncol = 2, byrow = T)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.52, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
+
+dev.off()
 
 ############################################################
 # INT EA ###################################################
@@ -379,7 +495,8 @@ pl <- ggplot(age_res,
   theme(text = element_text(size = 10),
         title = element_text(size=8),
         panel.grid.major.x = element_blank(),
-        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+        legend.position = "none") +
   scale_shape_manual(values = c(rep(c(19, 1), 5), 19)) +
   scale_linewidth_manual(values = c(rep(c(0.5, 0.2), 5), 0.5)) +
   scale_color_manual(values = c(rgb(254, 0, 0, maxColorValue = 254), rgb(38, 65, 140, maxColorValue = 254),
@@ -389,13 +506,32 @@ pl <- ggplot(age_res,
   guides(linewidth = "none", 
          shape = "none")
 
-pl
+# for the supplementary figure
+plots2 <- list(plots[[2]], pl + ggtitle("INT EA"))
 
-pdf("~/EA_heritability/figures/paper/revision/h2_ages_kin0.05_INT.pdf", width=5.5, height=2.5)
 
-plot(pl)
+# SF 3 Modified
+pdf("~/EA_heritability/figures/paper/revision/h2_ages_scales_noAgeAtAgr.pdf", width=7/3*2, height = 2.5)
+
+print(
+  grid.arrange(
+    grobs = plots2,
+    layout_matrix = matrix(1:2, ncol = 2, byrow = T)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.52, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
 
 dev.off()
+
+# pl
+# 
+# pdf("~/EA_heritability/figures/paper/revision/h2_ages_kin0.05_INT.pdf", width=5.5, height=2.5)
+# 
+# plot(pl)
+# 
+# dev.off()
 
 
 
@@ -424,7 +560,7 @@ pl <- ggplot(bin_res,
   scale_linewidth_manual(values = c(rep(c(0.5, 0.2), 5), 0.5)) +
   scale_color_manual(values = c(rgb(254, 0, 0, maxColorValue = 254),
                                 rgb(80, 148, 205, maxColorValue = 254))) +
-  ylab(bquote(h^2)) + xlab("Birth-year bin size (years since 1976)")  + 
+  ylab(bquote(h^2)) + xlab("Bandwidth (\u00B1 years from 1976)")  + 
   scale_x_discrete(labels = function(x) ifelse(seq_along(x) %% 2 == 1, x, "")) +
   guides(linewidth = "none", shape = "none")
 
@@ -455,7 +591,7 @@ pl_dif <- ggplot(bin_res_dif,
         panel.grid.major.x = element_blank()) +
   scale_shape_manual(values = c(rep(c(19, 1), 5), 19)) +
   scale_linewidth_manual(values = c(rep(c(0.5, 0.2), 5), 0.5)) +
-  ylab(bquote(Delta~h^2)) + xlab("Birth-year bin size (years since 1976)")  + 
+  ylab(bquote(Delta~h^2)) + xlab("Bandwidth (\u00B1 years from 1976)")  + 
   scale_x_discrete(labels = function(x) ifelse(seq_along(x) %% 2 == 1, x, "")) +
   scale_colour_viridis(
     option = "viridis",
