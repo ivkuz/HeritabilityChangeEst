@@ -57,28 +57,26 @@ Find a short description of what each of the scripts from the "scripts" director
   
     bayesian_estimates.R  -  Calculates Bayesian posterior estimates for differences in heritability, differences in polygenic-score variance explained, and PGS × era interaction effects. The script uses normal priors and produces posterior means, posterior standard deviations, 95% credible intervals, and probabilities of positive effects.
     
-Main analyses
+Software
 
-The repository therefore covers several complementary approaches to testing whether genetic influence on social outcomes changed following the end of the Soviet era:
+The analyses are implemented in R (version 4.4) and make use of packages including, depending on the script:
 
-Heritability comparisons
-Comparison of genetic and environmental contributions to variation in EA and other traits between Soviet and post-Soviet groups.
-Birth-cohort analyses
-Examination of changes in heritability and polygenic-score variance explained across overlapping birth-year cohorts.
-Polygenic-score analyses
-Estimation of the proportion of phenotypic variance explained by polygenic scores and comparison of these estimates between eras.
-Distribution matching
-Analyses designed to reduce the possibility that differences in the phenotype distributions between groups explain differences in PGS-based estimates.
-Weighting
-Analyses using weighted subsamples to account for differences in group composition.
-Original-sample analyses
-Additional analyses using the original sample definitions as robustness checks.
-G×E analyses
-Direct tests of interactions between genetic propensity, represented by polygenic scores, and the social environment/era.
-Additional robustness analyses
-Analyses using alternative phenotypic transformations, relatedness thresholds, participation waves, sex, settlement type, and other subgroup definitions.
-Data and computational requirements
+data.table, 
+ggplot2, 
+reshape2, 
+stringr, 
+grid, 
+gridExtra, 
+ggsignif, 
+psychometric, 
+readr, 
+readxl, 
+sjmisc, 
+ggpubr, 
+cowplot, 
+Hmisc, 
 
+Some analyses also rely on external genetic-analysis software and/or previously generated results, particularly GCTA and LDAK.
 The repository contains the R analysis code but does not contain the underlying individual-level data or intermediate genetic-analysis results.
 Because these data are not included in the repository, the scripts are intended to document and reproduce the analyses within the corresponding research environment rather than provide a completely self-contained pipeline.
 Some scripts also contain alternative or commented-out analyses. These are retained to document analysis decisions and intermediate approaches.
