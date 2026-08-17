@@ -128,8 +128,10 @@ compareR2 <- function(r2_res, bootstrap){
 }
 
 
-r2_res_v <- c("r2_adj_EA_p_years_origSample.tsv", "r2_adj_EA_a_order_origSample.tsv", "r2_adj_OS_origSample.tsv")
-bootstrap_v <- c("r2_adj_EA_p_years_origSample_1000.tsv", "r2_adj_EA_a_order_origSample_1000.tsv", "r2_adj_OS_origSample_1000.tsv")
+# r2_res_v <- c("r2_adj_EA_p_years_origSample.tsv", "r2_adj_EA_a_order_origSample.tsv", "r2_adj_OS_origSample.tsv")
+# bootstrap_v <- c("r2_adj_EA_p_years_origSample_1000.tsv", "r2_adj_EA_a_order_origSample_1000.tsv", "r2_adj_OS_origSample_1000.tsv")
+r2_res_v <- c("r2_adj_EA_p_years_origSample_newPGS.tsv", "r2_adj_EA_a_order_origSample_newPGS.tsv", "r2_adj_OS_origSample_newPGS.tsv")
+bootstrap_v <- c("r2_adj_EA_p_years_origSample_newPGS_1000.tsv", "r2_adj_EA_a_order_origSample_newPGS_1000.tsv", "r2_adj_OS_origSample_newPGS_1000.tsv")
 titles <- c("EA years", "EA categories", "OS")
 
 plot_list_inc <- list()
@@ -139,8 +141,10 @@ raw_table <- data.table()
 for(i in 1:3){
 
   # 1:10 are with all nationalities; 11:20 are with self-reported Estonians
-  r2_res <- fread(paste0("~/EA_heritability/results/", r2_res_v[i]))
-  bootstrap <- fread(paste0("~/EA_heritability/results/", bootstrap_v[i]))
+  # r2_res <- fread(paste0("~/EA_heritability/results/", r2_res_v[i]))
+  # bootstrap <- fread(paste0("~/EA_heritability/results/", bootstrap_v[i]))
+  r2_res <- fread(paste0("~/EA_heritability/results/revision/", r2_res_v[i]))
+  bootstrap <- fread(paste0("~/EA_heritability/results/revision/", bootstrap_v[i]))
   plot_list_inc <- append(plot_list_inc, makeR2(r2_res = r2_res[, 1:10], bootstrap = bootstrap[, 1:10], 
                                                 r2_var = "r2_inc", title = titles[i]))
   plot_list <- append(plot_list, makeR2(r2_res = r2_res[, 1:10], bootstrap = bootstrap[, 1:10], 
@@ -158,13 +162,13 @@ for(i in 1:3){
 
 pval_dt <- as.data.table(pval_dt)
 pval_dt[, trait := rep(titles, each = 2)]
-write.table(pval_dt, "~/EA_heritability/figures/paper/r2_origSample_pval.tsv",
+write.table(pval_dt, "~/EA_heritability/figures/paper/revision/r2_origSample_newPGS_pval.tsv",
             row.names = F, quote = F, sep = "\t")
-write.table(raw_table, "~/EA_heritability/figures/paper/revision/r2_estimates_origSample_pval.tsv",
+write.table(raw_table, "~/EA_heritability/figures/paper/revision/r2_estimates_origSample_newPGS.tsv",
             row.names = F, quote = F, sep = "\t")
 
 
-pdf("~/EA_heritability/figures/paper/r2_origSample_1incr_2adj.pdf", width=5.5, height=6)
+pdf("~/EA_heritability/figures/paper/revision/r2_origSample_newPGS_1incr_2adj.pdf", width=5.5, height=6)
 
 # Plot incremental R2
 print(
