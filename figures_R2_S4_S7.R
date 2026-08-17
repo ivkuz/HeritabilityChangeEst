@@ -146,16 +146,23 @@ compareR2 <- function(r2_res, bootstrap){
 #               "r2_adj_log_Height_first_ukbb.tsv", "r2_adj_log_BMI_first_ukbb.tsv")
 # bootstrap_v <- c("r2_adj_EA_p_years_1000.tsv", "r2_adj_OS_OS_15y_1000.tsv", 
 #                  "r2_adj_log_Height_first_1000_ukbb.tsv", "r2_adj_log_BMI_first_1000_ukbb.tsv")
-r2_res_v <- c("r2_adj_EduYears.tsv", "r2_adj_OS.tsv", 
-              "r2_adj_Height_first.tsv", "r2_adj_BMI_first.tsv")
-bootstrap_v <- c("r2_adj_EduYears_1000.tsv", "r2_adj_OS_1000.tsv", 
-                 "r2_adj_Height_first_1000.tsv", "r2_adj_BMI_first_1000.tsv")
+# r2_res_v <- c("r2_adj_EduYears.tsv", "r2_adj_OS.tsv", 
+#               "r2_adj_Height_first.tsv", "r2_adj_BMI_first.tsv")
+# bootstrap_v <- c("r2_adj_EduYears_1000.tsv", "r2_adj_OS_1000.tsv", 
+#                  "r2_adj_Height_first_1000.tsv", "r2_adj_BMI_first_1000.tsv")
+r2_res_v <- c("r2_adj_EduYears_10y.tsv", "r2_adj_OS_10y.tsv", 
+              "r2_adj_Height_first_10y.tsv", "r2_adj_BMI_first_10y.tsv")
+bootstrap_v <- c("r2_adj_EduYears_10y_1000.tsv", "r2_adj_OS_10y_1000.tsv", 
+                 "r2_adj_Height_first_10y_1000.tsv", "r2_adj_BMI_first_10y_1000.tsv")
 titles <- c("EA", "OS", "Height", "BMI")
 # lim_list_inc <- c(0.105, 0.10, 0.15, 0.13)
 # lim_list <- c(0.11, 0.10, 0.32, 0.13)
 # steps = c(0.05, 0.05, 0.1, 0.05)
-lim_list_inc <- c(0.16, 0.135, 0.20, 0.15)
-lim_list <- c(0.165, 0.135, 0.42, 0.15)
+# lim_list_inc <- c(0.16, 0.135, 0.20, 0.15)
+# lim_list <- c(0.165, 0.135, 0.42, 0.15)
+# steps = c(0.05, 0.04, 0.1, 0.05)
+lim_list_inc <- c(0.18, 0.13, 0.21, 0.15)
+lim_list <- c(0.19, 0.135, 0.45, 0.15)
 steps = c(0.05, 0.04, 0.1, 0.05)
 
 plot_list_inc <- list()
@@ -180,13 +187,17 @@ for(i in 1:4){
 
 pval_dt <- as.data.table(pval_dt)
 pval_dt[, trait := rep(titles, each = 2)]
-write.table(pval_dt, "~/EA_heritability/figures/paper/revision/r2_pval.tsv",
+# write.table(pval_dt, "~/EA_heritability/figures/paper/revision/r2_pval.tsv",
+#             row.names = F, quote = F, sep = "\t")
+# write.table(raw_table, "~/EA_heritability/figures/paper/revision/r2_estimates.tsv",
+#             row.names = F, quote = F, sep = "\t")
+write.table(pval_dt, "~/EA_heritability/figures/paper/revision/r2_10y_pval.tsv",
             row.names = F, quote = F, sep = "\t")
-write.table(raw_table, "~/EA_heritability/figures/paper/revision/r2_estimates.tsv",
+write.table(raw_table, "~/EA_heritability/figures/paper/revision/r2_10y_estimates.tsv",
             row.names = F, quote = F, sep = "\t")
 
 
-pdf("~/EA_heritability/figures/paper/revision/r2_main.pdf", width=5.5, height=6)
+pdf("~/EA_heritability/figures/paper/revision/r2_main_10y.pdf", width=5.5, height=6)
 print(
   grid.arrange(
     grobs = plot_list_inc,
