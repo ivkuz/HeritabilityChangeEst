@@ -522,8 +522,8 @@ analyzeR2_untransmitted <- function(ebb_test, pheno, age, prs, bootstrap_n = 100
 estbb_filtered <- fread("~/EBB_project/phenotypes/EstBB_filtered.tsv")
 ebb <- fread("~/EBB_project/phenotypes/query1.tsv")
 ebb <- ebb[, c("Person skood", "PersonLocation birthParishName", "PersonLocation residencyParishName", 
-               "CONCATSTR(BMIAssembled ageAtBmi)", "CONCATSTR(BMIAssembled bmi)", "CONCATSTR(BMIAssembled height)")]
-colnames(ebb) <- c("skood", "ParishBirth", "ParishRes", "Age_meas", "BMI", "Height")
+               "CONCATSTR(BMIAssembled ageAtBmi)", "CONCATSTR(BMIAssembled bmi)", "CONCATSTR(BMIAssembled height)", "CONCATSTR(Education highestEducationLevel code)")]
+colnames(ebb) <- c("skood", "ParishBirth", "ParishRes", "Age_meas", "BMI", "Height", "EA_answerset")
 ebb <- merge(estbb_filtered, ebb, by="skood")
 ebb <- ebb[Nat=="Eestlane", ]
 
@@ -618,7 +618,8 @@ ebb <- merge(ebb, prs)
 
 
 # Upload the list of unrelated individuals for each group on Era and Participation Wave
-ind_list <- getIndepInd(cutoff = 15)
+# ind_list <- getIndepInd(cutoff = 15)
+ind_list <- getIndepInd(cutoff = 10)
 ind_01 <- ind_list[[1]]
 ind_02 <- ind_list[[2]]
 ind_11 <- ind_list[[3]]
@@ -657,7 +658,7 @@ for(i in 1:4){
   age <- ages[i]
   prs <- prses[i]
   
-  analyzeR2(ebb_test, pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/")
+  analyzeR2(ebb_test, pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_10y")
   
 }
 
@@ -1082,8 +1083,10 @@ saveRDS(r2_list, "~/EA_heritability/figures/paper/revision/files_for_figures/r2_
 # Original sample ####################
 ######################################
 
+library(readxl)
+
 # Main function for R2 analysis
-analyzeR2_origSample <- function(ebb_test, pheno, age, prs, analysis_title, pcs = 40, bootstrap_n = 1000){
+analyzeR2_origSample <- function(ebb_test, pheno, age, prs, ind_list, analysis_title, pc_n = 40, bootstrap_n = 1000){
   
   # Format analysed data
   colnames(ebb_test)[which(colnames(ebb_test)==pheno)] <- "Trait"
@@ -1115,7 +1118,7 @@ analyzeR2_origSample <- function(ebb_test, pheno, age, prs, analysis_title, pcs 
   n <- c() # for the table with main results
   
   # Bootstrap for each group
-  for(ind in list(ind_02, ind_01, ind_12, ind_11, ind_22, ind_21)){
+  for(ind in ind_list){
     
     set.seed(100)
     
@@ -1183,7 +1186,7 @@ analyzeR2_origSample <- function(ebb_test, pheno, age, prs, analysis_title, pcs 
   
   # Save bootstrap results
   colnames(dt) <- cohort
-  write.table(dt, paste0("~/EA_heritability/results/r2_adj_", pheno, "_origSample.tsv"),
+  write.table(dt, paste0("~/EA_heritability/results/r2_adj_", pheno, "_origSample_newPGS.tsv"),
               row.names = F, quote = F, sep = "\t")
   
   ################################################
@@ -1192,7 +1195,7 @@ analyzeR2_origSample <- function(ebb_test, pheno, age, prs, analysis_title, pcs 
             "All", "All", "S15", "S15", "PS15", "PS15", "S10", "S10", "PS10", "PS10")
   r2_res <- rbind(name, r2, round(rsq_all, 10), n)
   colnames(r2_res) <- cohort
-  write.table(r2_res, paste0("~/EA_heritability/results/r2_adj_log_", pheno, "_origSample.tsv"),
+  write.table(r2_res, paste0("~/EA_heritability/results/r2_adj_log_", pheno, "_origSample_newPGS.tsv"),
               row.names = F, quote = F, sep = "\t")
   
   
@@ -1200,10 +1203,10 @@ analyzeR2_origSample <- function(ebb_test, pheno, age, prs, analysis_title, pcs 
 
 
 # Make a copy of the dataset
-ebb_test <- ebb_test
+ebb_test <- ebb
 
 # Filter for the original sample
-origSample <- read_excel("~/EA_heritability/data/origSamples/2024-06-18_KRimfeld/I16_2024-06-18.xlsx")
+origSample <- read_excel("~/EA_heritability/data/origSamples/2024-06-18_KRimfeld/I16_2024-06-18_15506GD_VK.xlsx")
 ebb_test <- ebb_test[vkood %in% origSample$Vcode1, ]
 ebb_test <- ebb_test[YoA-YoB >= 25, ]
 
@@ -1227,9 +1230,10 @@ ind_list <- list(ind_all, ind15_s, ind15_ps, ind10_s, ind10_ps, ind_all_est, ind
 
 phenotypes <- c("EA_p_years", "EA_a_order", "OS")
 for(i in 1:4){
-  
+  print(i)
   pheno <- phenotypes[i]
-  analyzeR2_origSample(ebb_test, pheno=pheno, age = "Age", prs = "PRS_EA", pc_n = 40, bootstrap_n = 1000)
+  # analyzeR2_origSample(ebb_test, pheno=pheno, age = "Age", prs = "PRS_EA", pc_n = 40, bootstrap_n = 1000)
+  analyzeR2_origSample(ebb_test, pheno=pheno, age = "Age", prs = "PGI_EA", ind_list = ind_list, pc_n = 40, bootstrap_n = 1000)
   
 }
 
