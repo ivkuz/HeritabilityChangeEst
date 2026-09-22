@@ -581,6 +581,7 @@ settlement <- fread("~/EA_heritability/data/query_settletype.tsv")
 colnames(settlement) <- c("skood", "settlCode", "settlName")
 ebb <- merge(ebb, settlement, by="skood")
 
+ebb[, SES := rowMeans(as.data.frame(lapply(.SD, scale)), na.rm = F), .SDcols = c("OS", "EduYears")]
 
 
 # Upload PCA
@@ -618,8 +619,8 @@ ebb <- merge(ebb, prs)
 
 
 # Upload the list of unrelated individuals for each group on Era and Participation Wave
-# ind_list <- getIndepInd(cutoff = 15)
-ind_list <- getIndepInd(cutoff = 10)
+ind_list <- getIndepInd(cutoff = 15)
+# ind_list <- getIndepInd(cutoff = 10)
 ind_01 <- ind_list[[1]]
 ind_02 <- ind_list[[2]]
 ind_11 <- ind_list[[3]]
@@ -646,19 +647,19 @@ ebb_test[, cohort := ifelse(vkood %in% ind_11, "p1ps", ifelse(vkood %in% ind_12,
 ebb_test[, cohort := factor(cohort, levels = c("p1s", "p1ps", "p2s", "p2ps"))]
 
 
-ages <- c("Age", "Age", "Age_first", "Age_first")
-phenotypes <- c("EduYears", "OS", "Height_first", "BMI_first")
+ages <- c("Age", "Age", "Age_first", "Age_first", "Age")
+phenotypes <- c("EduYears", "OS", "Height_first", "BMI_first", "SES")
 # prses <- c("PRS_EA", "PRS_EA", "PRS_Height", "PRS_BMI")
-prses <- c("PGI_EA", "PGI_EA", "PGI_HEIGHT", "PGI_BMI")
+prses <- c("PGI_EA", "PGI_EA", "PGI_HEIGHT", "PGI_BMI", "PGI_EA")
 
-for(i in 1:4){
-
+for(i in 1:5){
+  
   print(phenotypes[i])
   pheno <- phenotypes[i]
   age <- ages[i]
   prs <- prses[i]
   
-  analyzeR2(ebb_test, pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_10y")
+  analyzeR2(ebb_test, pheno=pheno, age = ages[i], prs = prses[i], bootstrap_n = 1000, out = "~/EA_heritability/results/revision/", suff = "_15y")
   
 }
 
