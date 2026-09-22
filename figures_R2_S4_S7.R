@@ -802,3 +802,40 @@ grid.text("h", x = 0.42, y = 0.23, gp = gpar(fontsize=14, fontface = "bold"))
 
 
 dev.off()
+
+
+
+# SES
+# titles <- c("EA")
+# lim_list_inc <- c(0.18, 0.175, 0.45, 0.15)
+# steps_inc = c(0.05, 0.05, 0.1, 0.05)
+# lim_list <- c(0.18, 0.175, 0.45, 0.15)
+# steps = c(0.05, 0.05, 0.1, 0.05)
+r2_res <- fread("~/EA_heritability/results/revision/r2_adj_SES_15y.tsv")
+bootstrap <- fread("~/EA_heritability/results/revision/r2_adj_SES_15y_1000.tsv")
+plot_ses_inc <- makeR2(r2_res = r2_res, bootstrap = bootstrap, 
+                       r2_var = "r2_inc", title = "incremental R\u00B2")[[1]]
+plot_ses <- makeR2(r2_res = r2_res, bootstrap = bootstrap, 
+                   r2_var = "r2", title = "R\u00B2")[[1]]
+plots_ses <- list(plot_ses_inc, plot_ses)
+
+pval_dt <- compareR2(r2_res = r2_res, bootstrap = bootstrap)
+raw_table <- makeR2table(r2_res = r2_res, bootstrap = bootstrap, trait = "SES")
+
+write.table(pval_dt, "~/EA_heritability/figures/paper/revision/r2_pval_SES.tsv",
+            row.names = F, quote = F, sep = "\t")
+write.table(raw_table, "~/EA_heritability/figures/paper/revision/r2_estimates_SES.tsv",
+            row.names = F, quote = F, sep = "\t")
+
+pdf(paste0("~/EA_heritability/figures/paper/revision/r2_SES.pdf"), width=4.4, height=1.5)
+print(
+  grid.arrange(
+    grobs = plots_ses,
+    layout_matrix = matrix(1:2, ncol = 2, byrow = T)
+  )
+)
+
+grid.text("a", x = 0.02, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
+grid.text("b", x = 0.52, y = 0.96, gp = gpar(fontsize=14, fontface = "bold"))
+
+dev.off()
