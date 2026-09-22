@@ -1,6 +1,12 @@
+#############################################################
+### Inverse normal transformation of EA #####################
+### Computing SES as average between normalized EA and OS ###
+#############################################################
+
 library(data.table)
 library(readr)
 library(sjmisc)
+library(stringr)
 
 # Transfer personal data (register) EA from categories to Years of Education
 transformEAtoEduYears <- function(EA_vector, to="years"){
@@ -90,6 +96,25 @@ getValue <- function(trait_vector, measurement="first"){
   
 }
 
+# extract the Ocupational Status values
+getOccStat <- function(x) {
+  # Extract all numbers from the string
+  occupation <- str_extract_all(x, "\\d+")[[1]]
+  # Check if we have any numbers; if not, return NA
+  if (length(occupation) == 0) return(NA)
+  # Extract the first digit of each number and convert to numeric
+  categories <- as.numeric(substr(occupation, 1, 1))
+  # Check if we have only 0, which means work in armed forces; if yes, return NA
+  if (all(categories == 0)) return(NA)
+  categories <- categories[which(categories != 0)]
+  # Calculate and return the mean of the first digits
+  OS <- mean(categories, na.rm = TRUE)
+  # Inverse the scale
+  OS <- 10 - OS
+  
+  return(OS)
+  
+}
 
 
 # Upload main data
@@ -110,6 +135,22 @@ colnames(ebb2) <- c("skood", "EA_portrait")
 ebb <- merge(ebb, ebb2, by="skood")
 ebb[, EduYears := transformEAtoEduYears(EA_portrait, to="years")]
 ebb[is.na(EduYears), EduYears := NA]
+
+
+# Upload and process OS
+ebb2 <- fread("~/EA_heritability/data/query_OccupationStatus.tsv")
+ebb2 <- ebb2[, c("Person skood", "CONCATSTR(Work currentOccupation code)", "CONCATSTR(Work mainOccupation code)")]
+colnames(ebb2) <- c("skood", "curOcc", "mainOcc")
+ebb2[, curOcc := sapply(curOcc, getOccStat)]
+ebb2[, mainOcc := sapply(mainOcc, getOccStat)]
+ebb2[, OS := rowMeans(.SD, na.rm = T), .SDcols = c("curOcc", "mainOcc")]
+ebb2[is.na(OS), OS := NA]
+ebb <- merge(ebb, ebb2, by="skood")
+
+ebb[, SES := rowMeans(as.data.frame(lapply(.SD, scale)), na.rm = F), .SDcols = c("OS", "EduYears")]
+write.table(data.table(0, ebb[, .(vkood, SES)]), "~/EA_heritability/gcta/data/phenoLDAK_SES.tsv",
+            row.names = F, col.names = F, quote = F, sep = "\t")
+
 
 
 # Upload PCA
