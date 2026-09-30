@@ -146,7 +146,7 @@ for( reml_file in reml_files){
     reml_res <- rbind(reml_res, c(reml_file, h2, se))
     
   } else{
-    print(paste0(res_file, " doesn't exist"))
+    print(paste0(reml_file, " doesn't exist"))
   }
 }
 
@@ -261,7 +261,7 @@ selected_lines <- c(
   "ldak_OS_pedigree_p2s_15.reml", "ldak_OS_pedigree_p2ps_15.reml", 
   "ldak_Height_pedigree_p2s_15.reml", "ldak_Height_pedigree_p2ps_15.reml", 
   "ldak_BMI_pedigree_p2s_15.reml", "ldak_BMI_pedigree_p2ps_15.reml", 
-  "ldak_EA_binary_pedigree_p2s_15.reml.liab", "ldak_EA_binary_pedigree_p2ps_15.reml.liab", 
+  "ldak_EA_binary_pedigree_p2s_15.reml.liab", "ldak_EA_binary_pedigree_p2ps_15.reml.liab",
   
   "ldak_pedigree_s_10.reml", "ldak_pedigree_ps_10.reml", 
   "ldak_OS_pedigree_s_10.reml", "ldak_OS_pedigree_ps_10.reml", 
@@ -282,6 +282,12 @@ selected_lines <- c(
 reml_res_selected <- reml_res[match(selected_lines, reml_res$name), ]
 reml_res_selected <- data.table(Trait, Wave, Era, Cutoff, reml_res_selected[, name := NULL])
 write.table(reml_res_selected, "~/EA_heritability/figures/paper/revision/h2_estimates_main_pedigree.tsv",
+            row.names = F, quote = F, sep = "\t")
+
+selected_lines <- c("ldak_SES_pedigree_s_15.reml", "ldak_SES_pedigree_ps_15.reml")
+reml_res_selected <- reml_res[match(selected_lines, reml_res$name), ]
+reml_res_selected <- data.table("SES", "All", c("S", "PS"), "15", reml_res_selected[, name := NULL])
+write.table(reml_res_selected, "~/EA_heritability/figures/paper/revision/h2_estimates_SES_pedigree.tsv",
             row.names = F, quote = F, sep = "\t")
 
 
@@ -880,6 +886,18 @@ grid.text("f", x = 0.52, y = 0.30, gp = gpar(fontsize=14, fontface = "bold"))
 dev.off()
 
 
+# SES
 
+reml_names <- c("ldak_SES_pedigree_s_15.reml", "ldak_SES_pedigree_ps_15.reml")
+# pl12 <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "EA")
+pl_ses <- plotH2(reml_res = reml_res, names = reml_names, errors = "CI", title = "")
+df_ses <- compareH2(reml_res = reml_res, names = reml_names)
+write.table(df_ses, "~/EA_heritability/figures/paper/revision/h2_SES_pval.tsv",
+            row.names = F, quote = F, sep = "\t")
 
+pdf("~/EA_heritability/figures/paper/revision/h2_SES.pdf", width=2.2, height=1.5)
+
+print(pl_ses)
+
+dev.off()
 
