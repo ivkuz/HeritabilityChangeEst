@@ -814,9 +814,9 @@ dev.off()
 r2_res <- fread("~/EA_heritability/results/revision/r2_adj_SES_15y.tsv")
 bootstrap <- fread("~/EA_heritability/results/revision/r2_adj_SES_15y_1000.tsv")
 plot_ses_inc <- makeR2(r2_res = r2_res, bootstrap = bootstrap, 
-                       r2_var = "r2_inc", title = "incremental R\u00B2")[[1]]
+                       r2_var = "r2_inc", title = "Incremental")[[1]]
 plot_ses <- makeR2(r2_res = r2_res, bootstrap = bootstrap, 
-                   r2_var = "r2", title = "R\u00B2")[[1]]
+                   r2_var = "r2", title = "Pre-adjusted trait")[[1]]
 plots_ses <- list(plot_ses_inc, plot_ses)
 
 pval_dt <- compareR2(r2_res = r2_res, bootstrap = bootstrap)
